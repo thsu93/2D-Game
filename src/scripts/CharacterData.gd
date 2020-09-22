@@ -6,11 +6,12 @@ signal play_animation(animation)
 signal new_sprite_animation(animation)
 signal turn_sprite
 
-#TODO move most of the logic code over to the PlayerData node rather than in the base CharData
-
+#TODO decide what logic code to move over to the PlayerData node rather than in the base CharData
 
 #region STATE MACHINE PARTS
 #TODO priority system for animations
+#TODO state changes and such still need revision, currently a bit jank
+
 enum ANIMATION_STATE{
 	IDLE, #DEFERRING TO OTHER STATE CHECKS
 	DASHING,
@@ -71,7 +72,7 @@ var cur_attack_name = "Jab"
 
 #ANIMATIONS CONTAINED WITHIN CHAR
 var sprite_library
-var anim_player_library
+var animation_player_library
 var current_animation = "StandIdle"
 
 #CHARACTER HP DATA
@@ -219,7 +220,6 @@ func evaluate_state_change(new_state, state_changed):
 			print("Attacking")
 			print(cur_attack_name)
 
-
 	if anim_state_ == ANIMATION_STATE.IDLE:
 		#start turn
 		if state_changed == "HORIZONTAL":
@@ -334,7 +334,7 @@ func update_current_animation():
 	
 	if not new_anim == current_animation: #probably redundant check
 		print(new_anim)
-		if new_anim in anim_player_library:
+		if new_anim in animation_player_library:
 			emit_signal("play_animation", new_anim)
 			current_animation = new_anim
 		elif new_anim in sprite_library:
@@ -356,16 +356,16 @@ func match_vert_state(new_anim):
 		MOVE_STATE.RUNNING : temp_anim = "Run" + new_anim
 		MOVE_STATE.DASHING : temp_anim = "Dash" + new_anim
 
-	if temp_anim in sprite_library or temp_anim in anim_player_library:
+	if temp_anim in sprite_library or temp_anim in animation_player_library:
 		return temp_anim
-	elif new_anim in sprite_library or new_anim in anim_player_library:
+	elif new_anim in sprite_library or new_anim in animation_player_library:
 		return new_anim
 	else:
 		#HACK Decide how to handle
 		temp_anim = "Stand" + new_anim
-		if temp_anim in sprite_library or temp_anim in anim_player_library:
+		if temp_anim in sprite_library or temp_anim in animation_player_library:
 			return temp_anim
-		elif new_anim in sprite_library or new_anim in anim_player_library:
+		elif new_anim in sprite_library or new_anim in animation_player_library:
 			return new_anim
 		else:
 			return new_anim

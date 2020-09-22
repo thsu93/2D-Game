@@ -1,7 +1,6 @@
 extends "res://src/scripts/CharacterData.gd"
 class_name CrabEnemyData
 
-
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"

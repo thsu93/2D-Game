@@ -1,44 +1,75 @@
 extends Node
 class_name AttackData
 
+#region ATTACK-RELATED VARIABLES
 var movename = "None"
 var dmg = 0
 var attacker = "None"
 
 var cost = 0
 
-#movement modifiers
+#These variables are supposed to dictate the movements of the attacker as it attacks
 var velocity = 0
 var direction = 0
-var duration = 0
+
+#These variables are intended to dictate the movements of the attacked target
+#is added to get_hit_var
+var knockback_val = 350
+var knockback_dir = Vector2(1,0)
 
 #TODO: decide if want the following datums
-var ground_type = "" #Standing, Crouching, Jumping, others? T/F vs descriptor
-var air_type = ""
+var ground_type = "" #T/F vs descriptor (stand, crouch, etc) vs all-types dict
+var air_type = "" #
 var priority = 0 #? unsure if will have this system
-var knockback_val = 0
-var knockback_dir = Vector2(1,0)
+
+#How much damage scaling for combos
+#Currently have yet to implement this system 
 var scaling = 1
 var hitstun = 1
+
+#Special properties of the attack
 var invincibility = false
 var invincibility_time = 0
-var special_state = "none"
+var special_state = "none" #TODO Consider ways to implement ground-bounce/wall-bounce/wall-splats etc.
 
-var attack_sound #sound char makes when attacking
-var hit_sound #sound move makes on hit
+#Timers related to the attack
+var duration = 0 #How long the attack lasts for.  Unsure if necessary.
+var cancellable_time #How long before the char can cancel the attack into the next or movements
 
-var cancellable_time 
-
+#Data passed to agent hit by attack
+#TODO: Decide what variables should be in here
 var get_hit_var = {
+    "attacker" : attacker,
+    "movename" : movename,
     "dmg": dmg,
     "knockback_dir": knockback_dir,
     "knockback_val": knockback_val,
-} #data passed to agent hit by attack
-#pass as dict
+}
+
+#endregion
+
+#region ASSOCIATED EXTERNAL RESOURCES
+#Sounds associated with the given attack
+var attack_sound #sound char makes when attacking
+var hit_sound #sound move makes on hit
+var attack_effects #particles or other external effects
+#endregion
+
+func get_hit_var():
+    var updated_hit_var = {
+    "attacker" : attacker,
+    "movename" : movename,
+    "dmg": dmg,
+    "knockback_dir": knockback_dir,
+    "knockback_val": knockback_val,
+    }
+    return updated_hit_var
 
 func print_data():
 	print(dmg)
 
+# FOR REFERENCE
+# MUGEN's data structs
 # type HitDef struct {
 # 	hitsound                   [2]int32
 # 	guardsound                 [2]int32

@@ -400,7 +400,7 @@ tracks/1/keys = {
 }
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 124.667, 88.6472 )
+extents = Vector2( 109.299, 207.1 )
 
 [sub_resource type="Animation" id=2]
 resource_name = "CrouchHook"
@@ -526,7 +526,7 @@ tracks/4/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( -104.509, -69.828 ) ]
+"values": [ Vector2( -130.185, -69.828 ) ]
 }
 
 [sub_resource type="Animation" id=4]
@@ -696,7 +696,7 @@ tracks/3/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( 124.667, 88.6472 ) ]
+"values": [ Vector2( 124.667, 137.767 ) ]
 }
 tracks/4/type = "value"
 tracks/4/path = NodePath("Sprite/Hitbox/CollisionShape2D:position")
@@ -708,7 +708,7 @@ tracks/4/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( -138.388, -95.4487 ) ]
+"values": [ Vector2( -168.878, -15.2105 ) ]
 }
 
 [sub_resource type="Animation" id=8]
@@ -872,7 +872,7 @@ tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0.4, 1.2 ),
+"times": PoolRealArray( 0.2, 1.1 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ false, true ]
@@ -887,7 +887,7 @@ tracks/3/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( 109.299, 246.609 ) ]
+"values": [ Vector2( 109.299, 207.1 ) ]
 }
 tracks/4/type = "value"
 tracks/4/path = NodePath("Sprite/Hitbox/CollisionShape2D:position")
@@ -899,7 +899,7 @@ tracks/4/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( -150.533, -75.2072 ) ]
+"values": [ Vector2( -140.332, -44.6038 ) ]
 }
 tracks/5/type = "value"
 tracks/5/path = NodePath("CharacterData:cancellable")
@@ -909,6 +909,18 @@ tracks/5/imported = false
 tracks/5/enabled = true
 tracks/5/keys = {
 "times": PoolRealArray( 1, 1.4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Sprite/Hurtbox/Hurtbox:disabled")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 1.1 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
@@ -1042,7 +1054,7 @@ tracks/4/keys = {
 
 [sub_resource type="CapsuleShape2D" id=13]
 radius = 7.08997
-height = 22.1184
+height = 20.2955
 
 [sub_resource type="SpriteFrames" id=14]
 animations = [ {
@@ -1309,14 +1321,14 @@ smoothing_enabled = true
 smoothing_speed = 8.0
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
-position = Vector2( 0.524506, -11.5409 )
+position = Vector2( -6.4129, -14.9045 )
 shape = SubResource( 13 )
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 position = Vector2( -2.57953, -10 )
 scale = Vector2( 0.131, 0.131 )
 frames = SubResource( 14 )
-animation = "DashHook"
+animation = "Shoryuken"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -1325,24 +1337,25 @@ collision_mask = 12
 script = ExtResource( 75 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -138.388, -95.4487 )
+position = Vector2( -140.332, -44.6038 )
 shape = SubResource( 1 )
-disabled = true
 
 [node name="Hurtbox" type="Area2D" parent="Sprite"]
 collision_mask = 6
 
 [node name="Hurtbox" type="CollisionPolygon2D" parent="Sprite/Hurtbox"]
-position = Vector2( -80.5885, -4.17107 )
+position = Vector2( -103.055, -23.4282 )
 scale = Vector2( 7.02018, 5.81359 )
 build_mode = 1
-polygon = PoolVector2Array( 15.7907, 12.5291, 2.96703, 12.5291, 2.85252, -20.3515, 15.5805, -20.4761 )
+polygon = PoolVector2Array( 15.7907, 12.5291, 2.96703, 12.5291, 3.76661, -20.0755, 15.5805, -20.4761 )
+disabled = true
 
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
 cancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
+position = Vector2( -6.72717, 0 )
 enabled = true
 cast_to = Vector2( 0, 5 )
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]

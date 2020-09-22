@@ -1,6 +1,4 @@
 build/
-assets/*
-addons/*
 !addons/ui_design_tool
 addons/ui_design_tool/user_pref.cfg
 

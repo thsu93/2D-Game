@@ -12,8 +12,6 @@ var _state = State.WALKING
 onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
-onready var sprite = $Sprite
-onready var animation_player = $AnimationPlayer
 
 func _init():
 	actor_type = "enemy"
@@ -62,6 +60,8 @@ func calculate_move_velocity(linear_velocity):
 	elif not floor_detector_right.is_colliding():
 		velocity.x = -speed.x
 
+
+	#BUG PRIORITY MINOR Enemy will spin uncontrollably if trappepd 
 	if is_on_wall():
 		velocity.x *= -1
 

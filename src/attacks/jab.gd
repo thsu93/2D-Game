@@ -7,6 +7,7 @@ extends AttackData
 func _init():
 	dmg = 5
 	movename = "Jab"
+	knockback_val = 350
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
