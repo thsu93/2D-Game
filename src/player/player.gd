@@ -37,6 +37,7 @@ const JUMP_VELOCITY = 500
 const STOP_JUMP_FORCE = 450.0
 const DASH_SPEED = 400
 const FLOOR_DETECT_DISTANCE = 20.0
+const BUFFER_MAX = 10
 
 var current_animation = ""
 
@@ -56,11 +57,15 @@ var shoot_time = 1e20
 var attack_data
 
 
+var buffer_length = 0
+var buffered_movements = []
+var held_buffer = false
+
+
 #HACK FOR MOVE CHECK
 var l_movelist = ["Jab"]
 var r_movelist = ["Hook", "Overhead", "Shoryuken"]
-var count = 0
-
+var movelist_num = 0
 
 func _init():
 	actor_type = "player"
@@ -75,10 +80,6 @@ func _ready():
 	char_data.animation_player_library = animation_player.get_animation_list()
 	print(char_data.animation_player_library)
 	print(char_data.sprite_library)
-
-	
-	
-
 	animation_player.stop()
 
 #Priority in calculations:
@@ -92,6 +93,7 @@ func _ready():
 #region 
 
 #TODO Ability to save movement state + data (speed, etc.)
+#TODO Refactor code to use input buffer rather than repeat move checks
 func _physics_process(delta):
 	
 	# Get the controls.
@@ -109,14 +111,14 @@ func _physics_process(delta):
 	check_if_slowed()
 
 	if scroll_down:
-		count = count + 1 if count < 2 else 2
+		movelist_num = movelist_num + 1 if movelist_num < 2 else 2
 		slowed = true
-		print(r_movelist[count])
+		print(r_movelist[movelist_num])
 
 	if scroll_up:
-		count = count -1 if count > 0 else 0
+		movelist_num = movelist_num -1 if movelist_num > 0 else 0
 		slowed = true
-		print(r_movelist[count])
+		print(r_movelist[movelist_num])
 	
 	# Deapply prev floor velocity.
 
@@ -136,21 +138,25 @@ func _physics_process(delta):
 	#TODO Decide how to handle momentum with moves, how to determine to preserve or not.
 	#BUG moves do not come out when going through transitional state animations
 	#BUG graphical bug of sliding back during jab, part of sprite rather than actual programmatic bug
-	if lclick:
-		#TODO ADD DEPTH
-		#TODO move buffers?
-		#HACK direct move insert currently
-		char_data.change_anim_state("Attack", "Jab")
-		attack_data = char_data.get_move_data()
-		speed_reset()
-		slowed = false
-		#BUG char will slide while stand-jab if not forced into velocity 0
+	#HACK the way attack movement is handled is incredibly janky and should not be done this way
+	if not char_data.uncancellable:
+		if lclick:
+			#TODO ADD DEPTH
+			#TODO move buffers?
+			#HACK direct move insert currently
+			char_data.change_anim_state("Attack", "Jab")
+			attack_data = char_data.get_move_data()
+			_velocity = Vector2(attack_data.direction.x * char_data.horizontal_state_ * -1, attack_data.direction.y) * attack_data.velocity
+			speed_reset()
+			slowed = false
+			#BUG char will slide while stand-jab if not forced into velocity 0
 
-	if rclick:
-		char_data.change_anim_state("Attack", r_movelist[count])
-		attack_data = char_data.get_move_data()
-		slowed = false
-		speed_reset()
+		if rclick:
+			char_data.change_anim_state("Attack", r_movelist[movelist_num])
+			attack_data = char_data.get_move_data()
+			_velocity = Vector2(attack_data.direction.x * char_data.horizontal_state_ * -1, attack_data.direction.y) * attack_data.velocity
+			slowed = false
+			speed_reset()
 
 	var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if not is_on_floor() else Vector2.ZERO
 	var is_on_platform = platform_detector.is_colliding()
@@ -183,7 +189,6 @@ func _physics_process(delta):
 				# Set off the jumping flag if going down.
 				#BUG will be in fall state when taking damage due to the way the knockback vector works. unclear solution.
 				char_data.change_move_state("Fall")
-				print(knockback)
 			elif not jump:
 				stopping_jump = true
 			
@@ -199,6 +204,8 @@ func _physics_process(delta):
 			else:
 				char_data.change_anim_state("Backdash")
 		
+		check_buffer()
+		
 		#BUG will not update if move_state is interrupted during jump
 		if is_on_floor():
 			if crouch:
@@ -212,41 +219,26 @@ func _physics_process(delta):
 
 			elif not crouch:
 				# Process logic when character is on floor.
-				#BUG sometimes still standing/slow-walking in air when neutral/slow-forward jump
-				#BUG Holding back direction button to slow just increases slide time
-				
-				
 				if jump:
 					_velocity.y = -JUMP_VELOCITY
 					char_data.change_move_state("Jump")
 					stopping_jump = false
-				
-				if move_left and not move_right:
-					if _velocity.x > -MAX_VELOCITY:
-						_velocity.x -= WALK_ACCEL * delta
-					else:
-						_velocity.x += WALK_DEACCEL * 2 * delta
-				elif move_right and not move_left:
-					if _velocity.x < MAX_VELOCITY:
-						_velocity.x += WALK_ACCEL * delta
-					else:
-						_velocity.x -= WALK_DEACCEL * 2 * delta
-				else:
-					var xv = abs(_velocity.x)
-					xv -= WALK_DEACCEL * delta
-					if xv < 0:
-						xv = 0
-					_velocity.x = sign(_velocity.x) * xv
 
+				update_movements(delta)
+
+				#CORRECT FOR OVERSPEED
 				if abs(_velocity.x) > MAX_VELOCITY:
 					_velocity.x = sign(_velocity.x) * MAX_VELOCITY
 				
-				if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
-					char_data.change_move_state("Walk")
-				elif abs(_velocity.x) > WALK_VELOCITY:
-					char_data.change_move_state("Run")
-				elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-					char_data.change_move_state("StandIdle")
+				#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
+				if not jump:
+					#CHANGE ANIMATIONS TO MATCH SPEED
+					if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
+						char_data.change_move_state("Walk")
+					elif abs(_velocity.x) > WALK_VELOCITY:
+						char_data.change_move_state("Run")
+					elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+						char_data.change_move_state("StandIdle")
 		
 	#TODO: Calculate move velocity allowing for:
 		#DASHING
@@ -258,6 +250,84 @@ func _physics_process(delta):
 	_velocity = move_and_slide_with_snap(
 		_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 3, 0.9, false
 		)
+
+func get_buttons_pressed():
+	var new_input = 5
+	if Input.is_action_pressed("move_right"):
+		if Input.is_action_pressed("move_left"):
+			new_input = 5
+		elif Input.is_action_pressed("crouch"):
+			new_input = 3
+		elif Input.is_action_pressed("jump"):
+			new_input = 9
+		else:
+			new_input = 6
+	if Input.is_action_pressed("move_left"):
+		if Input.is_action_pressed("move_right"):
+			new_input = 5
+		elif Input.is_action_pressed("crouch"):
+			new_input = 1
+		elif Input.is_action_pressed("jump"):
+			new_input = 7
+		else:
+			new_input = 4
+	return new_input
+
+func check_buffer():
+	var new_move = get_buttons_pressed()
+	buffered_movements.append(new_move)
+	if buffered_movements.size() > 2 and not buffered_movements[-1] == buffered_movements[-2]:
+		held_buffer = false
+	if buffered_movements.size() > BUFFER_MAX:
+		buffered_movements.remove(0)
+
+func update_movements(delta):
+	if buffered_movements.size() > 1:
+		if buffered_movements[-1] == 4:
+			if check_dash([4,5,4]) or held_buffer:
+				_velocity.x = -MAX_VELOCITY
+			else:
+				_velocity.x = -WALK_VELOCITY
+			# if _velocity.x > -MAX_VELOCITY:
+			# 	_velocity.x -= WALK_ACCEL * delta
+			# else:
+			# 	_velocity.x += WALK_DEACCEL * 2 * delta
+		elif buffered_movements[-1] == 6:
+			if check_dash([6,5,6]) or held_buffer:
+				_velocity.x = MAX_VELOCITY
+			else:
+				_velocity.x = WALK_VELOCITY
+		elif buffered_movements[-1] == 5:
+			var xv = abs(_velocity.x)
+			xv -= WALK_DEACCEL * delta
+			if xv < 0:
+				xv = 0
+			_velocity.x = sign(_velocity.x) * xv
+
+
+func check_dash(sequence):
+	var found = false
+	var temp_buffer = buffered_movements.duplicate(true)
+	var count = sequence.size()
+	if temp_buffer.size() > sequence.size():
+		for i in sequence:
+			var pos = temp_buffer.find(i)
+			if pos != -1:
+				count -= 1
+				temp_buffer = temp_buffer.slice(pos+1, temp_buffer.size()-1)
+			else:
+				return false
+	if count == 0:
+		found = true
+		held_buffer = true
+		flush_buffer()
+		print("success")
+	return found
+	pass
+
+func flush_buffer():
+	buffered_movements = []
+
 
 #HACK this should be fixed to a reasonable system
 func speed_reset():
@@ -310,7 +380,7 @@ func _on_Sprite_animation_finished():
 	if current_animation =="Backdash":
 		print("Backdash End")
 		speed_reset()
-	char_data.animation_completed()	
+	char_data.animation_completed()
 
 	# current_animation = char_data.get_new_animation()
 	#play_new_sprite()
@@ -318,6 +388,7 @@ func _on_Sprite_animation_finished():
 #Does this double up with the sprite animation finish?
 func _on_AnimationPlayer_animation_finished(_anim_name):
 	char_data.animation_completed()
+	char_data.uncancellable = false
 
 func _on_CharacterData_turn_sprite():
 	self.scale.x *= -1
@@ -382,7 +453,7 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 # 	# match _state:
 # 	# 	0: current_animation = "StandIdle" 	#	IDLE,
 # 	# 	1: invulnerable(INVULN_TIME) 	#	HIT,
-# 	# 	2: invulnerable(INVULN_TIME) 	#	COUNTERHIT,
+# 	# 	2: invulnerable(INVULN_TIME) 	#	movelist_numERHIT,
 # 	# 	3: print("invuln")				#	INVULN,
 # 	play_new_sprite()
 
@@ -426,7 +497,7 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 	# onready var dash_cd_timer = Timer.new()
 	# onready var invuln_timer = Timer.new()
 	
-	# var dashs_remaining = DASH_COUNT
+	# var dashs_remaining = DASH_movelist_num
 	# var dashed_distance = DASH_DISTANCE
 	# var dash_on_cooldown = false
 	# var dodgeable_objects = ["projectile",
@@ -636,7 +707,7 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 	
 	# func on_dash_cooldown_complete():
 	# 	dash_on_cooldown = false
-	# 	dashs_remaining = DASH_COUNT
+	# 	dashs_remaining = DASH_movelist_num
 	# 	dashed_distance = DASH_DISTANCE
 	
 	
@@ -755,7 +826,7 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 	# 	match _state:
 	# 		0: current_animation = "StandIdle" 	#	IDLE,
 	# 		1: invulnerable(INVULN_TIME) 	#	HIT,
-	# 		2: invulnerable(INVULN_TIME) 	#	COUNTERHIT,
+	# 		2: invulnerable(INVULN_TIME) 	#	movelist_numERHIT,
 	# 		3: print("invuln")				#	INVULN,
 	# 	play_new_sprite()
 	
@@ -797,3 +868,23 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 	# #endregion
 
 #endregion
+
+
+
+				#DEPRECATED ACCEL/DECEL MOVE CODE
+				# if move_left and not move_right:
+				# 	if _velocity.x > -MAX_VELOCITY:
+				# 		_velocity.x -= WALK_ACCEL * delta
+				# 	else:
+				# 		_velocity.x += WALK_DEACCEL * 2 * delta
+				# elif move_right and not move_left:
+				# 	if _velocity.x < MAX_VELOCITY:
+				# 		_velocity.x += WALK_ACCEL * delta
+				# 	else:
+				# 		_velocity.x -= WALK_DEACCEL * 2 * delta
+				# else:
+				# 	var xv = abs(_velocity.x)
+				# 	xv -= WALK_DEACCEL * delta
+				# 	if xv < 0:
+				# 		xv = 0
+				# 	_velocity.x = sign(_velocity.x) * xv

@@ -371,7 +371,7 @@
 [ext_resource path="res://assets/Akihiko/ak432_08.png" type="Texture" id=376]
 [ext_resource path="res://src/player/PlayerData.gd" type="Script" id=377]
 
-[sub_resource type="Animation" id=15]
+[sub_resource type="Animation" id=1]
 resource_name = "Backdash"
 length = 0.35
 tracks/0/type = "value"
@@ -399,11 +399,10 @@ tracks/1/keys = {
 "values": [ true, false ]
 }
 
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 109.299, 207.1 )
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 124.667, 137.767 )
 
-[sub_resource type="Animation" id=2]
-resource_name = "CrouchHook"
+[sub_resource type="Animation" id=3]
 length = 0.9
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -427,7 +426,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.9 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -465,8 +464,20 @@ tracks/4/keys = {
 "update": 0,
 "values": [ Vector2( -122.34, 4.04663 ) ]
 }
+tracks/5/type = "value"
+tracks/5/path = NodePath("CharacterData:uncancellable")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=4]
 length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -490,7 +501,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -529,7 +540,7 @@ tracks/4/keys = {
 "values": [ Vector2( -130.185, -69.828 ) ]
 }
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id=5]
 length = 0.55
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -556,8 +567,7 @@ tracks/1/keys = {
 "values": [ true, false ]
 }
 
-[sub_resource type="Animation" id=5]
-resource_name = "DashHook"
+[sub_resource type="Animation" id=6]
 length = 1.1
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -581,7 +591,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 1.1 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -619,9 +629,20 @@ tracks/4/keys = {
 "update": 0,
 "values": [ Vector2( -138.388, -95.4487 ) ]
 }
+tracks/5/type = "value"
+tracks/5/path = NodePath("CharacterData:uncancellable")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
 
-[sub_resource type="Animation" id=6]
-resource_name = "JumpDash"
+[sub_resource type="Animation" id=7]
 length = 0.4
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -648,8 +669,7 @@ tracks/1/keys = {
 "values": [ true, false ]
 }
 
-[sub_resource type="Animation" id=7]
-resource_name = "JumpHook"
+[sub_resource type="Animation" id=8]
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
 tracks/0/interp = 1
@@ -672,7 +692,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 1 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -711,7 +731,7 @@ tracks/4/keys = {
 "values": [ Vector2( -168.878, -15.2105 ) ]
 }
 
-[sub_resource type="Animation" id=8]
+[sub_resource type="Animation" id=9]
 length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -735,7 +755,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -774,8 +794,7 @@ tracks/4/keys = {
 "values": [ Vector2( -141.446, -119.502 ) ]
 }
 
-[sub_resource type="Animation" id=9]
-resource_name = "Overhead"
+[sub_resource type="Animation" id=10]
 length = 1.4
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -799,7 +818,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 1.4 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -838,8 +857,7 @@ tracks/4/keys = {
 "values": [ Vector2( -149.184, -34.7239 ) ]
 }
 
-[sub_resource type="Animation" id=10]
-resource_name = "Shoryuken"
+[sub_resource type="Animation" id=11]
 length = 1.4
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -863,7 +881,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 1.4 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -902,31 +920,31 @@ tracks/4/keys = {
 "values": [ Vector2( -140.332, -44.6038 ) ]
 }
 tracks/5/type = "value"
-tracks/5/path = NodePath("CharacterData:cancellable")
+tracks/5/path = NodePath("Sprite/Hurtbox/Hurtbox:disabled")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/imported = false
 tracks/5/enabled = true
 tracks/5/keys = {
-"times": PoolRealArray( 1, 1.4 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 1,
-"values": [ true, false ]
-}
-tracks/6/type = "value"
-tracks/6/path = NodePath("Sprite/Hurtbox/Hurtbox:disabled")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/keys = {
 "times": PoolRealArray( 0, 1.1 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
 }
+tracks/6/type = "value"
+tracks/6/path = NodePath("CharacterData:uncancellable")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
 
-[sub_resource type="Animation" id=11]
+[sub_resource type="Animation" id=12]
 length = 0.9
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -950,7 +968,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.9 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -989,7 +1007,7 @@ tracks/4/keys = {
 "values": [ Vector2( -138.388, -95.4487 ) ]
 }
 
-[sub_resource type="Animation" id=12]
+[sub_resource type="Animation" id=13]
 length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -1013,7 +1031,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0, 0.3 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ SubResource( 1 ), SubResource( 1 ) ]
+"values": [ SubResource( 2 ), SubResource( 2 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
@@ -1052,50 +1070,25 @@ tracks/4/keys = {
 "values": [ Vector2( -137.625, -124.597 ) ]
 }
 
-[sub_resource type="CapsuleShape2D" id=13]
+[sub_resource type="CapsuleShape2D" id=14]
 radius = 7.08997
 height = 20.2955
 
-[sub_resource type="SpriteFrames" id=14]
+[sub_resource type="SpriteFrames" id=15]
 animations = [ {
-"frames": [ ExtResource( 111 ), ExtResource( 102 ), ExtResource( 104 ) ],
-"loop": false,
-"name": "StandTurn",
-"speed": 10.0
-}, {
-"frames": [ ExtResource( 114 ), ExtResource( 125 ), ExtResource( 126 ), ExtResource( 132 ), ExtResource( 127 ), ExtResource( 130 ), ExtResource( 131 ), ExtResource( 171 ), ExtResource( 172 ), ExtResource( 173 ) ],
+"frames": [ ExtResource( 204 ), ExtResource( 201 ), ExtResource( 231 ), ExtResource( 236 ), ExtResource( 232 ), ExtResource( 196 ), ExtResource( 211 ), ExtResource( 221 ), ExtResource( 203 ) ],
 "loop": true,
-"name": "CombinationLight",
+"name": "CrouchHook",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 174 ), ExtResource( 169 ), ExtResource( 170 ), ExtResource( 230 ), ExtResource( 202 ), ExtResource( 199 ), ExtResource( 212 ), ExtResource( 197 ), ExtResource( 191 ), ExtResource( 218 ), ExtResource( 224 ), ExtResource( 194 ), ExtResource( 198 ) ],
+"frames": [ ExtResource( 72 ), ExtResource( 73 ), ExtResource( 74 ), ExtResource( 95 ), ExtResource( 108 ), ExtResource( 110 ), ExtResource( 98 ), ExtResource( 94 ), ExtResource( 101 ), ExtResource( 107 ) ],
 "loop": true,
-"name": "UppercutThrow",
+"name": "StandIdle",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 23 ), ExtResource( 14 ) ],
+"frames": [ ExtResource( 364 ), ExtResource( 310 ), ExtResource( 355 ), ExtResource( 323 ), ExtResource( 311 ), ExtResource( 330 ), ExtResource( 347 ), ExtResource( 307 ), ExtResource( 350 ), ExtResource( 353 ), ExtResource( 333 ) ],
 "loop": true,
-"name": "RunStop",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 200 ), ExtResource( 219 ), ExtResource( 177 ), ExtResource( 226 ), ExtResource( 213 ), ExtResource( 233 ), ExtResource( 228 ), ExtResource( 190 ), ExtResource( 220 ), ExtResource( 215 ), ExtResource( 186 ), ExtResource( 209 ), ExtResource( 181 ), ExtResource( 216 ) ],
-"loop": true,
-"name": "Overhead",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 241 ), ExtResource( 242 ), ExtResource( 239 ), ExtResource( 243 ), ExtResource( 240 ) ],
-"loop": true,
-"name": "StandGrab",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 19 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 42 ), ExtResource( 9 ) ],
-"loop": true,
-"name": "Backdash",
-"speed": 10.0
-}, {
-"frames": [ ExtResource( 339 ), ExtResource( 346 ), ExtResource( 337 ), ExtResource( 356 ), ExtResource( 338 ), ExtResource( 361 ), ExtResource( 343 ), ExtResource( 349 ), ExtResource( 317 ) ],
-"loop": true,
-"name": "DashUppercut",
+"name": "JumpGroundPound",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 322 ), ExtResource( 325 ), ExtResource( 328 ), ExtResource( 329 ), ExtResource( 352 ), ExtResource( 370 ), ExtResource( 371 ), ExtResource( 369 ), ExtResource( 376 ), ExtResource( 375 ), ExtResource( 372 ), ExtResource( 374 ), ExtResource( 373 ) ],
@@ -1103,69 +1096,59 @@ animations = [ {
 "name": "Cast",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 10 ), ExtResource( 31 ), ExtResource( 29 ), ExtResource( 41 ) ],
+"frames": [ ExtResource( 200 ), ExtResource( 219 ), ExtResource( 177 ), ExtResource( 226 ), ExtResource( 213 ), ExtResource( 233 ), ExtResource( 228 ), ExtResource( 190 ), ExtResource( 220 ), ExtResource( 215 ), ExtResource( 186 ), ExtResource( 209 ), ExtResource( 181 ), ExtResource( 216 ) ],
 "loop": true,
-"name": "JumpDash",
+"name": "Overhead",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 234 ), ExtResource( 235 ), ExtResource( 237 ) ],
+"frames": [ ExtResource( 303 ), ExtResource( 289 ), ExtResource( 245 ), ExtResource( 257 ), ExtResource( 266 ), ExtResource( 267 ), ExtResource( 269 ), ExtResource( 270 ), ExtResource( 278 ) ],
 "loop": true,
-"name": "JumpJab",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 96 ), ExtResource( 105 ), ExtResource( 85 ), ExtResource( 103 ), ExtResource( 106 ), ExtResource( 83 ) ],
-"loop": true,
-"name": "CrouchIdle",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 262 ), ExtResource( 299 ), ExtResource( 297 ), ExtResource( 274 ), ExtResource( 290 ), ExtResource( 285 ), ExtResource( 248 ), ExtResource( 271 ), ExtResource( 298 ), ExtResource( 249 ), ExtResource( 286 ) ],
-"loop": true,
-"name": "StandParry",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 204 ), ExtResource( 201 ), ExtResource( 231 ), ExtResource( 236 ), ExtResource( 232 ), ExtResource( 196 ), ExtResource( 211 ), ExtResource( 221 ), ExtResource( 203 ) ],
-"loop": true,
-"name": "CrouchHook",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 43 ), ExtResource( 55 ), ExtResource( 25 ) ],
-"loop": false,
-"name": "JumpTurn",
+"name": "Dash",
 "speed": 10.0
-}, {
-"frames": [ ExtResource( 86 ), ExtResource( 97 ), ExtResource( 84 ) ],
-"loop": false,
-"name": "CrouchTurn",
-"speed": 10.0
-}, {
-"frames": [ ExtResource( 341 ), ExtResource( 305 ), ExtResource( 321 ), ExtResource( 334 ), ExtResource( 306 ), ExtResource( 351 ), ExtResource( 309 ), ExtResource( 342 ), ExtResource( 326 ), ExtResource( 345 ), ExtResource( 313 ), ExtResource( 318 ), ExtResource( 319 ) ],
-"loop": true,
-"name": "Charge",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 47 ), ExtResource( 36 ), ExtResource( 30 ), ExtResource( 60 ), ExtResource( 64 ), ExtResource( 61 ), ExtResource( 39 ), ExtResource( 1 ), ExtResource( 53 ), ExtResource( 27 ), ExtResource( 51 ), ExtResource( 2 ) ],
-"loop": true,
-"name": "BackWalk",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 135 ), ExtResource( 137 ), ExtResource( 140 ) ],
-"loop": true,
-"name": "StandJab",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 214 ), ExtResource( 217 ), ExtResource( 222 ), ExtResource( 223 ) ],
-"loop": true,
-"name": "CrouchJab",
-"speed": 5.0
 }, {
 "frames": [ ExtResource( 66 ), ExtResource( 69 ), ExtResource( 65 ), ExtResource( 70 ), ExtResource( 67 ) ],
 "loop": true,
 "name": "StandDamage",
 "speed": 5.0
 }, {
+"frames": [ ExtResource( 88 ), ExtResource( 109 ), ExtResource( 90 ) ],
+"loop": false,
+"name": "CrouchDown",
+"speed": 10.0
+}, {
+"frames": [ ExtResource( 234 ), ExtResource( 235 ), ExtResource( 237 ) ],
+"loop": true,
+"name": "JumpJab",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 28 ), ExtResource( 49 ), ExtResource( 32 ), ExtResource( 13 ), ExtResource( 15 ), ExtResource( 16 ) ],
+"loop": true,
+"name": "JumpBlock",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 150 ), ExtResource( 136 ), ExtResource( 151 ), ExtResource( 139 ), ExtResource( 138 ), ExtResource( 152 ), ExtResource( 148 ), ExtResource( 159 ), ExtResource( 155 ), ExtResource( 116 ), ExtResource( 158 ), ExtResource( 141 ), ExtResource( 117 ) ],
+"loop": true,
+"name": "JumpDamage",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 279 ), ExtResource( 280 ), ExtResource( 362 ), ExtResource( 320 ), ExtResource( 335 ), ExtResource( 360 ), ExtResource( 366 ), ExtResource( 312 ), ExtResource( 354 ), ExtResource( 314 ), ExtResource( 315 ), ExtResource( 348 ), ExtResource( 363 ), ExtResource( 336 ) ],
 "loop": true,
 "name": "Dodge",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 357 ), ExtResource( 358 ), ExtResource( 365 ), ExtResource( 359 ), ExtResource( 324 ), ExtResource( 367 ), ExtResource( 344 ), ExtResource( 316 ), ExtResource( 368 ), ExtResource( 327 ), ExtResource( 331 ), ExtResource( 332 ), ExtResource( 308 ), ExtResource( 340 ) ],
+"loop": true,
+"name": "Shoryuken",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 341 ), ExtResource( 305 ), ExtResource( 321 ), ExtResource( 334 ), ExtResource( 306 ), ExtResource( 351 ), ExtResource( 309 ), ExtResource( 342 ), ExtResource( 326 ), ExtResource( 345 ), ExtResource( 313 ), ExtResource( 318 ), ExtResource( 319 ) ],
+"loop": true,
+"name": "Charge",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 208 ), ExtResource( 210 ), ExtResource( 178 ), ExtResource( 187 ), ExtResource( 238 ), ExtResource( 175 ), ExtResource( 176 ), ExtResource( 179 ), ExtResource( 182 ), ExtResource( 183 ), ExtResource( 184 ) ],
+"loop": true,
+"name": "JumpHook",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 21 ), ExtResource( 17 ) ],
@@ -1178,9 +1161,9 @@ animations = [ {
 "name": "CrouchDamage",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 156 ), ExtResource( 145 ), ExtResource( 124 ), ExtResource( 146 ), ExtResource( 163 ), ExtResource( 167 ), ExtResource( 121 ), ExtResource( 164 ), ExtResource( 134 ), ExtResource( 166 ), ExtResource( 129 ), ExtResource( 168 ), ExtResource( 112 ), ExtResource( 113 ) ],
+"frames": [ ExtResource( 192 ), ExtResource( 227 ), ExtResource( 225 ), ExtResource( 205 ), ExtResource( 180 ), ExtResource( 206 ), ExtResource( 193 ), ExtResource( 229 ), ExtResource( 195 ), ExtResource( 207 ) ],
 "loop": true,
-"name": "CombinationHeavy",
+"name": "CrouchHeavy",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 6 ), ExtResource( 35 ), ExtResource( 26 ), ExtResource( 3 ), ExtResource( 37 ), ExtResource( 4 ), ExtResource( 5 ) ],
@@ -1188,49 +1171,9 @@ animations = [ {
 "name": "Run",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 244 ), ExtResource( 185 ), ExtResource( 188 ), ExtResource( 189 ), ExtResource( 246 ) ],
+"frames": [ ExtResource( 48 ), ExtResource( 52 ), ExtResource( 40 ), ExtResource( 44 ), ExtResource( 33 ), ExtResource( 54 ) ],
 "loop": true,
-"name": "JumpGrab",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 192 ), ExtResource( 227 ), ExtResource( 225 ), ExtResource( 205 ), ExtResource( 180 ), ExtResource( 206 ), ExtResource( 193 ), ExtResource( 229 ), ExtResource( 195 ), ExtResource( 207 ) ],
-"loop": true,
-"name": "CrouchHeavy",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 357 ), ExtResource( 358 ), ExtResource( 365 ), ExtResource( 359 ), ExtResource( 324 ), ExtResource( 367 ), ExtResource( 344 ), ExtResource( 316 ), ExtResource( 368 ), ExtResource( 327 ), ExtResource( 331 ), ExtResource( 332 ), ExtResource( 308 ), ExtResource( 340 ) ],
-"loop": true,
-"name": "Shoryuken",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 161 ), ExtResource( 154 ), ExtResource( 115 ), ExtResource( 120 ), ExtResource( 118 ), ExtResource( 165 ), ExtResource( 147 ), ExtResource( 143 ), ExtResource( 144 ) ],
-"loop": true,
-"name": "StandHook",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 88 ), ExtResource( 109 ), ExtResource( 90 ) ],
-"loop": false,
-"name": "CrouchDown",
-"speed": 10.0
-}, {
-"frames": [ ExtResource( 38 ), ExtResource( 20 ), ExtResource( 11 ), ExtResource( 46 ), ExtResource( 12 ), ExtResource( 22 ) ],
-"loop": true,
-"name": "StandGuard",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 364 ), ExtResource( 310 ), ExtResource( 355 ), ExtResource( 323 ), ExtResource( 311 ), ExtResource( 330 ), ExtResource( 347 ), ExtResource( 307 ), ExtResource( 350 ), ExtResource( 353 ), ExtResource( 333 ) ],
-"loop": true,
-"name": "JumpGroundPound",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 157 ), ExtResource( 142 ), ExtResource( 153 ), ExtResource( 122 ), ExtResource( 123 ), ExtResource( 162 ), ExtResource( 128 ) ],
-"loop": true,
-"name": "Death",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 72 ), ExtResource( 73 ), ExtResource( 74 ), ExtResource( 95 ), ExtResource( 108 ), ExtResource( 110 ), ExtResource( 98 ), ExtResource( 94 ), ExtResource( 101 ), ExtResource( 107 ) ],
-"loop": true,
-"name": "StandIdle",
+"name": "CrouchGuard",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 90 ), ExtResource( 109 ), ExtResource( 88 ) ],
@@ -1238,24 +1181,14 @@ animations = [ {
 "name": "StandUp",
 "speed": 10.0
 }, {
-"frames": [ ExtResource( 28 ), ExtResource( 49 ), ExtResource( 32 ), ExtResource( 13 ), ExtResource( 15 ), ExtResource( 16 ) ],
+"frames": [ ExtResource( 23 ), ExtResource( 14 ) ],
 "loop": true,
-"name": "JumpBlock",
+"name": "RunStop",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 63 ), ExtResource( 57 ), ExtResource( 45 ), ExtResource( 24 ), ExtResource( 50 ), ExtResource( 62 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 18 ) ],
+"frames": [ ExtResource( 241 ), ExtResource( 242 ), ExtResource( 239 ), ExtResource( 243 ), ExtResource( 240 ) ],
 "loop": true,
-"name": "Walk",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 208 ), ExtResource( 210 ), ExtResource( 178 ), ExtResource( 187 ), ExtResource( 238 ), ExtResource( 175 ), ExtResource( 176 ), ExtResource( 179 ), ExtResource( 182 ), ExtResource( 183 ), ExtResource( 184 ) ],
-"loop": true,
-"name": "JumpHook",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 56 ), ExtResource( 34 ) ],
-"loop": true,
-"name": "Falling",
+"name": "StandGrab",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 254 ), ExtResource( 256 ), ExtResource( 273 ), ExtResource( 300 ), ExtResource( 304 ), ExtResource( 283 ), ExtResource( 261 ), ExtResource( 264 ), ExtResource( 302 ), ExtResource( 287 ), ExtResource( 288 ), ExtResource( 263 ) ],
@@ -1263,24 +1196,99 @@ animations = [ {
 "name": "DashHook",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 276 ), ExtResource( 284 ), ExtResource( 258 ), ExtResource( 265 ), ExtResource( 294 ), ExtResource( 296 ), ExtResource( 291 ), ExtResource( 255 ), ExtResource( 301 ), ExtResource( 293 ), ExtResource( 253 ) ],
+"frames": [ ExtResource( 156 ), ExtResource( 145 ), ExtResource( 124 ), ExtResource( 146 ), ExtResource( 163 ), ExtResource( 167 ), ExtResource( 121 ), ExtResource( 164 ), ExtResource( 134 ), ExtResource( 166 ), ExtResource( 129 ), ExtResource( 168 ), ExtResource( 112 ), ExtResource( 113 ) ],
 "loop": true,
-"name": "CrouchUppercut",
+"name": "CombinationHeavy",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 150 ), ExtResource( 136 ), ExtResource( 151 ), ExtResource( 139 ), ExtResource( 138 ), ExtResource( 152 ), ExtResource( 148 ), ExtResource( 159 ), ExtResource( 155 ), ExtResource( 116 ), ExtResource( 158 ), ExtResource( 141 ), ExtResource( 117 ) ],
+"frames": [ ExtResource( 38 ), ExtResource( 20 ), ExtResource( 11 ), ExtResource( 46 ), ExtResource( 12 ), ExtResource( 22 ) ],
 "loop": true,
-"name": "JumpDamage",
+"name": "StandGuard",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 48 ), ExtResource( 52 ), ExtResource( 40 ), ExtResource( 44 ), ExtResource( 33 ), ExtResource( 54 ) ],
+"frames": [ ExtResource( 161 ), ExtResource( 154 ), ExtResource( 115 ), ExtResource( 120 ), ExtResource( 118 ), ExtResource( 165 ), ExtResource( 147 ), ExtResource( 143 ), ExtResource( 144 ) ],
 "loop": true,
-"name": "CrouchGuard",
+"name": "StandHook",
 "speed": 5.0
+}, {
+"frames": [ ExtResource( 114 ), ExtResource( 125 ), ExtResource( 126 ), ExtResource( 132 ), ExtResource( 127 ), ExtResource( 130 ), ExtResource( 131 ), ExtResource( 171 ), ExtResource( 172 ), ExtResource( 173 ) ],
+"loop": true,
+"name": "CombinationLight",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 262 ), ExtResource( 299 ), ExtResource( 297 ), ExtResource( 274 ), ExtResource( 290 ), ExtResource( 285 ), ExtResource( 248 ), ExtResource( 271 ), ExtResource( 298 ), ExtResource( 249 ), ExtResource( 286 ) ],
+"loop": true,
+"name": "StandParry",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 135 ), ExtResource( 137 ), ExtResource( 140 ) ],
+"loop": true,
+"name": "StandJab",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 214 ), ExtResource( 217 ), ExtResource( 222 ), ExtResource( 223 ) ],
+"loop": true,
+"name": "CrouchJab",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 157 ), ExtResource( 142 ), ExtResource( 153 ), ExtResource( 122 ), ExtResource( 123 ), ExtResource( 162 ), ExtResource( 128 ) ],
+"loop": true,
+"name": "Death",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 111 ), ExtResource( 102 ), ExtResource( 104 ) ],
+"loop": false,
+"name": "StandTurn",
+"speed": 10.0
+}, {
+"frames": [ ExtResource( 63 ), ExtResource( 57 ), ExtResource( 45 ), ExtResource( 24 ), ExtResource( 50 ), ExtResource( 62 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 18 ) ],
+"loop": true,
+"name": "Walk",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 19 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 42 ), ExtResource( 9 ) ],
+"loop": true,
+"name": "Backdash",
+"speed": 10.0
 }, {
 "frames": [ ExtResource( 87 ), ExtResource( 99 ), ExtResource( 89 ), ExtResource( 91 ), ExtResource( 100 ), ExtResource( 92 ), ExtResource( 93 ) ],
 "loop": true,
 "name": "Jump",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 10 ), ExtResource( 31 ), ExtResource( 29 ), ExtResource( 41 ) ],
+"loop": true,
+"name": "JumpDash",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 47 ), ExtResource( 36 ), ExtResource( 30 ), ExtResource( 60 ), ExtResource( 64 ), ExtResource( 61 ), ExtResource( 39 ), ExtResource( 1 ), ExtResource( 53 ), ExtResource( 27 ), ExtResource( 51 ), ExtResource( 2 ) ],
+"loop": true,
+"name": "BackWalk",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 339 ), ExtResource( 346 ), ExtResource( 337 ), ExtResource( 356 ), ExtResource( 338 ), ExtResource( 361 ), ExtResource( 343 ), ExtResource( 349 ), ExtResource( 317 ) ],
+"loop": true,
+"name": "DashUppercut",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 96 ), ExtResource( 105 ), ExtResource( 85 ), ExtResource( 103 ), ExtResource( 106 ), ExtResource( 83 ) ],
+"loop": true,
+"name": "CrouchIdle",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 244 ), ExtResource( 185 ), ExtResource( 188 ), ExtResource( 189 ), ExtResource( 246 ) ],
+"loop": true,
+"name": "JumpGrab",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 174 ), ExtResource( 169 ), ExtResource( 170 ), ExtResource( 230 ), ExtResource( 202 ), ExtResource( 199 ), ExtResource( 212 ), ExtResource( 197 ), ExtResource( 191 ), ExtResource( 218 ), ExtResource( 224 ), ExtResource( 194 ), ExtResource( 198 ) ],
+"loop": true,
+"name": "UppercutThrow",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 56 ), ExtResource( 34 ) ],
+"loop": true,
+"name": "Falling",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 259 ), ExtResource( 275 ), ExtResource( 281 ), ExtResource( 295 ), ExtResource( 282 ), ExtResource( 250 ), ExtResource( 277 ), ExtResource( 247 ), ExtResource( 292 ), ExtResource( 272 ), ExtResource( 268 ), ExtResource( 251 ), ExtResource( 252 ), ExtResource( 260 ) ],
@@ -1288,10 +1296,20 @@ animations = [ {
 "name": "Corkscrew",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 303 ), ExtResource( 289 ), ExtResource( 245 ), ExtResource( 257 ), ExtResource( 266 ), ExtResource( 267 ), ExtResource( 269 ), ExtResource( 270 ), ExtResource( 278 ) ],
-"loop": true,
-"name": "Dash",
+"frames": [ ExtResource( 43 ), ExtResource( 55 ), ExtResource( 25 ) ],
+"loop": false,
+"name": "JumpTurn",
 "speed": 10.0
+}, {
+"frames": [ ExtResource( 86 ), ExtResource( 97 ), ExtResource( 84 ) ],
+"loop": false,
+"name": "CrouchTurn",
+"speed": 10.0
+}, {
+"frames": [ ExtResource( 276 ), ExtResource( 284 ), ExtResource( 258 ), ExtResource( 265 ), ExtResource( 294 ), ExtResource( 296 ), ExtResource( 291 ), ExtResource( 255 ), ExtResource( 301 ), ExtResource( 293 ), ExtResource( 253 ) ],
+"loop": true,
+"name": "CrouchUppercut",
+"speed": 5.0
 } ]
 
 [node name="Player" type="KinematicBody2D"]
@@ -1300,18 +1318,18 @@ script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-anims/Backdash = SubResource( 15 )
-anims/CrouchHook = SubResource( 2 )
-anims/CrouchJab = SubResource( 3 )
-anims/Dash = SubResource( 4 )
-anims/DashHook = SubResource( 5 )
-anims/JumpDash = SubResource( 6 )
-anims/JumpHook = SubResource( 7 )
-anims/JumpJab = SubResource( 8 )
-anims/Overhead = SubResource( 9 )
-anims/Shoryuken = SubResource( 10 )
-anims/StandHook = SubResource( 11 )
-anims/StandJab = SubResource( 12 )
+anims/Backdash = SubResource( 1 )
+anims/CrouchHook = SubResource( 3 )
+anims/CrouchJab = SubResource( 4 )
+anims/Dash = SubResource( 5 )
+anims/DashHook = SubResource( 6 )
+anims/JumpDash = SubResource( 7 )
+anims/JumpHook = SubResource( 8 )
+anims/JumpJab = SubResource( 9 )
+anims/Overhead = SubResource( 10 )
+anims/Shoryuken = SubResource( 11 )
+anims/StandHook = SubResource( 12 )
+anims/StandJab = SubResource( 13 )
 
 [node name="Camera" type="Camera2D" parent="."]
 offset = Vector2( 0, -20 )
@@ -1322,13 +1340,13 @@ smoothing_speed = 8.0
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
 position = Vector2( -6.4129, -14.9045 )
-shape = SubResource( 13 )
+shape = SubResource( 14 )
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 position = Vector2( -2.57953, -10 )
 scale = Vector2( 0.131, 0.131 )
-frames = SubResource( 14 )
-animation = "Shoryuken"
+frames = SubResource( 15 )
+animation = "JumpHook"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -1337,8 +1355,9 @@ collision_mask = 12
 script = ExtResource( 75 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -140.332, -44.6038 )
-shape = SubResource( 1 )
+position = Vector2( -168.878, -15.2105 )
+shape = SubResource( 2 )
+disabled = true
 
 [node name="Hurtbox" type="Area2D" parent="Sprite"]
 collision_mask = 6
@@ -1352,7 +1371,7 @@ disabled = true
 
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
-cancellable = true
+uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
 position = Vector2( -6.72717, 0 )

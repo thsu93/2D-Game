@@ -10,7 +10,7 @@ var cost = 0
 
 #These variables are supposed to dictate the movements of the attacker as it attacks
 var velocity = 0
-var direction = 0
+var direction = Vector2()
 
 #These variables are intended to dictate the movements of the attacked target
 #is added to get_hit_var

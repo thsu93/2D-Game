@@ -81,12 +81,13 @@ export(int) var max_HP = 5
 
 
 #HACK perhaps not needed
-export(bool) var cancellable = false
+export(bool) var uncancellable = false
 
 
 
 func _ready():
 	HP = max_HP
+	uncancellable = false
 
 # func _process(_delta):
 # 	#TODO MAKE A STATE PRIORITIZATION FUNCTION
@@ -227,24 +228,29 @@ func evaluate_state_change(new_state, state_changed):
 				
 		if state_changed == "MOVEMENT":
 			
+			#HIGHEST PRIORITY CHANGE 
+			if new_state == MOVE_STATE.JUMPING:
+				move_state_ = MOVE_STATE.JUMPING
+				pass #Should not require any changes to the animation state
+
+
 			if new_state == MOVE_STATE.CROUCHING:
 				#TODO Check if this will crouch in midair, possibly needs more complex checks
 				anim_state_ = ANIMATION_STATE.CROUCH_DOWN
 
+			#IF ANY CHANGES OUT OF CROUCHING, EXCEPTING JUMPING
+			if move_state_ == MOVE_STATE.CROUCHING:
+				if new_state != MOVE_STATE.CROUCHING:
+					anim_state_ = ANIMATION_STATE.STAND_UP
+			
 			if new_state == MOVE_STATE.STANDING:
 
-				if move_state_ == MOVE_STATE.CROUCHING:
-					anim_state_ = ANIMATION_STATE.STAND_UP
-
-				elif move_state_ == MOVE_STATE.RUNNING:
+				if move_state_ == MOVE_STATE.RUNNING:
 					anim_state_ = ANIMATION_STATE.RUN_STOP
 
 				else:
 					move_state_ = MOVE_STATE.STANDING
 
-			if new_state == MOVE_STATE.JUMPING:
-				move_state_ = MOVE_STATE.JUMPING
-				pass #Should not require any changes to the animation state
 			
 			if new_state == MOVE_STATE.FALLING:
 				move_state_ = MOVE_STATE.FALLING

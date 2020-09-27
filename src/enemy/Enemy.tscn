@@ -201,7 +201,7 @@ hue_variation = 0.05
 hue_variation_random = 0.46
 
 [node name="Enemy" type="KinematicBody2D"]
-collision_layer = 4
+collision_layer = 0
 collision_mask = 1031
 script = ExtResource( 5 )
 speed = Vector2( 75, 250 )

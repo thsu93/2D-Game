@@ -35,7 +35,6 @@ func _physics_process(delta):
 	if knockback != Vector2.ZERO:
 		knockback = knockback.move_toward(Vector2.ZERO, 1000*delta)
 		knockback = move_and_slide(knockback)
-		print(knockback)
 
 #Overload the get_class() function for hit detection purposes
 func get_class():
