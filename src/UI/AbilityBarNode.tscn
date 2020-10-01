@@ -1,16 +1,14 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://src/Scenes/UI/AbilityBarNode.gd" type="Script" id=1]
+[ext_resource path="res://src/UI/AbilityBarNode.gd" type="Script" id=1]
 [ext_resource path="res://assets/Selected.png" type="Texture" id=2]
 [ext_resource path="res://assets/UI/PNG/grey_panel.png" type="Texture" id=3]
 
 [node name="AbilityBarNode" type="TextureProgress"]
 anchor_right = 0.052
 anchor_bottom = 0.093
-margin_left = -0.374573
-margin_top = 0.749153
-margin_right = -0.214569
-margin_bottom = 0.309158
+margin_right = 58.4
+margin_bottom = 55.36
 step = 0.017
 texture_under = ExtResource( 3 )
 texture_over = ExtResource( 2 )

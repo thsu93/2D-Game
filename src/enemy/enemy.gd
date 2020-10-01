@@ -12,6 +12,7 @@ var _state = State.WALKING
 onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
+onready var hurtbox = $CollisionShape2D
 
 func _init():
 	actor_type = "enemy"
@@ -54,11 +55,12 @@ func _physics_process(_delta):
 # If the enemy encounters a wall or an edge, the horizontal velocity is flipped.
 func calculate_move_velocity(linear_velocity):
 	var velocity = linear_velocity
-
-	if not floor_detector_left.is_colliding():
-		velocity.x = speed.x
-	elif not floor_detector_right.is_colliding():
-		velocity.x = -speed.x
+	
+	if knockback == Vector2():
+		if not floor_detector_left.is_colliding():
+			velocity.x = speed.x
+		elif not floor_detector_right.is_colliding():
+			velocity.x = -speed.x
 
 
 	#BUG PRIORITY MINOR Enemy will spin uncontrollably if trappepd 
@@ -69,8 +71,13 @@ func calculate_move_velocity(linear_velocity):
 
 
 func destroy():
+	print("destroying")
 	_state = State.DEAD
 	_velocity = Vector2.ZERO
+
+	#HACK turn off collision for anything except world
+	self.collision_mask = 1024
+	
 
 
 func get_new_animation():
@@ -80,3 +87,7 @@ func get_new_animation():
 	else:
 		animation_new = "destroy"
 	return animation_new
+
+func _on_CharacterData_dead():
+	print("signal sent")
+	destroy()

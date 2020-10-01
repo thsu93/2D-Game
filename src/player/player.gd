@@ -2,40 +2,15 @@ class_name Player
 extends Actor
 
 
-# #EXAMPLE BUFFER SYSTEM
-# const COMBO_TIMEOUT = 0.3 # Timeout between key presses
-# const MAX_COMBO_CHAIN = 2 # Maximum key presses in a combo
-
-# var last_key_delta = 0    # Time since last keypress
-# var key_combo = []        # Current combo
-	
-# func _input(event):
-# 	if event is InputEventKey and event.pressed and !event.echo: # If distinct key press down
-# 		print(last_key_delta)
-# 		if last_key_delta > COMBO_TIMEOUT:                   # Reset combo if stale
-# 			key_combo = []
-		
-# 		key_combo.append(event.scancode)                     # Otherwise add it to combo
-# 		if key_combo.size() > MAX_COMBO_CHAIN:               # Prune if necessary
-# 			key_combo.pop_front()
-		
-# 		print(key_combo)                                     # Log the combo (could pass to combo evaluator)
-# 		last_key_delta = 0                                   # Reset keypress timer
-	
-# func _physics_process(delta):
-# 	last_key_delta += delta                                      # Track time between keypresses
-
-
 #TODO: PRIORITY SYSTEM FOR ANIMATIONS
-#TODO RESOLVE CONFLICTS BETWEEN ACTOR SPEED/GRAV AND CHAR VELOCITY
-#TODO MOVEMENT IS SLOPPY AS HELL, SLIDING EVERYWHERE ETC.
+#TODO ADJUST MIDAIR SPEED, AIR DEACCEL, MOVE AWAY FROM HARD STOP 
 const WALK_ACCEL = 450.0
 const WALK_DEACCEL = 3500.0
-const MAX_VELOCITY = 250.0
+const MAX_VELOCITY = 200.0
 const WALK_VELOCITY = 125.0
 const JUMP_VELOCITY = 500
 const STOP_JUMP_FORCE = 450.0
-const DASH_SPEED = 400
+const DASH_SPEED = 300
 const FLOOR_DETECT_DISTANCE = 20.0
 const BUFFER_MAX = 10
 
@@ -44,28 +19,28 @@ var current_animation = ""
 var siding_left = false
 var jumping = false
 var stopping_jump = false
-var slowed = false
+var slow_time = 0
 
+#TODO still have to fix platform detection
 onready var platform_detector = $PlatformDetector
 
 onready var attack_hitbox = $Sprite/Hitbox
 var floor_h_velocity = 0.0
 
-var airborne_time = 1e20
-var shoot_time = 1e20
+var airborne_time = 0
 
 var attack_data
 
+export var input_locked = false
+var external_movement_data = Vector2()
+var external_anim_time = 0
 
 var buffer_length = 0
 var buffered_movements = []
 var held_buffer = false
 
+#HACK TEMPORARY FOR MOVE CHECK, EVENTUALLY SHOULD BE UPDATED OUT OF PLAYERDATA
 
-#HACK FOR MOVE CHECK
-var l_movelist = ["Jab"]
-var r_movelist = ["Hook", "Overhead", "Shoryuken"]
-var movelist_num = 0
 
 func _init():
 	actor_type = "player"
@@ -91,165 +66,188 @@ func _ready():
 
 #PROCESS INPUT + CALCULATE PHYSICS
 #region 
-
-#TODO Ability to save movement state + data (speed, etc.)
+#TODO Ability to save movement state + data (speed, etc.) ?
 #TODO Refactor code to use input buffer rather than repeat move checks
 func _physics_process(delta):
-	
-	# Get the controls.
-	var move_left = Input.is_action_pressed("move_left")
-	var move_right = Input.is_action_pressed("move_right")
-	var jump = Input.is_action_pressed("jump")
-	var lclick = Input.is_action_just_pressed("lclick")
-	var rclick = Input.is_action_just_pressed("rclick")
-	var crouch = Input.is_action_pressed("crouch")
-	
-	var dashing = Input.is_action_just_pressed("dash")
-	var scroll_up = Input.is_action_just_released("scroll_up")
-	var scroll_down = Input.is_action_just_released("scroll_down")
-	
-	check_if_slowed()
 
-	if scroll_down:
-		movelist_num = movelist_num + 1 if movelist_num < 2 else 2
-		slowed = true
-		print(r_movelist[movelist_num])
+	#if there is any slowed-down time, check
+	time_slow(delta)
 
-	if scroll_up:
-		movelist_num = movelist_num -1 if movelist_num > 0 else 0
-		slowed = true
-		print(r_movelist[movelist_num])
-	
-	# Deapply prev floor velocity.
+	if not input_locked:
 
-	# var is_jump_interrupted = Input.is_action_just_released("jump") and _velocity.y < 0.0
+		# Get the controls. 
 
-	#TODO Evaluate how movement control works
-	#DO YOU EVEN REALLY WANT PHYSICS-BASED MOVEMENT VS DISCRETE CONTROLS MOVEMENT
-
-
-	# var x_dir = -1 if move_left and not move_right else 1 if move_right and not move_left else 0
-	# var direction = Vector2(x_dir, -1 if is_on_floor() and jump else 0)
-	# _velocity = calculate_move_velocity(_velocity, direction, speed, is_jump_interrupted)
-
-	#BUG DOES NOT DETECT IS ON FLOOR IF MID-ANIMATION
-
-	#ATTACKING
-	#TODO Decide how to handle momentum with moves, how to determine to preserve or not.
-	#BUG moves do not come out when going through transitional state animations
-	#BUG graphical bug of sliding back during jab, part of sprite rather than actual programmatic bug
-	#HACK the way attack movement is handled is incredibly janky and should not be done this way
-	if not char_data.uncancellable:
-		if lclick:
-			#TODO ADD DEPTH
-			#TODO move buffers?
-			#HACK direct move insert currently
-			char_data.change_anim_state("Attack", "Jab")
-			attack_data = char_data.get_move_data()
-			_velocity = Vector2(attack_data.direction.x * char_data.horizontal_state_ * -1, attack_data.direction.y) * attack_data.velocity
-			speed_reset()
-			slowed = false
-			#BUG char will slide while stand-jab if not forced into velocity 0
-
-		if rclick:
-			char_data.change_anim_state("Attack", r_movelist[movelist_num])
-			attack_data = char_data.get_move_data()
-			_velocity = Vector2(attack_data.direction.x * char_data.horizontal_state_ * -1, attack_data.direction.y) * attack_data.velocity
-			slowed = false
-			speed_reset()
-
-	var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if not is_on_floor() else Vector2.ZERO
-	var is_on_platform = platform_detector.is_colliding()
-
-	#DASH
-	#BUG into run post-dash w/out run-start
-	#BUG cannot forward dash after neutral jump in midair
-	#BUG If dash is cancelled into attack WILL NOT COME OUT OF NO-GRAV STATE
-	#TODO Determine if necessary
-	#HACK Handling no_grav from animationplayer
-	if char_data.anim_state_ == char_data.ANIMATION_STATE.DASHING:
-		_velocity.x = -char_data.horizontal_state_ * DASH_SPEED
-
-	elif char_data.anim_state_ == char_data.ANIMATION_STATE.BACKDASHING:
-		_velocity.x = char_data.horizontal_state_ * DASH_SPEED
+		var lclick = Input.is_action_just_pressed("lclick")
+		var rclick = Input.is_action_just_pressed("rclick")
 		
-	
-	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-		
-		# Update sidedness, give a bit of error room 
-		if _velocity.x < 0.5 and move_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
-			char_data.change_horiz_state("L")
-		
-		if _velocity.x > -0.5 and move_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
-			char_data.change_horiz_state("R")
+		var dashing = Input.is_action_just_pressed("dash")
+		var scroll_up = Input.is_action_just_released("scroll_up")
+		var scroll_down = Input.is_action_just_released("scroll_down")
 
-		# Process jump.
-		if not is_on_floor():
-			if _velocity.y > 0:
-				# Set off the jumping flag if going down.
-				#BUG will be in fall state when taking damage due to the way the knockback vector works. unclear solution.
-				char_data.change_move_state("Fall")
-			elif not jump:
-				stopping_jump = true
-			
-			if stopping_jump:
-				_velocity.y += STOP_JUMP_FORCE * delta
+		#Can likely get rid of these commands given 
+		var move_left = Input.is_action_pressed("move_left")
+		var move_right = Input.is_action_pressed("move_right")
+		var jump = Input.is_action_pressed("jump")
+		var crouch = Input.is_action_pressed("crouch")
 
-		if dashing:
-			print("dash start")
-			#HACK should determine if dashing in "facing" direction vs not
-			#TODO: Decide what optimal controls are here
-			if (move_right and char_data.horizontal_state_ == -1) or (move_left and char_data.horizontal_state_ == 1):
-				char_data.change_anim_state("Dash")
-			else:
-				char_data.change_anim_state("Backdash")
+		if scroll_down:
+			char_data.select_next_move()
+			slow_time += .25
+
+		if scroll_up:
+			char_data.select_prev_move()
+			slow_time += .25
 		
-		check_buffer()
-		
-		#BUG will not update if move_state is interrupted during jump
-		if is_on_floor():
-			if crouch:
-				if char_data.move_state_ == char_data.MOVE_STATE.CROUCHING:
-					if abs(_velocity.x) > 0:
-						var deaccel = WALK_DEACCEL * delta * 5
-						var new_velocity = _velocity.x - deaccel if _velocity.x - deaccel > 0 else 0
-						_velocity.x = new_velocity
-				else:
-					char_data.change_move_state("Crouch")
+		#PRESERVE CURRENT VELOCITY IF NO INPUTS ARE GIVEN
+		_velocity = _velocity
 
-			elif not crouch:
-				# Process logic when character is on floor.
-				if jump:
-					_velocity.y = -JUMP_VELOCITY
-					char_data.change_move_state("Jump")
-					stopping_jump = false
+		#BUG DOES NOT DETECT IS ON FLOOR IF MID-ANIMATION
 
-				update_movements(delta)
-
-				#CORRECT FOR OVERSPEED
-				if abs(_velocity.x) > MAX_VELOCITY:
-					_velocity.x = sign(_velocity.x) * MAX_VELOCITY
-				
-				#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
-				if not jump:
-					#CHANGE ANIMATIONS TO MATCH SPEED
-					if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
-						char_data.change_move_state("Walk")
-					elif abs(_velocity.x) > WALK_VELOCITY:
-						char_data.change_move_state("Run")
-					elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-						char_data.change_move_state("StandIdle")
-		
-	#TODO: Calculate move velocity allowing for:
-		#DASHING
 		#ATTACKING
 
-	# Unsure how to resolve this issue. Change to feature? unclear 
-	#BUG DOES NOT MOVE WITH MOVING PLATFORMS ETC.
-	#BUG CANNOT HANDLE SLOPES AT ALL
-	_velocity = move_and_slide_with_snap(
-		_velocity, snap_vector, FLOOR_NORMAL, not is_on_platform, 3, 0.9, false
-		)
+		#TODO Decide how to handle momentum with moves, how to determine to preserve or not.
+		#TODO buffer move inputs
+		#BUG? moves do not come out when going through transitional state animations
+		#BUG Attacking during the crouchdown/stand up animations is a bit janky
+		#HACK the way attack movement is handled is incredibly janky and should not be done this way
+		#Currently, pass in a movement vector, then the animation player will tell the char when to start playing it
+
+		if not char_data.uncancellable:
+			if lclick:
+				#TODO ADD DEPTH
+				#TODO move buffers?
+				char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+				attack_data = char_data.get_move_data()
+				external_movement_data = Vector2(attack_data.direction.x * char_data.horizontal_state_ * -1, attack_data.direction.y) * attack_data.velocity
+				external_anim_time = attack_data.anim_time
+				slow_time = 0
+				#BUG char will slide while stand-jab if not forced into velocity 0
+
+			if rclick:
+				char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING, true)
+				attack_data = char_data.get_move_data()
+				external_movement_data = Vector2(attack_data.direction.x * char_data.horizontal_state_ * -1, attack_data.direction.y) * attack_data.velocity
+				external_anim_time = attack_data.anim_time
+				slow_time = 0
+
+		if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+			#if want to have moves that are non-effected by gravity may need to reconsider
+			#However, those can likely handle themselves in the animation player
+			if no_grav == true:
+				no_grav = false
+			if not attack_data.running_type:
+				decelerate(delta)
+
+
+		#TODO THIS SNAP VECTOR IS REALLY BAD
+		# var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if not is_on_floor() else Vector2.ZERO
+		var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
+		var is_on_platform = platform_detector.is_colliding()
+
+		#DASH
+		#BUG get to run post-dash w/out run-start
+		#BUG If dash is cancelled into attack WILL NOT COME OUT OF NO-GRAV STATE
+		#BUG Ending backdashing will cause the character to go into running state while still moving backwards.
+		#HACK Handling no_grav from animationplayer
+		if char_data.anim_state_ == char_data.ANIMATION_STATE.DASHING:
+			_velocity.x = -char_data.horizontal_state_ * DASH_SPEED
+
+		elif char_data.anim_state_ == char_data.ANIMATION_STATE.BACKDASHING:
+			_velocity.x = char_data.horizontal_state_ * DASH_SPEED
+			
+		
+		#If no special state
+		#TODO this is a bad wayof handling this interaction
+		#You should do better later
+		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+			
+			# Update sidedness, give a bit of error room 
+			if _velocity.x < 0.5 and move_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
+				char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
+			
+			if _velocity.x > -0.5 and move_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
+				char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
+
+			if dashing:
+				print("dash start")
+				#HACK should determine if dashing in "facing" direction vs not
+				#TODO: Decide what optimal controls are here
+				if (move_right and char_data.horizontal_state_ == -1) or (move_left and char_data.horizontal_state_ == 1):
+					char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
+				else:
+					char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
+			
+			#Obtain directional input buffers
+			check_buffer()
+			update_movements(delta)
+			
+			# Process jump.
+			if not is_on_floor():
+				airborne_time += delta
+				if airborne_time > .1:
+					if _velocity.y > 0:
+						# Set off the jumping flag if going down.				
+						char_data.change_move_state(char_data.MOVE_STATE.FALLING)
+					elif not jump:
+						stopping_jump = true
+					
+					if stopping_jump:
+						_velocity.y += STOP_JUMP_FORCE * delta
+			
+			#BUG will not update if char never goes to fall_state
+			if is_on_floor():
+				if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+					char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+				airborne_time = 0
+				if crouch:
+					if char_data.move_state_ == char_data.MOVE_STATE.CROUCHING:
+						if abs(_velocity.x) > 0:
+							var deaccel = WALK_DEACCEL * delta * 5
+							var new_velocity = _velocity.x - deaccel if _velocity.x - deaccel > 0 else 0
+							_velocity.x = new_velocity
+					else:
+						char_data.change_move_state(char_data.MOVE_STATE.CROUCHING)
+
+				elif not crouch:
+					# Process logic when character is on floor.
+					if jump:
+						_velocity.y = -JUMP_VELOCITY
+						char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
+						stopping_jump = false
+
+					# old movement update location
+					# update_movements(delta)
+
+					#CORRECT FOR OVERSPEED
+					if abs(_velocity.x) > MAX_VELOCITY:
+						_velocity.x = sign(_velocity.x) * MAX_VELOCITY
+					
+					#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
+					if not jump:
+						#CHANGE ANIMATIONS TO MATCH SPEED
+						if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
+							char_data.change_move_state(char_data.MOVE_STATE.WALKING)
+						elif abs(_velocity.x) > WALK_VELOCITY and not sign(_velocity.x) == char_data.horizontal_state_:
+							#CANNOT RUN WHILE MOVING BACKWARDS
+							char_data.change_move_state(char_data.MOVE_STATE.RUNNING)
+						elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+							char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+			
+		#TODO: Calculate move velocity allowing for:
+			#DASHING
+			#ATTACKING
+
+		# Unsure how to resolve this issue. Change to feature? unclear 
+		# WILL SLIDE DOWN HILLS, UNSURE IF DESIRED IMPLEMENTATION.
+		_velocity = move_and_slide_with_snap(
+			_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
+			)
+
+	
+	else: #if the player input is locked out
+		external_movement(delta)
+#endregion
+
 
 func get_buttons_pressed():
 	var new_input = 5
@@ -262,24 +260,37 @@ func get_buttons_pressed():
 			new_input = 9
 		else:
 			new_input = 6
-	if Input.is_action_pressed("move_left"):
-		if Input.is_action_pressed("move_right"):
-			new_input = 5
-		elif Input.is_action_pressed("crouch"):
+	elif Input.is_action_pressed("move_left"):
+		if Input.is_action_pressed("crouch"):
 			new_input = 1
 		elif Input.is_action_pressed("jump"):
 			new_input = 7
 		else:
 			new_input = 4
+	elif Input.is_action_pressed("crouch"):
+		if Input.is_action_pressed("jump"):
+			new_input = 5
+		else:
+			new_input = 2
+	elif Input.is_action_pressed("jump"):
+		new_input = 8
 	return new_input
 
 func check_buffer():
 	var new_move = get_buttons_pressed()
 	buffered_movements.append(new_move)
-	if buffered_movements.size() > 2 and not buffered_movements[-1] == buffered_movements[-2]:
-		held_buffer = false
+	check_held()
 	if buffered_movements.size() > BUFFER_MAX:
 		buffered_movements.remove(0)
+
+#Check if still running, preserving if character is jumping while running
+func check_held():
+	#If more than two movements stored in buffer that do not match
+	if buffered_movements.size() > 2 and not buffered_movements[-1] == buffered_movements[-2]:
+		#If the mismatch is not resulting from a jump
+		if not ((buffered_movements[-1] in [4,7] and buffered_movements[-2] in [4,7]) 
+			or (buffered_movements[-1] in [6,9] and buffered_movements[-2] in [6,9])):
+			held_buffer = false
 
 func update_movements(delta):
 	if buffered_movements.size() > 1:
@@ -298,11 +309,15 @@ func update_movements(delta):
 			else:
 				_velocity.x = WALK_VELOCITY
 		elif buffered_movements[-1] == 5:
-			var xv = abs(_velocity.x)
-			xv -= WALK_DEACCEL * delta
-			if xv < 0:
-				xv = 0
-			_velocity.x = sign(_velocity.x) * xv
+			decelerate(delta)
+
+func decelerate(delta):
+	if is_on_floor():
+		var xv = abs(_velocity.x)
+		xv -= WALK_DEACCEL * delta
+		if xv < 0:
+			xv = 0
+		_velocity.x = sign(_velocity.x) * xv
 
 
 func check_dash(sequence):
@@ -320,6 +335,7 @@ func check_dash(sequence):
 	if count == 0:
 		found = true
 		held_buffer = true
+		#Clear the buffer. May have to revist this later for more complex inputs. 
 		flush_buffer()
 		print("success")
 	return found
@@ -333,14 +349,6 @@ func flush_buffer():
 func speed_reset():
 	if not (char_data.move_state_ == char_data.MOVE_STATE.JUMPING or char_data.move_state_ == char_data.MOVE_STATE.FALLING):
 		_velocity.x = 0
-
-#HACK current means of playing with time manipulation
-#TODO improve overall time-slow situation
-func check_if_slowed():
-	if slowed:
-		Engine.time_scale = 0.5
-	else:
-		Engine.time_scale = 1
 
 # This function calculates a new velocity whenever you need it.
 # It allows you to interrupt jumps.
@@ -377,35 +385,102 @@ func _on_CharacterData_play_animation(new_anim):
 	animation_player.play(current_animation)
 
 func _on_Sprite_animation_finished():
-	if current_animation =="Backdash":
-		print("Backdash End")
-		speed_reset()
-	char_data.animation_completed()
+	#HACK reset speeds shouldn't be like this
+	if not current_animation in animation_player.get_animation_list():
+		if current_animation =="Backdash":
+			speed_reset()
+		char_data.animation_completed()
 
 	# current_animation = char_data.get_new_animation()
 	#play_new_sprite()
 
 #Does this double up with the sprite animation finish?
 func _on_AnimationPlayer_animation_finished(_anim_name):
-	char_data.animation_completed()
+	print(_anim_name, " finished")
 	char_data.uncancellable = false
+	char_data.animation_completed()
+
+#Function to handle non-player movements
+#TODO change to move to a point, not move for x time
+func external_movement(delta):
+	if external_anim_time < 0:
+		input_locked = false
+		no_grav = false
+	else:
+		no_grav = true
+		external_movement_data = move_and_slide(external_movement_data)
+		external_anim_time -= delta
+	print(external_movement_data)
+	pass
+
+func force_velocity(new_velocity):
+	_velocity = new_velocity
+
+#HACK, NEED TO HAVE A DIFFERENT WAY TO DEAL WITH CANCELLING MOVES
+func _on_AnimationPlayer_animation_changed(_anim_name):
+	if no_grav == true:
+		no_grav = false
+	char_data.animation_completed()
 
 func _on_CharacterData_turn_sprite():
 	self.scale.x *= -1
 
-func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
+func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
 	print("TARGET ENTERED")
 	if body.get_class() == "Actor":
+
+		#HITSTOP
+		OS.delay_msec(25)
+
+		#Find where the hitspark should be located
+		var hit_pos = get_collision_position(body)
+
+
 		#HACK TEMPORARY KNOCKBACK CALC
-		attack_data.knockback_dir = Vector2(-1 * char_data.horizontal_state_ * attack_data.knockback_dir.x, attack_data.knockback_dir.y)
+		attack_data.knockback_dir = Vector2(-1 * char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
 		print(attack_data.get_hit_var)
 		body.take_damage(attack_data.get_hit_var())
-		slowed = true
+		slow_time += attack_data.slow_time
 
 
-#endregion
+		#HACK turn off hitbox once has collided
+		#Should probably handle this differently, given the possibility of hitting through two enemies
+		attack_hitbox.get_node("CollisionShape2D").disabled = true
+
+		#HACK hitspark
+		$Sprite/Hitbox/Hitspark.global_position = hit_pos
+		$Sprite/Hitbox/Hitspark.visible = true
+		$Sprite/Hitbox/Hitspark.frame = 0
+		$Sprite/Hitbox/Hitspark.scale.x = abs($Sprite/Hitbox/Hitspark.scale.x) * char_data.horizontal_state_
+		$Sprite/Hitbox/Hitspark.play(attack_data.hitspark)
 
 
+#HACK hitspark location calculation
+#Uses the average position between the attack hitbox and the target hurtbox.  Not ideal way to calculate. 
+#Ideal would probably be find both hitbox+hurtbox position and extents, calculate the overlapped regions and then find the middle of the overlapped region
+func get_collision_position(body):
+	var body_area_pos = body.get_node("CollisionShape2D").global_position
+	var self_body_pos = $Sprite/Hitbox/CollisionShape2D.global_position
+	return (body_area_pos + self_body_pos) / 2
+	#endregion
+
+
+#HACK current means of playing with time manipulation
+#TODO improve overall time-slow situation
+
+func time_slow(delta):
+	if slow_time > 0:
+		Engine.time_scale = .5
+		slow_time -= delta
+	else:
+		Engine.time_scale = 1
+		slow_time = 0
+	
+func get_HP():
+	return char_data.HP
+
+func get_max_HP():
+	return char_data.max_HP
 
 
 #DEPRECATED CODE
@@ -503,8 +578,6 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 	# var dodgeable_objects = ["projectile",
 	# 					"melee",]
 	
-	
-	# #TODO: Analyze the in-game need for this.   
 	# var forced_movement = false
 	# var external_speed = 0
 	# var external_direction = Vector2(0,0)
@@ -867,10 +940,6 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 	
 	# #endregion
 
-#endregion
-
-
-
 				#DEPRECATED ACCEL/DECEL MOVE CODE
 				# if move_left and not move_right:
 				# 	if _velocity.x > -MAX_VELOCITY:
@@ -888,3 +957,5 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape ):
 				# 	if xv < 0:
 				# 		xv = 0
 				# 	_velocity.x = sign(_velocity.x) * xv
+
+#endregion

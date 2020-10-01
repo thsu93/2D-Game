@@ -1,0 +1,24 @@
+[gd_scene format=2]
+
+[node name="Control" type="Control"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_right = 296.0
+margin_bottom = 52.0
+text = "TESTING LABEL TESTING LABEL TESTING LABEL"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+margin_top = 450.0
+margin_right = 500.0
+margin_bottom = 480.0
+__meta__ = {
+"_edit_use_anchors_": false
+}

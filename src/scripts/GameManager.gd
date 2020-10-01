@@ -4,13 +4,9 @@ export(String)var title_scene
 
 export(NodePath)var player_path
 export(NodePath)var UI_control_path
-export(NodePath)var camera_path
-export(NodePath)var spawn_layer_path
 
 var player
 var UI
-var camera
-var spawn_layer
 var select
 var slowed = false
 var slowable = true
@@ -25,10 +21,6 @@ func _ready():
 	
 	player = get_node(player_path)
 	UI = get_node(UI_control_path)
-	camera = get_node(camera_path)
-	spawn_layer = get_node(spawn_layer_path)
-	
-	player.set_camera(camera.get_path())
 	
 	slowdown_timer.set_one_shot(true)
 	slowdown_timer.set_wait_time(BULLET_TIME_LENGTH)
@@ -41,7 +33,7 @@ func _ready():
 	add_child(slowdown_cd_timer)
 
 	UI.set_max_HP(player.get_max_HP())
-	UI.set_movelist(player.get_movelist())
+	# UI.set_movelist(player.get_movelist())
 
 
 func _physics_process(_delta):
@@ -87,10 +79,6 @@ func get_player_pos():
 	return player.get_position()
 	
 	
-#OBJECT SPAWNING MECHANICS
-func spawn(obj):
-	spawn_layer.add_child(obj)
-
 #func _on_Char_dash_cooldown(DASH_COOLDOWN):
 #	UI.dash_cooldown(DASH_COOLDOWN)
 #
@@ -99,9 +87,9 @@ func spawn(obj):
 func _on_Char_game_over():
 	get_tree().change_scene(title_scene)
 
-func _on_Char_damage_taken():
-#	DETERMINE SCREENSHAKE VALS
-	camera.shake(.3, 5, 15)
+# func _on_Char_damage_taken():
+# #	DETERMINE SCREENSHAKE VALS
+# 	camera.shake(.3, 5, 15)
 
 func update_HP():
 	UI.show_HP(player.get_HP())

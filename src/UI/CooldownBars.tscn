@@ -1,12 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://src/Scenes/UI/HPBar.gd" type="Script" id=1]
-
-[sub_resource type="StyleBoxFlat" id=3]
-bg_color = Color( 0.941176, 0.145098, 0.0627451, 1 )
-
-[sub_resource type="StyleBoxFlat" id=2]
-bg_color = Color( 0.282353, 0.870588, 0.0745098, 1 )
+[ext_resource path="res://src/UI/HPBar.gd" type="Script" id=1]
 
 [node name="CooldownBars" type="VBoxContainer"]
 anchor_left = 0.5
@@ -14,66 +8,15 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 margin_left = -400.0
-margin_top = -104.0
+margin_top = -50.0
 margin_right = 400.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="BulletTimeCooldownBar" type="ProgressBar" parent="."]
+[node name="HPBar" type="ProgressBar" parent="."]
 margin_right = 800.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 800, 50 )
-custom_styles/fg = SubResource( 3 )
-percent_visible = false
-
-[node name="Label2" type="Label" parent="BulletTimeCooldownBar"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -77.0
-margin_top = -7.0
-margin_right = 77.0
-margin_bottom = 7.0
-text = "TIMESLOW COOLDOWN"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="DashCooldownBar" type="ProgressBar" parent="."]
-visible = false
-margin_top = 54.0
-margin_right = 800.0
-margin_bottom = 104.0
-rect_min_size = Vector2( 800, 50 )
-custom_styles/fg = SubResource( 2 )
-custom_colors/font_color = Color( 0.796078, 0.0784314, 0.0784314, 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-percent_visible = false
-
-[node name="Label" type="Label" parent="DashCooldownBar"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -60.5
-margin_top = -7.0
-margin_right = 60.5
-margin_bottom = 7.0
-text = "DASH COOLDOWN"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="HPBar" type="ProgressBar" parent="."]
-margin_top = 54.0
-margin_right = 800.0
-margin_bottom = 104.0
 rect_min_size = Vector2( 800, 50 )
 script = ExtResource( 1 )
 

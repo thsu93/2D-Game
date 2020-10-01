@@ -16,7 +16,6 @@ var selected = INITIAL
 #onready var dash_cd_bar = $CooldownBars/DashCooldownBar
 #var dash_cd_remaining = 0
 #var max_dash_cd
-onready var slowdown_cd_bar = $CooldownBars/BulletTimeCooldownBar
 onready var HP_bar = $CooldownBars/HPBar
 var slowdown_cd_remaining = 0
 var max_slowdown_cd
@@ -30,23 +29,15 @@ func _ready():
 
 func _process(delta):
 	var dir = ""
-	if Input.is_action_just_released("ui_swap_down"):
+	if Input.is_action_just_released("scroll_up"):
 		dir = "down"
-	if Input.is_action_just_released("ui_swap_up"):
+	if Input.is_action_just_released("scroll_down"):
 		dir = "up"
 
-	if not dir == "":
-		var changed = grid.change_selection(dir)
-		if changed:
-			emit_signal("special_change", grid.get_selected_special())
-
-	if slowdown_cd_remaining > 0:
-		slowdown_cd_remaining -= delta
-		slowdown_cd_bar.value = slowdown_cd_remaining / max_slowdown_cd * 100
-#
-#	if dash_cd_remaining > 0:
-#		dash_cd_remaining -= delta
-#		dash_cd_bar.value = dash_cd_remaining / max_dash_cd * 100
+	# if not dir == "":
+	# 	var changed = grid.change_selection(dir)
+	# 	if changed:
+	# 		emit_signal("special_change", grid.get_selected_special())
 
 
 func get_total_cd():
@@ -57,9 +48,6 @@ func set_movelist(movelist):
 
 func set_max_HP(maxHP):
 	HP_bar.set_maxHP(maxHP)
-
-
-
 
 func show_HP(curr_hp):
 	$CooldownBars/HPBar.value = curr_hp

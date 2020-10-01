@@ -1,21 +1,36 @@
 extends "res://src/scripts/CharacterData.gd"
 class_name PlayerData
 
-
-
 #TODO
 #Attach move list
 #Does the move dict need anything other than hit data? 
 #HACK directly loaded in moves
 var MOVE_DICTIONARY = {
-	"Jab": preload("res://src/attacks/jab.gd").new(),
+	"Jab": preload("res://src/attacks/jab.gd").new() ,
 	"Hook": preload("res://src/attacks/hook.gd").new(),
 	"Overhead" : preload("res://src/attacks/overhead.gd").new(),
 	"Shoryuken" : preload("res://src/attacks/shoryuken.gd").new(),
+	"Corkscrew" : preload("res://src/attacks/corkscrew.gd").new(),
+	"Combo (Light)" : preload("res://src/attacks/combolight.gd").new(),
+	"Combo (Heavy)": preload("res://src/attacks/comboheavy.gd").new(),
 }
 
+var movelist = [[MOVE_DICTIONARY["Jab"], MOVE_DICTIONARY["Hook"]], 
+				[MOVE_DICTIONARY["Corkscrew"], MOVE_DICTIONARY["Overhead"]], 
+				[MOVE_DICTIONARY["Combo (Light)"], MOVE_DICTIONARY["Combo (Heavy)"]], 
+			]
+
+var regen_rate = 15
+
+var cur_move_num = 0
+
 func _ready():
-	cur_attack = MOVE_DICTIONARY[cur_attack_name]
+	cur_attack = movelist[cur_move_num]
+	max_HP = 100
+	HP = max_HP
+
+func _physics_process(delta):
+	HP = 100 if HP + regen_rate * delta > 100 else HP + regen_rate * delta
 
 func is_move(move_name):
 	if move_name in MOVE_DICTIONARY:
@@ -24,9 +39,24 @@ func is_move(move_name):
 		print("ERROR: ", move_name , " IS NOT AN EXISTING MOVE")
 		return false
 
+func process_attack():
+	HP -= MOVE_DICTIONARY[cur_movename].cost
+	print(HP)
+
+
+#TODO double using variables to track, kinda gross
+#How do you want to handle attakc combinations
 func get_move_data():
-	MOVE_DICTIONARY[cur_attack_name].print_data()
-	return MOVE_DICTIONARY[cur_attack_name]
+	MOVE_DICTIONARY[cur_movename].print_data()
+	return MOVE_DICTIONARY[cur_movename]
+
+func select_next_move():
+	cur_move_num = cur_move_num + 1 if cur_move_num + 1 < movelist.size() else movelist.size()-1
+	cur_attack = movelist[cur_move_num]
+
+func select_prev_move():
+	cur_move_num = cur_move_num -1 if cur_move_num > 0 else 0
+	cur_attack = movelist[cur_move_num]
 
 # var special_node = preload("res://src/Scenes/Attacks/AbilityInfo.gd")
 # var FULL MOVE DICTIONARY
@@ -37,8 +67,7 @@ func get_move_data():
 # var current_move = 0
 
 # func _ready():
-# 	max_HP = 5
-# 	HP = max_HP
+
 # 	for move in selected_move_nums:
 # 		var child = Node.new()
 # 		child.name = "Move" + String(move)

@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://assets/UI/DialogueFont.tres" type="DynamicFont" id=1]
-[ext_resource path="res://src/Scenes/UI/DialoguePlayer.tscn" type="PackedScene" id=2]
-[ext_resource path="res://src/Scenes/UI/Dialogue.gd" type="Script" id=3]
+[ext_resource path="res://src/UI/DialoguePlayer.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/UI/Dialogue.gd" type="Script" id=3]
 
 [node name="Dialogue" type="Control"]
 anchor_left = 0.5
@@ -81,4 +81,3 @@ __meta__ = {
 
 [node name="DialoguePlayer" parent="." instance=ExtResource( 2 )]
 [connection signal="button_up" from="DialogueBox/Button" to="." method="_on_Button_button_up"]
-[connection signal="dialogue_complete" from="DialoguePlayer" to="." method="_on_DialoguePlayer_dialogue_complete"]

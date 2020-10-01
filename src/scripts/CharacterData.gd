@@ -32,6 +32,7 @@ enum DAMAGE_STATE{
 	HIT,
 	COUNTERHIT,
 	INVULN,
+	DEAD,
 }
 
 enum HORIZONTAL_STATE{
@@ -68,7 +69,7 @@ var cur_move_state_ = move_state_
 #ATTACK DATA
 #HACK, rewrite this for more complexity later
 var cur_attack = null
-var cur_attack_name = "Jab"
+var cur_movename = "Jab"
 
 #ANIMATIONS CONTAINED WITHIN CHAR
 var sprite_library
@@ -89,48 +90,31 @@ func _ready():
 	HP = max_HP
 	uncancellable = false
 
-# func _process(_delta):
-# 	#TODO MAKE A STATE PRIORITIZATION FUNCTION
-# 	#DEPRECATED?
-# 	# if not anim_state_ == cur_anim_state:
-# 	# 	emit_signal("anim_state_change", anim_state_)
-# 	# 	cur_anim_state = anim_state_
-
-# 	# if not horizontal_state_ == cur_horizontal_state_ :
-# 	# 	emit_signal("horizontal_state_change", horizontal_state_)
-# 	# 	cur_horizontal_state_ = horizontal_state_
-
-# 	# if not move_state_ == cur_move_state_  :
-# 	# 	emit_signal("move_state_change", move_state_ )
-# 	# 	cur_move_state_ = move_state_ 
-
-# 	# if not damage_state_ == cur_damage_state_:
-# 	# 	emit_signal("damage_state_change", damage_state_)
-# 	# 	cur_damage_state_ = damage_state_
-
-
-
 func take_damage(dmg):
 	if not damage_state_ == DAMAGE_STATE.INVULN:
-		match (anim_state_):
-			ANIMATION_STATE.DASHING:
-				pass
-			ANIMATION_STATE.ATTACKING:
-				HP -= dmg	#Should some sort of multiplier?
-				damage_state_ = DAMAGE_STATE.COUNTERHIT
-				emit_signal("damage_state_change", damage_state_)
-				#multiplied damage
-			#STATE.BLOCKING:
-				#reduced damage
-			_:
-				HP -= dmg
-				damage_state_ = DAMAGE_STATE.HIT
-				emit_signal("damage_state_change", damage_state_)
+		# match (anim_state_):
+		# 	ANIMATION_STATE.DASHING:
+		# 		pass
+		# 	ANIMATION_STATE.ATTACKING:
+		# 		HP -= dmg	#Should some sort of multiplier?
+		# 		damage_state_ = DAMAGE_STATE.COUNTERHIT
+		# 		emit_signal("damage_state_change", damage_state_)
+		# 		#multiplied damage
+		# 	#STATE.BLOCKING:
+		# 		#reduced damage
+		# 	_:
+		# 		HP -= dmg
+		# 		damage_state_ = DAMAGE_STATE.HIT
+		# 		emit_signal("damage_state_change", damage_state_)
+		
+		HP -= dmg
+		print("hit ", HP)
+		
 		if HP <= 0:
 			emit_signal("dead")
 			
 
-#TODO: What does this do?
+#TODO: What does this actually do for gameplay?
 func toggle_invuln():
 	if damage_state_ == DAMAGE_STATE.INVULN:
 		damage_state_ = DAMAGE_STATE.IDLE
@@ -141,19 +125,8 @@ func toggle_invuln():
 #region change_horiz_state
 func change_horiz_state(dir):
 	#if trying to turn to the direction already facing
-	if (dir == "L" and horizontal_state_ == 1) or (dir == "R" and horizontal_state_ == -1):
-		#ignore 
-		pass
-	else:
-		#try to start turn animation
-		var new_state = HORIZONTAL_STATE.R
-		if dir == "L":
-			new_state = HORIZONTAL_STATE.L
-		elif dir == "R":
-			new_state = HORIZONTAL_STATE.R
-		evaluate_state_change(new_state, "HORIZONTAL")
-		#anim_state_ = ANIMATION_STATE.TURNING
-		update_current_animation()
+	if not dir == horizontal_state_:
+		evaluate_state_change(dir, "HORIZONTAL")
 #endregion
 
 #change mvmt state
@@ -163,39 +136,25 @@ func change_move_state(new_state):
 	#should be checked in player via on_floor
 	#unsure how to handle better
 
-	# if new_state == "Crouch":
-	# 	if move_state_ == MOVE_STATE.CROUCHING:
-	# 		pass
-	# 	else:
-	# 		anim_state_=ANIMATION_STATE.CROUCH_DOWN
-	# elif new_state == "Run":
-	# 	if not move_state_ == MOVE_STATE.RUNNING:
-
-	match new_state:
-		"Crouch" : new_state = MOVE_STATE.CROUCHING
-		"StandIdle": new_state = MOVE_STATE.STANDING
-		"Jump" : new_state = MOVE_STATE.JUMPING
-		"Fall" : new_state = MOVE_STATE.FALLING
-		"Walk" : new_state = MOVE_STATE.WALKING
-		"Run" : new_state = MOVE_STATE.RUNNING
-
 	if not new_state == move_state_:
 		evaluate_state_change(new_state, "MOVEMENT")
+	else:
+		update_current_animation()
 
 #change dmg state 
 
 #change animation state
 #HACK should handle this more cleanly
-func change_anim_state(new_state, move_name = ""):
-	if new_state == "Dash":
+func change_anim_state(new_state, special = false):
+	if new_state == ANIMATION_STATE.DASHING:
 		evaluate_state_change(ANIMATION_STATE.DASHING, "ANIMATION")
-	if new_state == "Backdash":
+	if new_state == ANIMATION_STATE.BACKDASHING:
 		evaluate_state_change(ANIMATION_STATE.BACKDASHING, "ANIMATION")
-	if new_state == "Attack":
-		cur_attack_name = move_name
+	if new_state == ANIMATION_STATE.ATTACKING:
+		cur_movename = cur_attack[0].movename if not special else cur_attack[1].movename
 		evaluate_state_change(ANIMATION_STATE.ATTACKING, "ANIMATION")
-		
 	pass
+
 
 #See if char is currently able to change state
 #region 
@@ -218,8 +177,7 @@ func evaluate_state_change(new_state, state_changed):
 
 		elif new_state == ANIMATION_STATE.ATTACKING:
 			anim_state_ = ANIMATION_STATE.ATTACKING
-			print("Attacking")
-			print(cur_attack_name)
+			process_attack()
 
 	if anim_state_ == ANIMATION_STATE.IDLE:
 		#start turn
@@ -235,7 +193,6 @@ func evaluate_state_change(new_state, state_changed):
 
 
 			if new_state == MOVE_STATE.CROUCHING:
-				#TODO Check if this will crouch in midair, possibly needs more complex checks
 				anim_state_ = ANIMATION_STATE.CROUCH_DOWN
 
 			#IF ANY CHANGES OUT OF CROUCHING, EXCEPTING JUMPING
@@ -271,11 +228,16 @@ func evaluate_state_change(new_state, state_changed):
 
 
 	else: #If playing another animation right now
+		print("nothing")
 		pass #Do not update anything
 	
 	update_current_animation()
 #endregion
 
+#region HOW CHARACTER WILL HANDLE ATTACKING
+func process_attack():
+	pass
+#endregion
 
 #region update_current_animation 
 func update_current_animation():
@@ -296,7 +258,7 @@ func update_current_animation():
 		new_anim = "Backdash"
 	
 	elif anim_state_ == ANIMATION_STATE.ATTACKING:
-		new_anim = cur_attack_name
+		new_anim = cur_movename
 
 	elif anim_state_ == ANIMATION_STATE.TURNING:
 		new_anim = "Turn"
@@ -313,7 +275,7 @@ func update_current_animation():
 
 	
 	elif anim_state_ == ANIMATION_STATE.ATTACKING:
-		new_anim = cur_attack_name
+		new_anim = cur_movename
 		pass
 		#no attacking animations current
 		#should probably defer this call to a more complex function given possible variants
@@ -357,7 +319,7 @@ func match_vert_state(new_anim):
 		MOVE_STATE.CROUCHING : temp_anim = "Crouch" + new_anim
 		MOVE_STATE.STANDING : temp_anim = "Stand" + new_anim
 		MOVE_STATE.JUMPING : temp_anim = "Jump" + new_anim
-		MOVE_STATE.FALLING : temp_anim = "Fall" + new_anim
+		MOVE_STATE.FALLING : temp_anim = "Jump" + new_anim
 		MOVE_STATE.WALKING : temp_anim = "Walk" + new_anim
 		MOVE_STATE.RUNNING : temp_anim = "Run" + new_anim
 		MOVE_STATE.DASHING : temp_anim = "Dash" + new_anim
@@ -380,32 +342,30 @@ func match_vert_state(new_anim):
 #region animation_completed()
 func animation_completed():
 	#THE TRANSITIONAL ANIMATIONS
+	var move_state_change = false
 	#if turning state, change horizontal state
 	if anim_state_ == ANIMATION_STATE.TURNING:
 		horizontal_state_ *= -1 #FLIP SIDE
 		emit_signal("turn_sprite")
 
 	#RunStart
-	if anim_state_ == ANIMATION_STATE.RUN_START:
-		move_state_ = MOVE_STATE.RUNNING
-
-	#RunStop
-	if anim_state_ == ANIMATION_STATE.RUN_STOP:
-		move_state_ = MOVE_STATE.STANDING
-
-	#CrouchDown
-	if anim_state_ == ANIMATION_STATE.CROUCH_DOWN:
-		move_state_ = MOVE_STATE.CROUCHING
-
-	#StandUp
-	if anim_state_ == ANIMATION_STATE.STAND_UP:
-		move_state_ = MOVE_STATE.STANDING
-
-	if anim_state_ == ANIMATION_STATE.BACKDASHING:
-		move_state_ = MOVE_STATE.STANDING
-
+	else:
+		move_state_change = true
+		match anim_state_:
+			ANIMATION_STATE.RUN_START:	move_state_ = MOVE_STATE.RUNNING
+			ANIMATION_STATE.RUN_STOP:	move_state_ = MOVE_STATE.STANDING
+			ANIMATION_STATE.CROUCH_DOWN:	move_state_ = MOVE_STATE.CROUCHING
+			ANIMATION_STATE.STAND_UP:	move_state_ = MOVE_STATE.STANDING
+			ANIMATION_STATE.BACKDASHING:	move_state_ = MOVE_STATE.STANDING
+			ANIMATION_STATE.IDLE: move_state_change = MOVE_STATE.STANDING
+			_: move_state_change = false
+	
 	anim_state_ = ANIMATION_STATE.IDLE
-	evaluate_state_change(anim_state_, "ANIMATION")
+
+	if move_state_change:
+		change_move_state(move_state_)
+	else: 
+		evaluate_state_change(anim_state_, "ANIMATION")
 #endregion
 
 func get_new_animation():

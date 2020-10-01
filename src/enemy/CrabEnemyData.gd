@@ -5,6 +5,8 @@ class_name CrabEnemyData
 # var a = 2
 # var b = "text"
 
+func _init():
+	HP = 5
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

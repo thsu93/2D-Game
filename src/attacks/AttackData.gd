@@ -3,14 +3,18 @@ class_name AttackData
 
 #region ATTACK-RELATED VARIABLES
 var movename = "None"
+var animname = "None"
 var dmg = 0
 var attacker = "None"
 
 var cost = 0
 
+var slow_time = .25
+
 #These variables are supposed to dictate the movements of the attacker as it attacks
 var velocity = 0
 var direction = Vector2()
+var anim_time = 0
 
 #These variables are intended to dictate the movements of the attacked target
 #is added to get_hit_var
@@ -18,14 +22,22 @@ var knockback_val = 350
 var knockback_dir = Vector2(1,0)
 
 #TODO: decide if want the following datums
-var ground_type = "" #T/F vs descriptor (stand, crouch, etc) vs all-types dict
-var air_type = "" #
+var ground_type = true #T/F vs descriptor (stand, crouch, etc) vs all-types dict
+var air_type = true #
+var crouch_type = true
+var running_type = false
+
+
+
 var priority = 0 #? unsure if will have this system
 
 #How much damage scaling for combos
 #Currently have yet to implement this system 
 var scaling = 1
 var hitstun = 1
+
+#Type of hitspark to play on hit
+var hitspark = "default"
 
 #Special properties of the attack
 var invincibility = false

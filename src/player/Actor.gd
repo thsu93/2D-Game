@@ -44,4 +44,5 @@ func take_damage(hit_var):
 	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
 	print(hit_var["knockback_dir"])
 	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"]
+	char_data.take_damage(hit_var["dmg"])
 	print(knockback)
