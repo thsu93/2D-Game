@@ -1,0 +1,333 @@
+[gd_scene load_steps=78 format=2]
+
+[ext_resource path="res://src/enemy/NanayaCharacterData.gd" type="Script" id=1]
+[ext_resource path="res://src/enemy/EnemyNew.gd" type="Script" id=2]
+[ext_resource path="res://src/player/bullet.png" type="Texture" id=3]
+[ext_resource path="res://assets/audio/sound_explode.wav" type="AudioStream" id=4]
+[ext_resource path="res://assets/audio/sound_hit.wav" type="AudioStream" id=5]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_005.png" type="Texture" id=6]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_008.png" type="Texture" id=7]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_007.png" type="Texture" id=8]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_009.png" type="Texture" id=9]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_010.png" type="Texture" id=10]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_003.png" type="Texture" id=11]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_000.png" type="Texture" id=12]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_001.png" type="Texture" id=13]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_002.png" type="Texture" id=14]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_004.png" type="Texture" id=15]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_006.png" type="Texture" id=16]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_012.png" type="Texture" id=17]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_015.png" type="Texture" id=18]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_014.png" type="Texture" id=19]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_011.png" type="Texture" id=20]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh00_013.png" type="Texture" id=21]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_008.png" type="Texture" id=22]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_007.png" type="Texture" id=23]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_006.png" type="Texture" id=24]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_003.png" type="Texture" id=25]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_004.png" type="Texture" id=26]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_005.png" type="Texture" id=27]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_000.png" type="Texture" id=28]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_002.png" type="Texture" id=29]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/7sh28_001.png" type="Texture" id=30]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_004.png" type="Texture" id=31]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_003.png" type="Texture" id=32]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_001.png" type="Texture" id=33]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_000.png" type="Texture" id=34]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_002.png" type="Texture" id=35]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_000.png" type="Texture" id=36]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_006.png" type="Texture" id=37]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_003.png" type="Texture" id=38]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_005.png" type="Texture" id=39]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_006.png" type="Texture" id=40]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_005.png" type="Texture" id=41]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_005.png" type="Texture" id=42]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_004.png" type="Texture" id=43]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_004.png" type="Texture" id=44]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_007.png" type="Texture" id=45]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_000.png" type="Texture" id=46]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_002.png" type="Texture" id=47]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi22_007.png" type="Texture" id=48]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_003.png" type="Texture" id=49]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_001.png" type="Texture" id=50]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_007.png" type="Texture" id=51]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_006.png" type="Texture" id=52]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi23_001.png" type="Texture" id=53]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi21_002.png" type="Texture" id=54]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_010.png" type="Texture" id=55]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_011.png" type="Texture" id=56]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_007.png" type="Texture" id=57]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_008.png" type="Texture" id=58]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_009.png" type="Texture" id=59]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_002.png" type="Texture" id=60]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_004.png" type="Texture" id=61]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_003.png" type="Texture" id=62]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_005.png" type="Texture" id=63]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_000.png" type="Texture" id=64]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_001.png" type="Texture" id=65]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi26_006.png" type="Texture" id=66]
+
+[sub_resource type="CapsuleShape2D" id=1]
+radius = 6.0
+
+[sub_resource type="Animation" id=2]
+resource_name = "StandDamage"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandDamage" ]
+}
+
+[sub_resource type="Animation" id=3]
+resource_name = "StandIdle"
+length = 6.75
+loop = true
+step = 0.25
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandIdle" ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "StandTurn"
+length = 0.1
+
+[sub_resource type="Animation" id=5]
+length = 1.25
+loop = true
+step = 0.25
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "Walk" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:playing")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="Animation" id=6]
+length = 1.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Explosion:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Explosion:process_material:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0.6, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ 1.0, 4.0 ]
+}
+tracks/2/type = "method"
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 1.5 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "queue_free"
+} ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath(".:collision_layer")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[sub_resource type="CanvasItemMaterial" id=7]
+blend_mode = 1
+
+[sub_resource type="Gradient" id=8]
+offsets = PoolRealArray( 0.5, 1 )
+colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
+
+[sub_resource type="GradientTexture" id=9]
+gradient = SubResource( 8 )
+width = 256
+
+[sub_resource type="ParticlesMaterial" id=10]
+emission_shape = 1
+emission_sphere_radius = 8.0
+flag_disable_z = true
+spread = 180.0
+gravity = Vector3( 0, 250, 0 )
+initial_velocity = 120.0
+initial_velocity_random = 0.5
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+angle_random = 1.0
+scale = 4.0
+scale_random = 1.0
+color_ramp = SubResource( 9 )
+hue_variation = 0.05
+hue_variation_random = 0.46
+
+[sub_resource type="SpriteFrames" id=11]
+animations = [ {
+"frames": [ ExtResource( 64 ), ExtResource( 65 ) ],
+"loop": true,
+"name": "WalkStart",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
+"loop": true,
+"name": "StandStagger",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 60 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 63 ), ExtResource( 66 ), ExtResource( 57 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 55 ), ExtResource( 56 ) ],
+"loop": true,
+"name": "Walk",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 28 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 25 ), ExtResource( 26 ) ],
+"loop": true,
+"name": "CrouchDown",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
+"loop": true,
+"name": "StandUp",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
+"loop": true,
+"name": "StandDamage",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 36 ), ExtResource( 53 ), ExtResource( 35 ), ExtResource( 49 ), ExtResource( 44 ), ExtResource( 42 ), ExtResource( 52 ), ExtResource( 45 ) ],
+"loop": true,
+"name": "CrouchDamage",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 15 ), ExtResource( 6 ), ExtResource( 16 ), ExtResource( 8 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 20 ), ExtResource( 17 ), ExtResource( 21 ), ExtResource( 19 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 21 ), ExtResource( 17 ), ExtResource( 20 ), ExtResource( 10 ), ExtResource( 9 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 16 ), ExtResource( 6 ), ExtResource( 15 ), ExtResource( 11 ), ExtResource( 14 ), ExtResource( 13 ) ],
+"loop": true,
+"name": "StandIdle",
+"speed": 10.0
+} ]
+
+[node name="Enemy" type="KinematicBody2D"]
+scale = Vector2( 1.5, 1.5 )
+collision_layer = 0
+collision_mask = 1031
+script = ExtResource( 2 )
+speed = Vector2( 100, 450 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 0, -5 )
+shape = SubResource( 1 )
+
+[node name="PlatformDetector" type="RayCast2D" parent="."]
+position = Vector2( 0, 6 )
+enabled = true
+cast_to = Vector2( 0, 8 )
+collision_mask = 1024
+
+[node name="FloorDetectorLeft" type="RayCast2D" parent="."]
+position = Vector2( -10, -5 )
+enabled = true
+cast_to = Vector2( 0, 20 )
+collision_mask = 1024
+
+[node name="FloorDetectorRight" type="RayCast2D" parent="."]
+position = Vector2( 10, -5 )
+enabled = true
+cast_to = Vector2( 0, 20 )
+collision_mask = 1024
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+anims/StandDamage = SubResource( 2 )
+anims/StandIdle = SubResource( 3 )
+anims/StandTurn = SubResource( 4 )
+anims/Walk = SubResource( 5 )
+anims/destroy = SubResource( 6 )
+
+[node name="Explosion" type="Particles2D" parent="."]
+self_modulate = Color( 1, 1, 1, 0.12 )
+material = SubResource( 7 )
+emitting = false
+amount = 32
+lifetime = 0.5
+one_shot = true
+speed_scale = 1.2
+explosiveness = 0.76
+draw_order = 215832976
+process_material = SubResource( 10 )
+texture = ExtResource( 3 )
+
+[node name="Hit" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 5 )
+
+[node name="Explode" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 4 )
+
+[node name="CharacterData" type="Node" parent="."]
+script = ExtResource( 1 )
+max_HP = 500
+
+[node name="Sprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0.623271, -15.0935 )
+scale = Vector2( 0.3, 0.3 )
+frames = SubResource( 11 )
+animation = "StandDamage"
+speed_scale = 2.0
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
+[connection signal="dead" from="CharacterData" to="." method="_on_CharacterData_dead"]
+[connection signal="new_sprite_animation" from="CharacterData" to="." method="_on_CharacterData_new_sprite_animation"]
+[connection signal="play_animation" from="CharacterData" to="." method="_on_CharacterData_play_animation"]
+[connection signal="turn_sprite" from="CharacterData" to="." method="_on_CharacterData_turn_sprite"]

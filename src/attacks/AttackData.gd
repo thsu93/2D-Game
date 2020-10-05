@@ -2,10 +2,9 @@ extends Node
 class_name AttackData
 
 #region ATTACK-RELATED VARIABLES
-var movename = "None"
-var animname = "None"
+var movename = "None" #Perhaps should have different names for internal and Player-facing tracking
 var dmg = 0
-var attacker = "None"
+var attacker = "None" 
 
 var cost = 0
 
@@ -18,7 +17,7 @@ var anim_time = 0
 
 #These variables are intended to dictate the movements of the attacked target
 #is added to get_hit_var
-var knockback_val = 350
+var knockback_val = 250
 var knockback_dir = Vector2(1,0)
 
 #TODO: decide if want the following datums
@@ -36,8 +35,7 @@ var priority = 0 #? unsure if will have this system
 var scaling = 1
 var hitstun = 1
 
-#Type of hitspark to play on hit
-var hitspark = "default"
+
 
 #Special properties of the attack
 var invincibility = false
@@ -50,7 +48,7 @@ var cancellable_time #How long before the char can cancel the attack into the ne
 
 #Data passed to agent hit by attack
 #TODO: Decide what variables should be in here
-var get_hit_var = {
+var hit_var = {
     "attacker" : attacker,
     "movename" : movename,
     "dmg": dmg,
@@ -61,10 +59,16 @@ var get_hit_var = {
 #endregion
 
 #region ASSOCIATED EXTERNAL RESOURCES
+
 #Sounds associated with the given attack
 var attack_sound #sound char makes when attacking
 var hit_sound #sound move makes on hit
+
+#Other sprites to bring out 
+var associated_scenes = null #Any external scenes (projectiles, summons, etc.)
 var attack_effects #particles or other external effects
+var hitspark = "default" #Type of hitspark to play on hit
+
 #endregion
 
 func get_hit_var():

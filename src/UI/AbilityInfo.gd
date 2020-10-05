@@ -1,10 +1,10 @@
 extends Node
 
 const SCENEDICTIONARY = {
-	"BULLET": preload("res://src/Scenes/Attacks/Bullet.tscn"),
-	"BARREL": preload("res://src/Scenes/GameWorld/barrel_E.tscn"),
-	"LIGHTNING": preload("res://src/Scenes/Attacks/LightningStrike.tscn"),
-	"FIREBALL": preload("res://src/Scenes/Attacks/Fireball.tscn"),
+	# "BULLET": preload("res://src/Scenes/Attacks/Bullet.tscn"),
+	# "BARREL": preload("res://src/Scenes/GameWorld/barrel_E.tscn"),
+	# "LIGHTNING": preload("res://src/Scenes/Attacks/LightningStrike.tscn"),
+	# "FIREBALL": preload("res://src/Scenes/Attacks/Fireball.tscn"),
 };
 
 #TODO: Can likely delete Movement and AnimTime sections when Animations are finished

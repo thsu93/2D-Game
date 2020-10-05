@@ -16,28 +16,30 @@ enum ANIMATION_STATE{
 	IDLE, #DEFERRING TO OTHER STATE CHECKS
 	DASHING,
 	BACKDASHING,
-	TURNING,
 	CROUCH_DOWN,
 	STAND_UP,
 	RUN_START,
 	RUN_STOP,
-	ATTACKING,
+	TURNING,
 	BLOCKING,
 	DODGING,
+	ATTACKING,
 	DISABLED, #TODO NECESSARY?
 	};
 
 enum DAMAGE_STATE{
-	IDLE,
-	HIT,
-	COUNTERHIT,
-	INVULN,
-	DEAD,
+	IDLE, #Currently not taking damage
+	DAMAGED, #Normal Damage State
+	STAGGERED, #Special Damage State
+	HIT, #Normal Hit, no special modifiers
+	COUNTERHIT, #Hit during an attack animation, special modifiers
+	INVULN, #Immune to damage
+	DEAD, 
 }
 
 enum HORIZONTAL_STATE{
-	L = 1,
-	R = -1,
+	L = -1,
+	R = 1,
 }
 
 #TODO ADD TRANSITIONAL STATES?
@@ -51,6 +53,8 @@ enum MOVE_STATE{
 	DASHING,
 	TRANSITIONING,
 }
+
+var char_name = ""
 
 var anim_state_ = ANIMATION_STATE.IDLE
 var cur_anim_state = anim_state_
@@ -81,14 +85,16 @@ var HP = 5
 export(int) var max_HP = 5
 
 
-#HACK perhaps not needed
+#TODO revisit how the cancelable attacks work
 export(bool) var uncancellable = false
-
 
 
 func _ready():
 	HP = max_HP
 	uncancellable = false
+
+func set_name(name):
+	char_name = name
 
 func take_damage(dmg):
 	if not damage_state_ == DAMAGE_STATE.INVULN:
@@ -110,8 +116,13 @@ func take_damage(dmg):
 		HP -= dmg
 		print("hit ", HP)
 		
+
 		if HP <= 0:
 			emit_signal("dead")
+
+		else:
+			#DO THE DAMAGE THINGS
+			pass
 			
 
 #TODO: What does this actually do for gameplay?
@@ -316,13 +327,13 @@ func update_current_animation():
 func match_vert_state(new_anim):
 	var temp_anim = new_anim
 	match move_state_:
-		MOVE_STATE.CROUCHING : temp_anim = "Crouch" + new_anim
-		MOVE_STATE.STANDING : temp_anim = "Stand" + new_anim
-		MOVE_STATE.JUMPING : temp_anim = "Jump" + new_anim
-		MOVE_STATE.FALLING : temp_anim = "Jump" + new_anim
-		MOVE_STATE.WALKING : temp_anim = "Walk" + new_anim
-		MOVE_STATE.RUNNING : temp_anim = "Run" + new_anim
-		MOVE_STATE.DASHING : temp_anim = "Dash" + new_anim
+		MOVE_STATE.CROUCHING : 	temp_anim = "Crouch" + new_anim
+		MOVE_STATE.STANDING : 	temp_anim = "Stand" + new_anim
+		MOVE_STATE.JUMPING : 	temp_anim = "Jump" + new_anim
+		MOVE_STATE.FALLING : 	temp_anim = "Jump" + new_anim
+		MOVE_STATE.WALKING : 	temp_anim = "Walk" + new_anim
+		MOVE_STATE.RUNNING : 	temp_anim = "Run" + new_anim
+		MOVE_STATE.DASHING :	temp_anim = "Dash" + new_anim
 
 	if temp_anim in sprite_library or temp_anim in animation_player_library:
 		return temp_anim
@@ -352,12 +363,12 @@ func animation_completed():
 	else:
 		move_state_change = true
 		match anim_state_:
-			ANIMATION_STATE.RUN_START:	move_state_ = MOVE_STATE.RUNNING
-			ANIMATION_STATE.RUN_STOP:	move_state_ = MOVE_STATE.STANDING
+			ANIMATION_STATE.RUN_START:		move_state_ = MOVE_STATE.RUNNING
+			ANIMATION_STATE.RUN_STOP:		move_state_ = MOVE_STATE.STANDING
 			ANIMATION_STATE.CROUCH_DOWN:	move_state_ = MOVE_STATE.CROUCHING
-			ANIMATION_STATE.STAND_UP:	move_state_ = MOVE_STATE.STANDING
+			ANIMATION_STATE.STAND_UP:		move_state_ = MOVE_STATE.STANDING
 			ANIMATION_STATE.BACKDASHING:	move_state_ = MOVE_STATE.STANDING
-			ANIMATION_STATE.IDLE: move_state_change = MOVE_STATE.STANDING
+			ANIMATION_STATE.IDLE: 			move_state_change = MOVE_STATE.STANDING
 			_: move_state_change = false
 	
 	anim_state_ = ANIMATION_STATE.IDLE
@@ -367,6 +378,8 @@ func animation_completed():
 	else: 
 		evaluate_state_change(anim_state_, "ANIMATION")
 #endregion
+
+
 
 func get_new_animation():
 	return current_animation
