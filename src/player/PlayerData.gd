@@ -15,6 +15,7 @@ var MOVE_DICTIONARY = {
 	"Combo (Heavy)": preload("res://src/attacks/comboheavy.gd").new(),
 }
 
+#TODO improve this
 var movelist = [[MOVE_DICTIONARY["Jab"], MOVE_DICTIONARY["Hook"]], 
 				[MOVE_DICTIONARY["Corkscrew"], MOVE_DICTIONARY["Overhead"]], 
 				[MOVE_DICTIONARY["Combo (Light)"], MOVE_DICTIONARY["Combo (Heavy)"]], 
@@ -57,6 +58,9 @@ func select_next_move():
 func select_prev_move():
 	cur_move_num = cur_move_num -1 if cur_move_num > 0 else 0
 	cur_attack = movelist[cur_move_num]
+
+func select_attack(special = false):
+	cur_movename = cur_attack[0].movename if not special else cur_attack[1].movename
 
 # var special_node = preload("res://src/Scenes/Attacks/AbilityInfo.gd")
 # var FULL MOVE DICTIONARY

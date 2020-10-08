@@ -24,6 +24,7 @@ enum ANIMATION_STATE{
 	BLOCKING,
 	DODGING,
 	ATTACKING,
+	DAMAGED,
 	DISABLED, #TODO NECESSARY?
 	};
 
@@ -57,16 +58,12 @@ enum MOVE_STATE{
 var char_name = ""
 
 var anim_state_ = ANIMATION_STATE.IDLE
-var cur_anim_state = anim_state_
 
 var damage_state_ = DAMAGE_STATE.IDLE
-var cur_damage_state_ = damage_state_
 
 var horizontal_state_ = HORIZONTAL_STATE.R
-var cur_horizontal_state_ = horizontal_state_
 
 var move_state_ = MOVE_STATE.STANDING
-var cur_move_state_ = move_state_
 #endregion
 
 
@@ -116,14 +113,19 @@ func take_damage(dmg):
 		HP -= dmg
 		print("hit ", HP)
 		
+		anim_state_ = ANIMATION_STATE.DAMAGED
+		damage_state_ = DAMAGE_STATE.HIT
 
 		if HP <= 0:
 			emit_signal("dead")
+			damage_state_ = DAMAGE_STATE.DEAD
+			return
 
 		else:
 			#DO THE DAMAGE THINGS
 			pass
 			
+		update_current_animation()
 
 #TODO: What does this actually do for gameplay?
 func toggle_invuln():
@@ -154,15 +156,16 @@ func change_move_state(new_state):
 
 #change dmg state 
 
+
+
 #change animation state
 #HACK should handle this more cleanly
-func change_anim_state(new_state, special = false):
+func change_anim_state(new_state):
 	if new_state == ANIMATION_STATE.DASHING:
 		evaluate_state_change(ANIMATION_STATE.DASHING, "ANIMATION")
 	if new_state == ANIMATION_STATE.BACKDASHING:
 		evaluate_state_change(ANIMATION_STATE.BACKDASHING, "ANIMATION")
 	if new_state == ANIMATION_STATE.ATTACKING:
-		cur_movename = cur_attack[0].movename if not special else cur_attack[1].movename
 		evaluate_state_change(ANIMATION_STATE.ATTACKING, "ANIMATION")
 	pass
 
@@ -236,16 +239,14 @@ func evaluate_state_change(new_state, state_changed):
 					anim_state_ = ANIMATION_STATE.RUN_START
 				pass
 
-
-
 	else: #If playing another animation right now
-		print("nothing")
 		pass #Do not update anything
 	
 	update_current_animation()
 #endregion
 
 #region HOW CHARACTER WILL HANDLE ATTACKING
+#TODO When Character Attacks
 func process_attack():
 	pass
 #endregion
@@ -256,6 +257,7 @@ func update_current_animation():
 	var new_anim = current_animation
 
 	if not damage_state_ == DAMAGE_STATE.IDLE:
+		new_anim = "Damage"
 		pass #deal with 
 
 	
@@ -311,19 +313,20 @@ func update_current_animation():
 
 	new_anim = match_vert_state(new_anim)
 	
-	if not new_anim == current_animation: #probably redundant check
-		print(new_anim)
-		if new_anim in animation_player_library:
-			emit_signal("play_animation", new_anim)
-			current_animation = new_anim
-		elif new_anim in sprite_library:
-			emit_signal("new_sprite_animation", new_anim)
-			current_animation = new_anim
-		else:
-			print("ERROR ANIMATION NOT IN LIBRARY: ", new_anim)
+	# if not new_anim == current_animation: #probably redundant check
+# 		print(new_anim)
+	if new_anim in animation_player_library:
+		emit_signal("play_animation", new_anim)
+		current_animation = new_anim
+	elif new_anim in sprite_library:
+		emit_signal("new_sprite_animation", new_anim)
+		current_animation = new_anim
+	else:
+		print("ERROR ANIMATION NOT IN LIBRARY: ", new_anim)
 
 #endregion
 
+#region match the vertical state, if possible
 func match_vert_state(new_anim):
 	var temp_anim = new_anim
 	match move_state_:
@@ -333,7 +336,10 @@ func match_vert_state(new_anim):
 		MOVE_STATE.FALLING : 	temp_anim = "Jump" + new_anim
 		MOVE_STATE.WALKING : 	temp_anim = "Walk" + new_anim
 		MOVE_STATE.RUNNING : 	temp_anim = "Run" + new_anim
-		MOVE_STATE.DASHING :	temp_anim = "Dash" + new_anim
+
+		#BUG? this means dash moves will come out while backdashing as well as forward dashing
+		MOVE_STATE.DASHING :	temp_anim = "Dash" + new_anim 
+
 
 	if temp_anim in sprite_library or temp_anim in animation_player_library:
 		return temp_anim
@@ -344,16 +350,20 @@ func match_vert_state(new_anim):
 		temp_anim = "Stand" + new_anim
 		if temp_anim in sprite_library or temp_anim in animation_player_library:
 			return temp_anim
-		elif new_anim in sprite_library or new_anim in animation_player_library:
+		else: # new_anim in sprite_library or new_anim in animation_player_library
 			return new_anim
-		else:
-			return new_anim
+#endregion
 
 
 #region animation_completed()
 func animation_completed():
 	#THE TRANSITIONAL ANIMATIONS
 	var move_state_change = false
+	#
+	if anim_state_ == ANIMATION_STATE.DAMAGED:
+		print("damage finished")
+		damage_state_ = DAMAGE_STATE.IDLE
+
 	#if turning state, change horizontal state
 	if anim_state_ == ANIMATION_STATE.TURNING:
 		horizontal_state_ *= -1 #FLIP SIDE
@@ -368,6 +378,7 @@ func animation_completed():
 			ANIMATION_STATE.CROUCH_DOWN:	move_state_ = MOVE_STATE.CROUCHING
 			ANIMATION_STATE.STAND_UP:		move_state_ = MOVE_STATE.STANDING
 			ANIMATION_STATE.BACKDASHING:	move_state_ = MOVE_STATE.STANDING
+			ANIMATION_STATE.DASHING: 		move_state_ = MOVE_STATE.RUNNING #HACK
 			ANIMATION_STATE.IDLE: 			move_state_change = MOVE_STATE.STANDING
 			_: move_state_change = false
 	
@@ -378,8 +389,6 @@ func animation_completed():
 	else: 
 		evaluate_state_change(anim_state_, "ANIMATION")
 #endregion
-
-
 
 func get_new_animation():
 	return current_animation

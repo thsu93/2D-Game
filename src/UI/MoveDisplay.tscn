@@ -7,13 +7,10 @@
 
 [node name="MoveDisplay" type="PanelContainer"]
 anchor_left = 1.0
-anchor_top = 0.5
 anchor_right = 1.0
-anchor_bottom = 0.5
-margin_left = -100.0
-margin_top = -265.0
-margin_right = 14.0
-margin_bottom = 265.0
+margin_left = -117.0
+margin_right = -3.0
+margin_bottom = 322.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 __meta__ = {
@@ -24,9 +21,9 @@ __meta__ = {
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 107.0
-margin_bottom = 523.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+margin_bottom = 315.0
+size_flags_horizontal = 7
+size_flags_vertical = 7
 script = ExtResource( 2 )
 
 [node name="Ability1" parent="Grid" instance=ExtResource( 1 )]
@@ -50,20 +47,4 @@ anchor_bottom = 0.0
 margin_top = 208.0
 margin_right = 100.0
 margin_bottom = 308.0
-theme = SubResource( 1 )
-
-[node name="Ability4" parent="Grid" instance=ExtResource( 1 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_top = 312.0
-margin_right = 100.0
-margin_bottom = 412.0
-theme = SubResource( 1 )
-
-[node name="Ability5" parent="Grid" instance=ExtResource( 1 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_top = 416.0
-margin_right = 100.0
-margin_bottom = 516.0
 theme = SubResource( 1 )

@@ -3,18 +3,17 @@ extends Actor
 
 #TODO use char_data instead
 
-enum State {
-	WALKING,
-	DAMAGED,
-	DEAD
-}
-
-var _state = State.WALKING
+signal combo(num)
 
 onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
 onready var hurtbox = $CollisionShape2D
+
+#HACK 
+var dir_switch_time = .2
+
+var combo_counter = 0
 
 func _init():
 	actor_type = "enemy"
@@ -23,8 +22,15 @@ func _init():
 # We can initialize variables here.
 func _ready():
 
-	char_data.set_name(actor_type)
+	current_animation = "StandIdle"
+	sprite.playing = true
+	sprite.animation = current_animation
+	sprite.speed_scale = 2
 
+	char_data.sprite_library = sprite.frames.get_animation_names()
+	char_data.animation_player_library = animation_player.get_animation_list()
+
+	char_data.horizontal_state_ = char_data.HORIZONTAL_STATE.R
 	_velocity.x = speed.x
 
 # Physics process is a built-in loop in Godot.
@@ -43,87 +49,82 @@ func _ready():
 # - If you split the character into a state machine or more advanced pattern,
 #   you can easily move individual functions.
 func _physics_process(_delta):
-	_velocity = calculate_move_velocity(_velocity)
+
+	stun_time -= _delta
+
+	if stun_time<0:
+		if combo_counter > 0:
+			combo_counter = 0
+			emit_signal("combo", combo_counter)
+
+	if char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
+		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+			_velocity = calculate_move_velocity(_velocity)
+
+
+			if abs(_velocity.x) > 5 and not char_data.move_state_ == char_data.MOVE_STATE.WALKING:
+				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
+
+			elif abs(_velocity.x) < 5 and not char_data.move_state_ == char_data.MOVE_STATE.STANDING:
+				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+
+	else:
+		_velocity.x = 0
 
 	# We only update the y value of _velocity as we want to handle the horizontal movement ourselves.
 	_velocity.y = move_and_slide(_velocity, FLOOR_NORMAL).y
 
-	# We flip the Sprite depending on which way the enemy is moving.
-	sprite.scale.x = abs(sprite.scale.x) if _velocity.x > 0 else abs(sprite.scale.x)*-1
 
-	update_animation()
-
-func update_animation():
-	var animation = char_data.get_new_animation()
-	if animation != animation_player.current_animation:
-		animation_player.play(animation)
 
 # This function calculates a new velocity whenever you need it.
 # If the enemy encounters a wall or an edge, the horizontal velocity is flipped.
 func calculate_move_velocity(linear_velocity):
 	var velocity = linear_velocity
-	
-	if _state == State.DAMAGED:
-		velocity.x = 0
-	
+
 	if knockback == Vector2():
-		if not floor_detector_left.is_colliding():
-			velocity.x = speed.x
-		elif not floor_detector_right.is_colliding():
-			velocity.x = -speed.x
 
+		if (not floor_detector_left.is_colliding()
+			or not floor_detector_right.is_colliding()
+			or is_on_wall()):
+			if velocity.x < 0: 
+				char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
+			else: 
+				char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
 
-	#BUG Enemy will spin uncontrollably if trappepd 
-	if is_on_wall():
-		velocity.x *= -1
+		velocity.x = speed.x * char_data.horizontal_state_
 
 	return velocity
-	
 
-func get_new_animation():
-	var animation_new = ""
-	if _state == State.WALKING:
-		animation_new = "Walk" if abs(_velocity.x) > 5 else "StandIdle"
-	elif _state == State.DAMAGED:
-		animation_new = "StandDamage"
-	elif _state == State.DEAD:
-		animation_new = "destroy"
-	return animation_new
-
-func _on_CharacterData_dead():
-	print("signal sent")
-	destroy()
 
 func take_damage(hit_var):
 	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
+	print(hit_var["knockback_dir"])
 	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"]
 	char_data.take_damage(hit_var["dmg"])
+
+	if hit_var["rooted"]:
+		knockback = Vector2()
+
 	stunned = true
-	_state = State.DAMAGED
-	print(knockback)
-
-
-func _on_AnimationPlayer_animation_finished(_anim_name):
+	stun_time = hit_var["stun"]
+	combo_counter += 1
+	emit_signal("combo", combo_counter)
 	
-	#HACK
-	if _state == State.DAMAGED:
-		stunned = false
-		_state = State.WALKING
-		_velocity.x = speed.x
-		print("finished damage")
 
-	char_data.animation_completed()
-
-func _on_CharacterData_turn_sprite():
-	sprite.scale *= -1
-
-
-
+#On character death
+func _on_CharacterData_dead():
+	print("death signal sent")
+	destroy()
 
 func destroy():
-	print("destroying")
-	_state = State.DEAD
+	animation_player.stop(true)
+	animation_player.play("Death")
+	print("dead")
 	_velocity = Vector2.ZERO
+	knockback = Vector2(250,0) * -char_data.horizontal_state_
 
 	#HACK turn off collision for anything except world
 	self.collision_mask = 1024
+
+
+

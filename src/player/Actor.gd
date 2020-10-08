@@ -27,37 +27,76 @@ onready var sprite = $Sprite
 onready var animation_player = $AnimationPlayer
 var current_animation = ""
 
+
+
+export var movement_locked = false
+export(Vector2) var external_movement_data = Vector2()
+var remaining_animation_time = 0
+
 var knockback = Vector2.ZERO
+var stun_time = 0
+
 var overwrite = false
+
+func _ready():
+	char_data.set_name(actor_type)
 
 # _physics_process is called after the inherited _physics_process function.
 # This allows the Player and Enemy scenes to be affected by gravity.
 func _physics_process(delta):
 
 	#Should stunned leave vertical falling? choice? 
-	if stunned:
-		_velocity = Vector2()
+	# if stunned:
+	# 	_velocity = Vector2()
+	# 	stun_time -= delta
+	# 	if stun_time <=0:
+	# 		stunned = false
+
+	# else:
+	if no_grav:
+	#HACK probably not the best way to handle this
+		_velocity.y = 0
 	else:
-		if no_grav:
-		#HACK probably not the best way to handle this
-			_velocity.y = 0
-		else:
-			_velocity.y += gravity * delta
-		
-		if knockback != Vector2.ZERO:
-			knockback = knockback.move_toward(Vector2.ZERO, 1000*delta)
-			knockback = move_and_slide(knockback)
+		_velocity.y += gravity * delta
+	
+	if knockback != Vector2.ZERO:
+		knockback = knockback.move_toward(Vector2.ZERO, 1000*delta)
+		knockback = move_and_slide(knockback)
+
 
 #Overload the get_class() function for hit detection purposes
 func get_class():
 	return "Actor"
 
 func take_damage(hit_var):
-	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
+	print(hit_var)
 	print(hit_var["knockback_dir"])
 	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"]
 	char_data.take_damage(hit_var["dmg"])
+
+	stunned = true
+	stun_time += hit_var["stun"]
+
 	print(knockback)
+
+#Function to handle non-input/AI movements
+#TODO change to move to a point, vs current move for x time
+func external_movement(new_move_data:Vector2, animation_time:float, delta:float = 0):
+
+	movement_locked = true
+	external_movement_data = new_move_data #CONVOLUTED WHY
+	var temp_move_data = new_move_data
+	temp_move_data.x = new_move_data.x * char_data.horizontal_state_
+	
+	remaining_animation_time = animation_time - delta
+	if remaining_animation_time <= 0:
+		movement_locked = false
+		no_grav = false
+	else:
+		no_grav = true
+		temp_move_data = move_and_slide(temp_move_data)
+	pass
+
 
 
 #region ANIMATION PLAY FUNCTION SIGNALS 
@@ -71,12 +110,13 @@ func _on_CharacterData_new_sprite_animation(new_anim):
 	play_new_sprite()
 
 func _on_CharacterData_play_animation(new_anim):
-	current_animation = new_anim
+	current_animation = new_anim		
+	animation_player.stop(true)
 	animation_player.play(current_animation)
 
-	
+
+#TODO THIS MAY CAUSE A POTENTIAL PROBLEM IF ANIMATIONS AND SPRITES DON'T LINE UP
 func _on_Sprite_animation_finished():
-	#HACK reset speeds shouldn't be like this
 	if not current_animation in animation_player.get_animation_list():
 		char_data.animation_completed()
 		

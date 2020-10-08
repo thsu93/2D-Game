@@ -87,13 +87,15 @@ func get_player_pos():
 func _on_Char_game_over():
 	get_tree().change_scene(title_scene)
 
+func _on_Enemy_combo(num:int):
+	UI.set_combo_count(num)
+
 # func _on_Char_damage_taken():
 # #	DETERMINE SCREENSHAKE VALS
 # 	camera.shake(.3, 5, 15)
 
 func update_HP():
 	UI.show_HP(player.get_HP())
-
 
 #on start dialogue
 #disable player, set invuln?

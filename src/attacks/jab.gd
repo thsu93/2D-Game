@@ -8,6 +8,7 @@ func _init():
 	dmg = 5
 	movename = "Jab"
 	knockback_val = 5
+	hitstun = .3
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

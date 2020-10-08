@@ -10,6 +10,7 @@ const INITIAL = 0
 
 onready var grid = $MoveDisplay/Grid
 onready var length = grid.length
+onready var combo_counter = $Panel/Label
 var curr_length
 var selected = INITIAL
 #
@@ -67,6 +68,9 @@ func slowdown_cooldown(time):
 func update_cooldowns(dmg):
 	grid.increase_cooldown(dmg)
 
+
+func set_combo_count(num):
+	combo_counter.text = "COMBO COUNT \n" + str(num)
 
 
 #DIALOGUE HANDLING

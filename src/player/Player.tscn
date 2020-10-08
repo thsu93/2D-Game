@@ -67,19 +67,19 @@ animations = [ {
 } ]
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 109.299, 119.447 )
+extents = Vector2( 124.667, 88.6472 )
 
 [sub_resource type="SpriteFrames" id=3]
 animations = [ {
-"frames": [ ExtResource( 57 ), ExtResource( 63 ), ExtResource( 81 ), ExtResource( 76 ), ExtResource( 77 ), ExtResource( 82 ), ExtResource( 78 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 378 ) ],
-"loop": false,
-"name": "DashEffect",
-"speed": 10.0
-}, {
 "frames": [  ],
 "loop": true,
 "name": "Default",
 "speed": 5.0
+}, {
+"frames": [ ExtResource( 57 ), ExtResource( 63 ), ExtResource( 81 ), ExtResource( 76 ), ExtResource( 77 ), ExtResource( 82 ), ExtResource( 78 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 378 ) ],
+"loop": false,
+"name": "DashEffect",
+"speed": 10.0
 } ]
 
 [sub_resource type="CapsuleShape2D" id=4]
@@ -90,7 +90,6 @@ height = 25.0
 collision_mask = 12
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
-no_grav = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Backdash = ExtResource( 3 )
@@ -122,7 +121,7 @@ smoothing_speed = 8.0
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "Backdash"
+animation = "DashHook"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -140,9 +139,8 @@ animation = "slash"
 speed_scale = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -140.332, -44.6038 )
+position = Vector2( -138.388, -95.4487 )
 shape = SubResource( 2 )
-disabled = true
 
 [node name="Hurtbox" type="Area2D" parent="Sprite"]
 collision_mask = 6
@@ -164,6 +162,7 @@ playing = true
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
 max_HP = 100
+uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
 position = Vector2( -0.361423, -8.08499 )

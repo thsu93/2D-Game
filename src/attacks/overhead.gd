@@ -6,4 +6,5 @@ func _init():
 	dmg = 25
 	movename = "Overhead"
 	running_type = true
+	rooted = true
 	pass # Replace with function body.

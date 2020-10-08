@@ -10,6 +10,9 @@ var cost = 0
 
 var slow_time = .25
 
+
+var hitstun = .5
+
 #These variables are supposed to dictate the movements of the attacker as it attacks
 var velocity = 0
 var direction = Vector2()
@@ -17,14 +20,16 @@ var anim_time = 0
 
 #These variables are intended to dictate the movements of the attacked target
 #is added to get_hit_var
-var knockback_val = 250
+var knockback_val = 150
 var knockback_dir = Vector2(1,0)
 
-#TODO: decide if want the following datums
-var ground_type = true #T/F vs descriptor (stand, crouch, etc) vs all-types dict
-var air_type = true #
-var crouch_type = true
-var running_type = false
+#Is the move allowed to occur from a particular state? 
+#IE if char is crouching and does a non-crouch-type move, will not come out. 
+var ground_type = true #can occur when standing on ground
+var air_type = true #can occur when in the air
+var crouch_type = true #can occur while crouching
+var running_type = false #can occur while running (ie does not stop momentum)
+var dashing_type = false #can occur while dashing (ie does not cancel dash)
 
 
 
@@ -32,15 +37,20 @@ var priority = 0 #? unsure if will have this system
 
 #How much damage scaling for combos
 #Currently have yet to implement this system 
-var scaling = 1
-var hitstun = 1
+var damage_scaling = 1
+var hitstun_scaling = 1
 
 
 
-#Special properties of the attack
+#Special properties of the attack, for the attacker
 var invincibility = false
 var invincibility_time = 0
+
+#Special properties of the attack, when hitting the defender
 var special_state = "none" #TODO Consider ways to implement ground-bounce/wall-bounce/wall-splats etc.
+var rooted = false
+var wall_bounces = false
+var ground_bounces = false
 
 #Timers related to the attack
 var duration = 0 #How long the attack lasts for.  Unsure if necessary.
@@ -54,6 +64,7 @@ var hit_var = {
     "dmg": dmg,
     "knockback_dir": knockback_dir,
     "knockback_val": knockback_val,
+    "stun" : hitstun,
 }
 
 #endregion
@@ -72,13 +83,17 @@ var hitspark = "default" #Type of hitspark to play on hit
 #endregion
 
 func get_hit_var():
+
     var updated_hit_var = {
     "attacker" : attacker,
     "movename" : movename,
     "dmg": dmg,
     "knockback_dir": knockback_dir,
     "knockback_val": knockback_val,
+    "stun" : hitstun,
+    "rooted" : rooted
     }
+    
     return updated_hit_var
 
 func print_data():
