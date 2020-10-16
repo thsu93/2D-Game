@@ -1,19 +1,28 @@
+#Class that controls the movement and manages hitting data of the enemy
+#Data and attack AI are contained within actor's char_data file
+#TODO how to structure AI
 class_name Enemy2
 extends Actor
 
-#TODO use char_data instead
 
 signal combo(num)
+signal shake
 
 onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
 onready var hurtbox = $CollisionShape2D
 
+onready var hitspark = $Sprite/Hitbox/Hitspark
+onready var hitbox = $Sprite/Hitbox
+
 #HACK 
 var dir_switch_time = .2
 
 var combo_counter = 0
+
+var knockback_scaling_mult = 1
+var damage_scaling_mult = 1
 
 func _init():
 	actor_type = "enemy"
@@ -26,6 +35,8 @@ func _ready():
 	sprite.playing = true
 	sprite.animation = current_animation
 	sprite.speed_scale = 2
+
+	animation_player.playback_speed = 1.5
 
 	char_data.sprite_library = sprite.frames.get_animation_names()
 	char_data.animation_player_library = animation_player.get_animation_list()
@@ -55,18 +66,22 @@ func _physics_process(_delta):
 	if stun_time<0:
 		if combo_counter > 0:
 			combo_counter = 0
+			knockback_scaling_mult = 1
+			damage_scaling_mult = 1
 			emit_signal("combo", combo_counter)
 
 	if char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
 		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
 			_velocity = calculate_move_velocity(_velocity)
 
-
 			if abs(_velocity.x) > 5 and not char_data.move_state_ == char_data.MOVE_STATE.WALKING:
 				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
 
 			elif abs(_velocity.x) < 5 and not char_data.move_state_ == char_data.MOVE_STATE.STANDING:
 				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+
+		elif char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+			_velocity.x = 0
 
 	else:
 		_velocity.x = 0
@@ -96,35 +111,79 @@ func calculate_move_velocity(linear_velocity):
 	return velocity
 
 
+#TODO clean up?
+#Overloaded take_damage function, taking into consideration: 
+#knockback scaling
+#damage scaling
+#combo counts
+#stun effects
 func take_damage(hit_var):
-	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
-	print(hit_var["knockback_dir"])
-	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"]
-	char_data.take_damage(hit_var["dmg"])
 
+	#HACK
+	hit_var["dmg"] /= damage_scaling_mult
+	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
+	
+	char_data.take_damage(hit_var)
+
+	damage_scaling_mult += hit_var["damage_scaling"]
+
+	#Cant rooted and knockback just be the same thing?
+	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"] * knockback_scaling_mult
 	if hit_var["rooted"]:
 		knockback = Vector2()
+
+	knockback_scaling_mult *= (1+ hit_var["knockback_scaling"])
+	
 
 	stunned = true
 	stun_time = hit_var["stun"]
 	combo_counter += 1
 	emit_signal("combo", combo_counter)
+	emit_signal("shake")
 	
+
+
 
 #On character death
 func _on_CharacterData_dead():
-	print("death signal sent")
 	destroy()
 
+#destroy body
 func destroy():
 	animation_player.stop(true)
 	animation_player.play("Death")
-	print("dead")
 	_velocity = Vector2.ZERO
 	knockback = Vector2(250,0) * -char_data.horizontal_state_
 
 	#HACK turn off collision for anything except world
 	self.collision_mask = 1024
 
+
+func _on_Hitspark_animation_finished():
+	hitspark.visible = false
+	pass # Replace with function body.
+
+func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
+	if body.get_class() == "Actor" and body.actor_type == "player":
+
+		# body.stunned = true
+
+		#HITSTOP
+		OS.delay_msec(25)
+
+		# #HACK hitspark
+		# var hit_pos = get_collision_position(body)
+		# emit_hitspark(hit_pos)
+
+		var attack_data = char_data.cur_attack
+
+		#HACK TEMPORARY KNOCKBACK CALC
+		attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
+		body.take_damage(attack_data.get_hit_var())
+		
+		#TODO How to prevent double-hitting of moves
+		#Is this even necessary? It won't maintain hitting
+		#Should probably handle this differently, given the possibility of hitting through two enemies
+		#attack_hitbox.get_node("CollisionShape2D").disabled = true
 
 

@@ -1,4 +1,4 @@
-extends Area2D
+extends Node
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -7,24 +7,79 @@ extends Area2D
 #TODO DOES THIS NEED TO EXIST AS A SCRIPT?
 #TODO HITBOX CURRENTLY WILL IGNORE THE WORLD ENTIRELY. NECESSARY TO UNDO?
 
-var cur_hitdata
+var cur_attack_data = null
+var dir = 1
+signal time_slow(slow_amt)
 
-onready var collision_shape = $CollisionShape2D
+onready var hitspark = $Hitbox/Hitspark
+onready var collision_shape = $Hitbox/CollisionShape2D
+var actor = "player"
+var target = "enemy"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	collision_shape.disabled = true
 	pass # Replace with function body.
 
+func set_actor(new_actor):
+	actor = new_actor
+
+func set_target(new_target):
+	target = new_target
 
 func _on_Hitspark_animation_finished():
-	$Hitspark.visible = false
+	hitspark.visible = false
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
+func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
+	if body.get_class() == "Actor" and body.actor_type == target:
 
+		# body.stunned = true
+
+		#HITSTOP
+		OS.delay_msec(25)
+
+		#HACK hitspark
+		var hit_pos = get_collision_position(body)
+		emit_hitspark(hit_pos)
+
+
+		#HACK TEMPORARY KNOCKBACK CALC
+		cur_attack_data.knockback_dir = Vector2(dir * abs(cur_attack_data.knockback_dir.x), cur_attack_data.knockback_dir.y)
+		body.take_damage(cur_attack_data.get_hit_var())
+
+
+		if actor == "player":
+			emit_signal("time_slow", cur_attack_data.slow_time)
+		
+		#TODO How to prevent double-hitting of moves
+		#Is this even necessary? It won't maintain hitting
+		#Should probably handle this differently, given the possibility of hitting through two enemies
+		#attack_hitbox.get_node("CollisionShape2D").disabled = true
+
+
+
+#HACK hitspark location calculation
+#Uses the average position between the attack hitbox and the target hurtbox.  Not ideal way to calculate. 
+#Ideal would probably be find both hitbox+hurtbox position and extents, calculate the overlapped regions and then find the middle of the overlapped region
+func get_collision_position(body):
+	var body_area_pos = body.get_node("CollisionShape2D").global_position
+	var self_body_pos = collision_shape.global_position
+	return (body_area_pos + self_body_pos) / 2
+
+
+#Emit a hitspark sprite at the given position		
+func emit_hitspark(hit_pos):
+	#Find where the hitspark should be located
+	hitspark.global_position = hit_pos
+	hitspark.visible = true
+	hitspark.frame = 0
+	hitspark.scale.x = abs(hitspark.scale.x) * dir
+	hitspark.play(cur_attack_data.hitspark)
+#endregion
 
 # type GetHitVar struct {
 # 	hitBy          [][2]int32

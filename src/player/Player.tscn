@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=2]
+[gd_scene load_steps=38 format=2]
 
 [ext_resource path="res://src/player/Player.tres" type="SpriteFrames" id=1]
 [ext_resource path="res://src/player/CharAnim/Combo (Heavy).tres" type="Animation" id=2]
@@ -18,10 +18,11 @@
 [ext_resource path="res://src/player/CharAnim/playerCrouchJab.tres" type="Animation" id=16]
 [ext_resource path="res://src/player/CharAnim/playerDash.tres" type="Animation" id=17]
 [ext_resource path="res://src/player/CharAnim/Combo (Light).tres" type="Animation" id=18]
+[ext_resource path="res://src/UI/Camera.gd" type="Script" id=19]
+[ext_resource path="res://src/attacks/Hitspark.tscn" type="PackedScene" id=20]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_000.png" type="Texture" id=57]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_001.png" type="Texture" id=63]
 [ext_resource path="res://src/player/player.gd" type="Script" id=71]
-[ext_resource path="res://src/player/Hitbox.gd" type="Script" id=75]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_003.png" type="Texture" id=76]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_004.png" type="Texture" id=77]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_006.png" type="Texture" id=78]
@@ -31,43 +32,89 @@
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_005.png" type="Texture" id=82]
 [ext_resource path="res://src/player/PlayerData.gd" type="Script" id=377]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_009.png" type="Texture" id=378]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40913 copy.png" type="Texture" id=379]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40916 copy.png" type="Texture" id=380]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40912 copy.png" type="Texture" id=381]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40911 copy.png" type="Texture" id=382]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40914 copy.png" type="Texture" id=383]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40917 copy.png" type="Texture" id=384]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40918 copy.png" type="Texture" id=385]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40919 copy.png" type="Texture" id=386]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40915 copy.png" type="Texture" id=387]
-[ext_resource path="res://assets/SF3_3S_HitSparks_Sprite.7z/SF3_3S_HitSparks_40920 copy.png" type="Texture" id=388]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_202.png" type="Texture" id=389]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_209.png" type="Texture" id=390]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_203.png" type="Texture" id=391]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_204.png" type="Texture" id=392]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_206.png" type="Texture" id=393]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_208.png" type="Texture" id=394]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_201.png" type="Texture" id=395]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_200.png" type="Texture" id=396]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_207.png" type="Texture" id=397]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_205.png" type="Texture" id=398]
-[ext_resource path="res://assets/effects (MBAC PC)/Nanaya effects/shi61_210.png" type="Texture" id=399]
 
-[sub_resource type="SpriteFrames" id=1]
-animations = [ {
-"frames": [ ExtResource( 382 ), ExtResource( 381 ), ExtResource( 379 ), ExtResource( 383 ), ExtResource( 387 ), ExtResource( 380 ), ExtResource( 384 ), ExtResource( 385 ), ExtResource( 386 ), ExtResource( 388 ) ],
-"loop": true,
-"name": "default",
-"speed": 20.0
-}, {
-"frames": [ ExtResource( 396 ), ExtResource( 395 ), ExtResource( 389 ), ExtResource( 391 ), ExtResource( 392 ), ExtResource( 398 ), ExtResource( 393 ), ExtResource( 397 ), ExtResource( 394 ), ExtResource( 390 ), ExtResource( 399 ) ],
-"loop": true,
-"name": "slash",
-"speed": 25.0
-} ]
+[sub_resource type="Animation" id=5]
+resource_name = "StandDamage"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandDamage" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath(".:movement_locked")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=6]
+resource_name = "StandStagger"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandStagger" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath(".:movement_locked")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.6 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 124.667, 88.6472 )
+extents = Vector2( 107.756, 37.9429 )
 
 [sub_resource type="SpriteFrames" id=3]
 animations = [ {
@@ -90,6 +137,7 @@ height = 25.0
 collision_mask = 12
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
+movement_locked = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Backdash = ExtResource( 3 )
@@ -106,8 +154,10 @@ anims/JumpHook = ExtResource( 12 )
 anims/JumpJab = ExtResource( 10 )
 anims/Overhead = ExtResource( 8 )
 anims/Shoryuken = ExtResource( 7 )
+anims/StandDamage = SubResource( 5 )
 anims/StandHook = ExtResource( 6 )
 anims/StandJab = ExtResource( 5 )
+anims/StandStagger = SubResource( 6 )
 anims/StandUp = ExtResource( 4 )
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -116,31 +166,27 @@ current = true
 zoom = Vector2( 0.5, 0.5 )
 smoothing_enabled = true
 smoothing_speed = 8.0
+script = ExtResource( 19 )
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "DashHook"
+animation = "StandStagger"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
-position = Vector2( -8.10574, 0.900642 )
+position = Vector2( -8.10574, 0.90065 )
 collision_layer = 2
 collision_mask = 12
-script = ExtResource( 75 )
 
-[node name="Hitspark" type="AnimatedSprite" parent="Sprite/Hitbox"]
-visible = false
-position = Vector2( -158.513, -121.587 )
-scale = Vector2( 5, 5 )
-frames = SubResource( 1 )
-animation = "slash"
-speed_scale = 2.0
+[node name="Hitspark" parent="Sprite/Hitbox" instance=ExtResource( 20 )]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -138.388, -95.4487 )
+position = Vector2( -118.734, -69.828 )
+scale = Vector2( 1.13819, 1.02605 )
 shape = SubResource( 2 )
+disabled = true
 
 [node name="Hurtbox" type="Area2D" parent="Sprite"]
 collision_mask = 6
@@ -162,7 +208,6 @@ playing = true
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
 max_HP = 100
-uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
 position = Vector2( -0.361423, -8.08499 )
@@ -176,7 +221,7 @@ shape = SubResource( 4 )
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
 [connection signal="animation_finished" from="Sprite" to="." method="_on_Sprite_animation_finished"]
 [connection signal="body_shape_entered" from="Sprite/Hitbox" to="." method="_on_Hitbox_body_shape_entered"]
-[connection signal="animation_finished" from="Sprite/Hitbox/Hitspark" to="Sprite/Hitbox" method="_on_Hitspark_animation_finished"]
+[connection signal="animation_finished" from="Sprite/Hitbox/Hitspark" to="." method="_on_Hitspark_animation_finished"]
 [connection signal="new_sprite_animation" from="CharacterData" to="." method="_on_CharacterData_new_sprite_animation"]
 [connection signal="play_animation" from="CharacterData" to="." method="_on_CharacterData_play_animation"]
 [connection signal="turn_sprite" from="CharacterData" to="." method="_on_CharacterData_turn_sprite"]

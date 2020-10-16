@@ -22,10 +22,13 @@ var jumping = false
 var stopping_jump = false
 var slow_time = 0
 
-#TODO still have to fix platform detection
+onready var camera = $Camera
+
 onready var platform_detector = $PlatformDetector
 
+
 onready var attack_hitbox = $Sprite/Hitbox
+onready var hitspark = $Sprite/Hitbox/Hitspark
 var floor_h_velocity = 0.0
 
 var airborne_time = 0
@@ -36,8 +39,8 @@ var buffer_length = 0
 var buffered_movements = []
 var held_buffer = false
 
-#HACK TEMPORARY FOR MOVE CHECK, EVENTUALLY SHOULD BE UPDATED OUT OF PLAYERDATA
-
+var dash_count = 0
+var DASH_MAX = 2
 
 func _init():
 	actor_type = "player"
@@ -113,30 +116,15 @@ func _physics_process(delta):
 		if dashing:
 			#HACK should determine if dashing in "facing" direction vs not
 			#TODO: Decide what optimal controls are here
-			if (move_left and char_data.horizontal_state_ == -1) or (move_right and char_data.horizontal_state_ == 1):
-				char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
-			else:
-				char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
-
-
-	#TODO THIS SNAP VECTOR IS REALLY BAD
-	# var snap_vector = Vector2.DOWN * FLOOR_DETECT_DISTANCE if not is_on_floor() else Vector2.ZERO
-	var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
-
-	#DASH
-	#BUG get to run post-dash w/out run-start
-	#BUG If dash is cancelled into attack WILL NOT COME OUT OF NO-GRAV STATE
-	#BUG Ending backdashing will cause the character to go into running state while still moving backwards.
-	#TODO should probably control this through the animation player in its entirety
-	#HACK Handling no_grav from animationplayer
-	# if char_data.anim_state_ == char_data.ANIMATION_STATE.DASHING:
-	# 	_velocity.x = char_data.horizontal_state_ * DASH_SPEED
-
-	# elif char_data.anim_state_ == char_data.ANIMATION_STATE.BACKDASHING:
-	# 	_velocity.x = -char_data.horizontal_state_ * DASH_SPEED
-		
+			dash_count += 1
+			if dash_count <= DASH_MAX:
+				if (move_left and char_data.horizontal_state_ == -1) or (move_right and char_data.horizontal_state_ == 1):
+					char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
+				else:
+					char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
+				
 	
-	#If not in  special state
+	#If not in special state
 	#TODO this is a bad wayof handling this interaction
 	#You should do better later
 	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
@@ -148,14 +136,14 @@ func _physics_process(delta):
 		check_buffer()
 		update_movements(delta)
 		
-		# Process jump/fall
+		#Process jump/fall	
 		if not is_on_floor():
 			check_falling(delta, jump)
-		
-		#
+
 		if is_on_floor():
 
 			airborne_time = 0
+			dash_count = 0
 
 			if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
 				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
@@ -184,7 +172,8 @@ func _physics_process(delta):
 
 	if not movement_locked:
 		# Unsure how to resolve this issue. Change to feature? unclear 
-		# WILL SLIDE DOWN HILLS, UNSURE IF DESIRED IMPLEMENTATION.
+		# WILL SLIDE DOWN SLOPES, UNSURE IF DESIRED IMPLEMENTATION.
+		var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
 		_velocity = move_and_slide_with_snap(
 			_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
 			)
@@ -193,6 +182,8 @@ func _physics_process(delta):
 	else: #if the player input is locked out
 		external_movement(external_movement_data, remaining_animation_time, delta)
 #endregion
+
+
 
 #region MOVEMENT BUFFER PROCESSSING
 
@@ -347,6 +338,11 @@ func check_new_attack():
 
 		if matching_move_state:
 
+			if airborne_time > .1:
+				#HACK force into idle
+				char_data.anim_state_ = char_data.ANIMATION_STATE.IDLE
+				char_data.change_move_state(char_data.MOVE_STATE.FALLING)
+
 			char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
 
 			slow_time = 0
@@ -434,7 +430,6 @@ func _on_AnimationPlayer_animation_changed(_anim_name):
 	char_data.animation_completed()
 
 func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
-	print("TARGET ENTERED")
 	if body.get_class() == "Actor" and body.actor_type == "enemy":
 
 		# body.stunned = true
@@ -449,10 +444,8 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
 
 		#HACK TEMPORARY KNOCKBACK CALC
 		attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
-		print(attack_data.get_hit_var())
 		body.take_damage(attack_data.get_hit_var())
 		slow_time += attack_data.slow_time
-
 		
 		#TODO How to prevent double-hitting of moves
 		#Is this even necessary? It won't maintain hitting
@@ -473,11 +466,15 @@ func get_collision_position(body):
 #Emit a hitspark sprite at the given position		
 func emit_hitspark(hit_pos):
 	#Find where the hitspark should be located
-	$Sprite/Hitbox/Hitspark.global_position = hit_pos
-	$Sprite/Hitbox/Hitspark.visible = true
-	$Sprite/Hitbox/Hitspark.frame = 0
-	$Sprite/Hitbox/Hitspark.scale.x = abs($Sprite/Hitbox/Hitspark.scale.x) * char_data.horizontal_state_
-	$Sprite/Hitbox/Hitspark.play(attack_data.hitspark)
+	hitspark.global_position = hit_pos
+	hitspark.visible = true
+	hitspark.frame = 0
+	hitspark.scale.x = abs(hitspark.scale.x) * char_data.horizontal_state_
+	hitspark.play(attack_data.hitspark)
+
+
+func _on_Hitspark_animation_finished():
+	hitspark.visible = false
 #endregion
 
 

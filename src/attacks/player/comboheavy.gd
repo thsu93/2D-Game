@@ -11,4 +11,5 @@ func _init():
 	direction = Vector2(.75,0)
 	anim_time = .2
 	running_type = false
+	stagger = true
 	pass # Replace with function body.

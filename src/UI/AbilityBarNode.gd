@@ -38,11 +38,11 @@ class_name AbilityBarNode
 # 		value = 100
 # 		$Label.visible = false
 
-# func set_selected():
-# 	tint_over = Color( 1, 1, 1, .8)
+func set_selected():
+	tint_over = Color( 1, 1, 1, .8)
 
-# func set_unselected():
-# 	tint_over = Color( 1, 1, 1, 0)
+func set_unselected():
+	tint_over = Color( 1, 1, 1, 0)
 
 # func get_instance():
 # 	return nodeInfo.return_instance()

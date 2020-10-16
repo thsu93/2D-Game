@@ -72,7 +72,7 @@ func take_damage(hit_var):
 	print(hit_var)
 	print(hit_var["knockback_dir"])
 	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"]
-	char_data.take_damage(hit_var["dmg"])
+	char_data.take_damage(hit_var)
 
 	stunned = true
 	stun_time += hit_var["stun"]

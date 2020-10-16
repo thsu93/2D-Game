@@ -1,6 +1,6 @@
 [gd_resource type="Animation" load_steps=2 format=2]
 
-[sub_resource type="RectangleShape2D" id=5]
+[sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 109.299, 37.0859 )
 
 [resource]
@@ -101,7 +101,7 @@ tracks/7/keys = {
 "times": PoolRealArray( 0.3 ),
 "transitions": PoolRealArray( 1 ),
 "update": 1,
-"values": [ SubResource( 5 ) ]
+"values": [ SubResource( 1 ) ]
 }
 tracks/8/type = "value"
 tracks/8/path = NodePath("CollisionShape2D2:shape:height")

@@ -7,6 +7,7 @@ export(NodePath)var UI_control_path
 
 var player
 var UI
+var camera
 var select
 var slowed = false
 var slowable = true
@@ -20,6 +21,9 @@ const BULLET_TIME_CD_LENGTH = 1
 func _ready():
 	
 	player = get_node(player_path)
+
+	camera = player.camera
+
 	UI = get_node(UI_control_path)
 	
 	slowdown_timer.set_one_shot(true)
@@ -90,9 +94,12 @@ func _on_Char_game_over():
 func _on_Enemy_combo(num:int):
 	UI.set_combo_count(num)
 
-# func _on_Char_damage_taken():
-# #	DETERMINE SCREENSHAKE VALS
-# 	camera.shake(.3, 5, 15)
+
+#TODO scale this to weight of hit?
+#TODO use the same function on any char taking damage? IE player, normal mob, boss?
+func _on_Enemy_shake():
+	camera.shake(.1, 50, 1)
+	pass
 
 func update_HP():
 	UI.show_HP(player.get_HP())
@@ -116,3 +123,7 @@ func _on_StaticBody2D_start_dialogue(dialogue_path):
 func _on_Control_special_change(new_selection):
 	player.set_special(new_selection)
 	slow_time()
+
+
+func _on_Player_selected_move_changed(num):
+	UI.change_move(num)

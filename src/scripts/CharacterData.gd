@@ -93,7 +93,7 @@ func _ready():
 func set_name(name):
 	char_name = name
 
-func take_damage(dmg):
+func take_damage(hit_var):
 	if not damage_state_ == DAMAGE_STATE.INVULN:
 		# match (anim_state_):
 		# 	ANIMATION_STATE.DASHING:
@@ -110,12 +110,15 @@ func take_damage(dmg):
 		# 		damage_state_ = DAMAGE_STATE.HIT
 		# 		emit_signal("damage_state_change", damage_state_)
 		
-		HP -= dmg
-		print("hit ", HP)
+		HP -= hit_var["dmg"]
 		
+		if hit_var["stagger"]:
+			damage_state_ = DAMAGE_STATE.STAGGERED
+		else:
+			damage_state_ = DAMAGE_STATE.HIT
+			
 		anim_state_ = ANIMATION_STATE.DAMAGED
-		damage_state_ = DAMAGE_STATE.HIT
-
+		
 		if HP <= 0:
 			emit_signal("dead")
 			damage_state_ = DAMAGE_STATE.DEAD
@@ -167,6 +170,9 @@ func change_anim_state(new_state):
 		evaluate_state_change(ANIMATION_STATE.BACKDASHING, "ANIMATION")
 	if new_state == ANIMATION_STATE.ATTACKING:
 		evaluate_state_change(ANIMATION_STATE.ATTACKING, "ANIMATION")
+	if new_state == ANIMATION_STATE.IDLE:
+		anim_state_ = ANIMATION_STATE.IDLE
+	
 	pass
 
 
@@ -257,7 +263,10 @@ func update_current_animation():
 	var new_anim = current_animation
 
 	if not damage_state_ == DAMAGE_STATE.IDLE:
-		new_anim = "Damage"
+		if damage_state_ == DAMAGE_STATE.STAGGERED:
+			new_anim = "Stagger"
+		else:
+			new_anim = "Damage"
 		pass #deal with 
 
 	
@@ -361,7 +370,6 @@ func animation_completed():
 	var move_state_change = false
 	#
 	if anim_state_ == ANIMATION_STATE.DAMAGED:
-		print("damage finished")
 		damage_state_ = DAMAGE_STATE.IDLE
 
 	#if turning state, change horizontal state

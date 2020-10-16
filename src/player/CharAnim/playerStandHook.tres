@@ -24,7 +24,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( 109.299, 80 ) ]
+"values": [ Vector2( 57.1969, 43.1063 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:position")
@@ -36,7 +36,7 @@ tracks/2/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( -138.388, -95.4487 ) ]
+"values": [ Vector2( -118.989, -72.6207 ) ]
 }
 tracks/3/type = "value"
 tracks/3/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")

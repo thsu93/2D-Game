@@ -1,4 +1,4 @@
-[gd_scene load_steps=101 format=2]
+[gd_scene load_steps=152 format=2]
 
 [ext_resource path="res://src/enemy/NanayaCharacterData.gd" type="Script" id=1]
 [ext_resource path="res://src/enemy/EnemyNew.gd" type="Script" id=2]
@@ -89,6 +89,53 @@
 [ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi24_013.png" type="Texture" id=87]
 [ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi24_014.png" type="Texture" id=88]
 [ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi24_015.png" type="Texture" id=89]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_017.png" type="Texture" id=90]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_018.png" type="Texture" id=91]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_019.png" type="Texture" id=92]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_020.png" type="Texture" id=93]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi01_001.png" type="Texture" id=94]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_013.png" type="Texture" id=95]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_007.png" type="Texture" id=96]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_003.png" type="Texture" id=97]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_008.png" type="Texture" id=98]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_014.png" type="Texture" id=99]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_001.png" type="Texture" id=100]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi01_000.png" type="Texture" id=101]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_000.png" type="Texture" id=102]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_002.png" type="Texture" id=103]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi01_003.png" type="Texture" id=104]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi01_002.png" type="Texture" id=105]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_004.png" type="Texture" id=106]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_006.png" type="Texture" id=107]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_009.png" type="Texture" id=108]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_012.png" type="Texture" id=109]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_015.png" type="Texture" id=110]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_016.png" type="Texture" id=111]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_005.png" type="Texture" id=112]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi01_004.png" type="Texture" id=113]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_010.png" type="Texture" id=114]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_011.png" type="Texture" id=115]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_005.png" type="Texture" id=116]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_000.png" type="Texture" id=117]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi02_021.png" type="Texture" id=118]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_011.png" type="Texture" id=119]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_007.png" type="Texture" id=120]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_003.png" type="Texture" id=121]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_008.png" type="Texture" id=122]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_012.png" type="Texture" id=123]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_016.png" type="Texture" id=124]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_017.png" type="Texture" id=125]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_009.png" type="Texture" id=126]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_010.png" type="Texture" id=127]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_015.png" type="Texture" id=128]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_004.png" type="Texture" id=129]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_006.png" type="Texture" id=130]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_002.png" type="Texture" id=131]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_018.png" type="Texture" id=132]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_013.png" type="Texture" id=133]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_001.png" type="Texture" id=134]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_014.png" type="Texture" id=135]
+[ext_resource path="res://src/attacks/Hitspark.tscn" type="PackedScene" id=136]
 
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 6.0
@@ -186,6 +233,57 @@ tracks/1/keys = {
 "values": [ 0 ]
 }
 
+[sub_resource type="Animation" id=15]
+resource_name = "StandElbow"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandElbow" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5, 0.8 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:shape:extents")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 16.7533, 11.3087 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite/Hitbox/CollisionShape2D:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 40.3711, 18.3126 ) ]
+}
+
 [sub_resource type="Animation" id=4]
 length = 1.5
 loop = true
@@ -203,10 +301,90 @@ tracks/0/keys = {
 "values": [ "StandIdle" ]
 }
 
+[sub_resource type="Animation" id=14]
+resource_name = "StandJab"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandJab" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite/Hitbox/CollisionShape2D:shape:extents")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 19.2506, 10 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite/Hitbox/CollisionShape2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 43.7006, 4.16194 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.2, 0.4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ true, false, true ]
+}
+
 [sub_resource type="Animation" id=5]
-length = 0.15
+resource_name = "StandStagger"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandStagger" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Sprite:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
 
 [sub_resource type="Animation" id=6]
+length = 0.15
+
+[sub_resource type="Animation" id=7]
 loop = true
 step = 0.25
 tracks/0/type = "value"
@@ -234,18 +412,18 @@ tracks/1/keys = {
 "values": [ true ]
 }
 
-[sub_resource type="CanvasItemMaterial" id=7]
+[sub_resource type="CanvasItemMaterial" id=8]
 blend_mode = 1
 
-[sub_resource type="Gradient" id=8]
+[sub_resource type="Gradient" id=9]
 offsets = PoolRealArray( 0.5, 1 )
 colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
 
-[sub_resource type="GradientTexture" id=9]
-gradient = SubResource( 8 )
+[sub_resource type="GradientTexture" id=10]
+gradient = SubResource( 9 )
 width = 256
 
-[sub_resource type="ParticlesMaterial" id=10]
+[sub_resource type="ParticlesMaterial" id=11]
 emission_shape = 1
 emission_sphere_radius = 8.0
 flag_disable_z = true
@@ -257,26 +435,26 @@ orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 angle_random = 1.0
 scale_random = 1.0
-color_ramp = SubResource( 9 )
+color_ramp = SubResource( 10 )
 hue_variation = 0.05
 hue_variation_random = 0.46
 
-[sub_resource type="SpriteFrames" id=11]
+[sub_resource type="SpriteFrames" id=12]
 animations = [ {
-"frames": [ ExtResource( 64 ), ExtResource( 65 ) ],
+"frames": [ ExtResource( 101 ), ExtResource( 94 ), ExtResource( 105 ), ExtResource( 104 ), ExtResource( 113 ) ],
 "loop": true,
-"name": "WalkStart",
+"name": "StandJab",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
+"frames": [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 15 ), ExtResource( 6 ), ExtResource( 16 ), ExtResource( 8 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 20 ), ExtResource( 17 ), ExtResource( 21 ), ExtResource( 19 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 21 ), ExtResource( 17 ), ExtResource( 20 ), ExtResource( 10 ), ExtResource( 9 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 16 ), ExtResource( 6 ), ExtResource( 15 ), ExtResource( 11 ), ExtResource( 14 ), ExtResource( 13 ) ],
 "loop": true,
-"name": "StandStagger",
-"speed": 5.0
+"name": "StandIdle",
+"speed": 10.0
 }, {
-"frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
+"frames": [ ExtResource( 83 ), ExtResource( 82 ), ExtResource( 81 ), ExtResource( 84 ), ExtResource( 85 ), ExtResource( 86 ), ExtResource( 87 ), ExtResource( 88 ), ExtResource( 89 ), ExtResource( 74 ), ExtResource( 75 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 78 ), ExtResource( 73 ), ExtResource( 67 ), ExtResource( 76 ), ExtResource( 68 ), ExtResource( 77 ), ExtResource( 69 ), ExtResource( 70 ), ExtResource( 71 ), ExtResource( 72 ) ],
 "loop": true,
-"name": "StandDamage",
-"speed": 5.0
+"name": "Death",
+"speed": 10.0
 }, {
 "frames": [ ExtResource( 36 ), ExtResource( 53 ), ExtResource( 35 ), ExtResource( 49 ), ExtResource( 44 ), ExtResource( 42 ), ExtResource( 52 ), ExtResource( 45 ) ],
 "loop": true,
@@ -288,26 +466,49 @@ animations = [ {
 "name": "Walk",
 "speed": 5.0
 }, {
+"frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
+"loop": true,
+"name": "StandDamage",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 28 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 25 ), ExtResource( 26 ) ],
 "loop": true,
 "name": "CrouchDown",
 "speed": 5.0
-}, {
-"frames": [ ExtResource( 83 ), ExtResource( 82 ), ExtResource( 81 ), ExtResource( 84 ), ExtResource( 85 ), ExtResource( 86 ), ExtResource( 87 ), ExtResource( 88 ), ExtResource( 89 ), ExtResource( 74 ), ExtResource( 75 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 78 ), ExtResource( 73 ), ExtResource( 67 ), ExtResource( 76 ), ExtResource( 68 ), ExtResource( 77 ), ExtResource( 69 ), ExtResource( 70 ), ExtResource( 71 ), ExtResource( 72 ) ],
-"loop": true,
-"name": "Death",
-"speed": 10.0
 }, {
 "frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
 "loop": true,
 "name": "StandUp",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 14 ), ExtResource( 11 ), ExtResource( 15 ), ExtResource( 6 ), ExtResource( 16 ), ExtResource( 8 ), ExtResource( 7 ), ExtResource( 9 ), ExtResource( 10 ), ExtResource( 20 ), ExtResource( 17 ), ExtResource( 21 ), ExtResource( 19 ), ExtResource( 18 ), ExtResource( 19 ), ExtResource( 21 ), ExtResource( 17 ), ExtResource( 20 ), ExtResource( 10 ), ExtResource( 9 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 16 ), ExtResource( 6 ), ExtResource( 15 ), ExtResource( 11 ), ExtResource( 14 ), ExtResource( 13 ) ],
+"frames": [ ExtResource( 64 ), ExtResource( 65 ) ],
 "loop": true,
-"name": "StandIdle",
-"speed": 10.0
+"name": "WalkStart",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
+"loop": true,
+"name": "StandStagger",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 102 ), ExtResource( 100 ), ExtResource( 103 ), ExtResource( 97 ), ExtResource( 106 ), ExtResource( 112 ), ExtResource( 107 ), ExtResource( 96 ), ExtResource( 98 ), ExtResource( 108 ) ],
+"loop": true,
+"name": "StandElbow",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 114 ), ExtResource( 115 ), ExtResource( 109 ), ExtResource( 95 ), ExtResource( 99 ), ExtResource( 110 ), ExtResource( 111 ), ExtResource( 90 ), ExtResource( 91 ), ExtResource( 92 ), ExtResource( 93 ), ExtResource( 118 ) ],
+"loop": true,
+"name": "StandUpper",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 117 ), ExtResource( 134 ), ExtResource( 131 ), ExtResource( 121 ), ExtResource( 129 ), ExtResource( 116 ), ExtResource( 130 ), ExtResource( 120 ), ExtResource( 122 ), ExtResource( 126 ), ExtResource( 127 ), ExtResource( 119 ), ExtResource( 123 ), ExtResource( 133 ), ExtResource( 135 ), ExtResource( 128 ), ExtResource( 124 ), ExtResource( 125 ), ExtResource( 132 ) ],
+"loop": true,
+"name": "StandLunge",
+"speed": 5.0
 } ]
+
+[sub_resource type="RectangleShape2D" id=13]
+extents = Vector2( 16.7533, 11.3087 )
 
 [node name="Enemy" type="KinematicBody2D"]
 scale = Vector2( 1.5, 1.5 )
@@ -341,13 +542,16 @@ collision_mask = 1024
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Death = SubResource( 2 )
 anims/StandDamage = SubResource( 3 )
+anims/StandElbow = SubResource( 15 )
 anims/StandIdle = SubResource( 4 )
-anims/StandTurn = SubResource( 5 )
-anims/Walk = SubResource( 6 )
+anims/StandJab = SubResource( 14 )
+anims/StandStagger = SubResource( 5 )
+anims/StandTurn = SubResource( 6 )
+anims/Walk = SubResource( 7 )
 
 [node name="Explosion" type="Particles2D" parent="."]
 self_modulate = Color( 1, 1, 1, 0.12 )
-material = SubResource( 7 )
+material = SubResource( 8 )
 emitting = false
 amount = 32
 lifetime = 0.5
@@ -355,7 +559,7 @@ one_shot = true
 speed_scale = 1.2
 explosiveness = 0.76
 draw_order = 215832976
-process_material = SubResource( 10 )
+process_material = SubResource( 11 )
 texture = ExtResource( 3 )
 
 [node name="Hit" type="AudioStreamPlayer2D" parent="."]
@@ -369,11 +573,23 @@ script = ExtResource( 1 )
 max_HP = 550
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
-position = Vector2( 0, -16.3913 )
+position = Vector2( 0.463109, -17.0179 )
 scale = Vector2( 0.3, 0.3 )
-frames = SubResource( 11 )
-animation = "StandDamage"
+frames = SubResource( 12 )
+animation = "StandElbow"
+frame = 9
 speed_scale = 2.0
+
+[node name="Hitbox" type="Area2D" parent="Sprite"]
+collision_layer = 8
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
+position = Vector2( 40.3711, 18.3126 )
+shape = SubResource( 13 )
+disabled = true
+
+[node name="Hitspark" parent="Sprite/Hitbox" instance=ExtResource( 136 )]
 [connection signal="animation_changed" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_changed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
 [connection signal="dead" from="CharacterData" to="." method="_on_CharacterData_dead"]
@@ -381,3 +597,5 @@ speed_scale = 2.0
 [connection signal="play_animation" from="CharacterData" to="." method="_on_CharacterData_play_animation"]
 [connection signal="turn_sprite" from="CharacterData" to="." method="_on_CharacterData_turn_sprite"]
 [connection signal="animation_finished" from="Sprite" to="." method="_on_Sprite_animation_finished"]
+[connection signal="body_shape_entered" from="Sprite/Hitbox" to="." method="_on_Hitbox_body_shape_entered"]
+[connection signal="animation_finished" from="Sprite/Hitbox/Hitspark" to="." method="_on_Hitspark_animation_finished"]

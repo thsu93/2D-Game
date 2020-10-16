@@ -5,14 +5,27 @@ class_name NanayaCharacterData
 # var a = 2
 # var b = "text"
 
+var movelist = {
+	"Jab": preload("res://src/attacks/enemy1/jab.gd").new()
+}
+
+var ATTACK_TIMER = 1.5
+var timer = 0
+#JAB, LUNGE, UPPER, ELBOW
+
 func _init():
-	HP = 50
+	max_HP = 500
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	cur_attack = movelist["Jab"]
+	HP = max_HP
 
+func _process(delta):
+	timer += delta
+	run_ai()
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func run_ai():
+	if timer > ATTACK_TIMER and not anim_state_ == ANIMATION_STATE.DAMAGED:
+		timer = 0
+		change_anim_state(ANIMATION_STATE.ATTACKING)
+	pass

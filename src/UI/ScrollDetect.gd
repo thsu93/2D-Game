@@ -16,45 +16,53 @@ func _ready():
 		if child.get_class() == "TextureProgress":
 			nodes.append(child)
 	length = nodes.size()
+	reset_all_nodes()
+	nodes[0].set_selected()
 
 
-func change_selection(dir):
-	var temp_pos = current_pos
-	if dir == "down":
-		while (temp_pos < nodes.size()):
-			temp_pos += 1 
-			if temp_pos == nodes.size():
-				return false
-			elif nodes[temp_pos].active:
-				nodes[current_pos].set_unselected()
-				current_pos = temp_pos
-				nodes[current_pos].set_selected()
-				return true
+# func change_selection(dir):
+# 	var temp_pos = current_pos
+# 	if dir == "down":
+# 		while (temp_pos < nodes.size()):
+# 			temp_pos += 1 
+# 			if temp_pos == nodes.size():
+# 				return false
+# 			elif nodes[temp_pos].active:
+# 				nodes[current_pos].set_unselected()
+# 				current_pos = temp_pos
+# 				nodes[current_pos].set_selected()
+# 				return true
 
-	if dir == "up":
-		while (temp_pos >= 0):
-			temp_pos -= 1 
-			if temp_pos < 0:
-				return false
-			elif nodes[temp_pos].active:
-				nodes[current_pos].set_unselected()
-				current_pos = temp_pos
-				nodes[current_pos].set_selected()
-				return true
+# 	if dir == "up":
+# 		while (temp_pos >= 0):
+# 			temp_pos -= 1 
+# 			if temp_pos < 0:
+# 				return false
+# 			elif nodes[temp_pos].active:
+# 				nodes[current_pos].set_unselected()
+# 				current_pos = temp_pos
+# 				nodes[current_pos].set_selected()
+# 				return true
 
-func get_selected_special():
-	return current_pos
+func reset_all_nodes():
+	for node in nodes:
+		node.set_unselected()
+
+func change_selection(num):
+	reset_all_nodes()
+	nodes[num].set_selected()
+
+# func get_selected_special():
+# 	return current_pos
 	
-#take in a list of abilitynodes
-#set ability node children to said nodes
-#TODO: Deal with excess moves etc.
+# #take in a list of abilitynodes
+# #set ability node children to said nodes
+# #TODO: Deal with excess moves etc.
 
-func set_movelist(movelist):
-	for i in nodes.size():
-		nodes[i].set_ability(movelist[i])
-	nodes[current_pos].set_selected()
-
-
+# func set_movelist(movelist):
+# 	for i in nodes.size():
+# 		nodes[i].set_ability(movelist[i])
+# 	nodes[current_pos].set_selected()
 
 
 

@@ -4,15 +4,15 @@ class_name PlayerData
 #TODO
 #Attach move list
 #Does the move dict need anything other than hit data? 
-#HACK directly loaded in moves
+#HACK directly loaded in moves, cleaner way to do this?
 var MOVE_DICTIONARY = {
-	"Jab": preload("res://src/attacks/jab.gd").new() ,
-	"Hook": preload("res://src/attacks/hook.gd").new(),
-	"Overhead" : preload("res://src/attacks/overhead.gd").new(),
-	"Shoryuken" : preload("res://src/attacks/shoryuken.gd").new(),
-	"Corkscrew" : preload("res://src/attacks/corkscrew.gd").new(),
-	"Combo (Light)" : preload("res://src/attacks/combolight.gd").new(),
-	"Combo (Heavy)": preload("res://src/attacks/comboheavy.gd").new(),
+	"Jab": preload("res://src/attacks/player/jab.gd").new(),
+	"Hook": preload("res://src/attacks/player/hook.gd").new(),
+	"Overhead" : preload("res://src/attacks/player/overhead.gd").new(),
+	"Shoryuken" : preload("res://src/attacks/player/shoryuken.gd").new(),
+	"Corkscrew" : preload("res://src/attacks/player/corkscrew.gd").new(),
+	"Combo (Light)" : preload("res://src/attacks/player/combolight.gd").new(),
+	"Combo (Heavy)": preload("res://src/attacks/player/comboheavy.gd").new(),
 }
 
 #TODO improve this
@@ -42,13 +42,11 @@ func is_move(move_name):
 
 func process_attack():
 	HP -= MOVE_DICTIONARY[cur_movename].cost
-	print(HP)
 
 
 #TODO double using variables to track, kinda gross
 #How do you want to handle attakc combinations
 func get_move_data():
-	MOVE_DICTIONARY[cur_movename].print_data()
 	return MOVE_DICTIONARY[cur_movename]
 
 func select_next_move():

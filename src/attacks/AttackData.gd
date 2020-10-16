@@ -35,11 +35,11 @@ var dashing_type = false #can occur while dashing (ie does not cancel dash)
 
 var priority = 0 #? unsure if will have this system
 
-#How much damage scaling for combos
-#Currently have yet to implement this system 
-var damage_scaling = 1
-var hitstun_scaling = 1
-
+#How much knockback/damage scaling for combos
+#TODO DO YOU WANT THIS TO BE MULTIPLICATIVE VS ADDITIVE
+var damage_scaling = .1
+var knockback_scaling = .2
+var hitstun_scaling = 1 #UNIMPLEMENTED
 
 
 #Special properties of the attack, for the attacker
@@ -47,26 +47,15 @@ var invincibility = false
 var invincibility_time = 0
 
 #Special properties of the attack, when hitting the defender
-var special_state = "none" #TODO Consider ways to implement ground-bounce/wall-bounce/wall-splats etc.
+#TODO Consider ways to implement ground-bounce/wall-bounce/wall-splats etc.
 var rooted = false
 var wall_bounces = false
 var ground_bounces = false
+var stagger = false
 
 #Timers related to the attack
 var duration = 0 #How long the attack lasts for.  Unsure if necessary.
 var cancellable_time #How long before the char can cancel the attack into the next or movements
-
-#Data passed to agent hit by attack
-#TODO: Decide what variables should be in here
-var hit_var = {
-    "attacker" : attacker,
-    "movename" : movename,
-    "dmg": dmg,
-    "knockback_dir": knockback_dir,
-    "knockback_val": knockback_val,
-    "stun" : hitstun,
-}
-
 #endregion
 
 #region ASSOCIATED EXTERNAL RESOURCES
@@ -82,6 +71,7 @@ var hitspark = "default" #Type of hitspark to play on hit
 
 #endregion
 
+#Data passed to agent hit by attack
 func get_hit_var():
 
     var updated_hit_var = {
@@ -90,8 +80,12 @@ func get_hit_var():
     "dmg": dmg,
     "knockback_dir": knockback_dir,
     "knockback_val": knockback_val,
+    "knockback_scaling" : knockback_scaling,
+    "damage_scaling" : damage_scaling,
     "stun" : hitstun,
-    "rooted" : rooted
+    "rooted" : rooted,
+    "stagger" : stagger,
+    
     }
     
     return updated_hit_var

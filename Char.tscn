@@ -13,7 +13,7 @@
 [ext_resource path="res://assets/Akihiko/ak045_03.png" type="Texture" id=11]
 [ext_resource path="res://assets/Akihiko/ak040_04.png" type="Texture" id=12]
 [ext_resource path="res://assets/Akihiko/ak040_02.png" type="Texture" id=13]
-[ext_resource path="res://src/player/Hitbox.gd" type="Script" id=14]
+[ext_resource path="res://src/scripts/HitboxHandler.gd" type="Script" id=14]
 [ext_resource path="res://assets/Akihiko/ak030_08.png" type="Texture" id=15]
 [ext_resource path="res://assets/Akihiko/ak045_00.png" type="Texture" id=16]
 [ext_resource path="res://assets/Akihiko/ak032_00.png" type="Texture" id=17]
@@ -368,6 +368,8 @@
 [ext_resource path="res://assets/Akihiko/ak432_08.png" type="Texture" id=366]
 [ext_resource path="res://assets/Akihiko/ak432_11.png" type="Texture" id=367]
 [ext_resource path="res://assets/Akihiko/ak432_09.png" type="Texture" id=368]
+
+
 
 [sub_resource type="SpriteFrames" id=4]
 animations = [ {

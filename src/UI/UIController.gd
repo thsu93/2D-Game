@@ -21,7 +21,6 @@ onready var HP_bar = $CooldownBars/HPBar
 var slowdown_cd_remaining = 0
 var max_slowdown_cd
 
-signal special_change
 signal dialogue_finished
 
 # Called when the node enters the scene tree for the first time.
@@ -29,17 +28,7 @@ func _ready():
 	curr_length = length
 
 func _process(delta):
-	var dir = ""
-	if Input.is_action_just_released("scroll_up"):
-		dir = "down"
-	if Input.is_action_just_released("scroll_down"):
-		dir = "up"
-
-	# if not dir == "":
-	# 	var changed = grid.change_selection(dir)
-	# 	if changed:
-	# 		emit_signal("special_change", grid.get_selected_special())
-
+	pass
 
 func get_total_cd():
 	return grid.get_total_cd()
@@ -88,7 +77,8 @@ func _on_DialogueBox_dialogue_complete():
 	$MoveDisplay.visible = true
 
 
-
+func change_move(num):
+	grid.change_selection(num)
 
 
 
