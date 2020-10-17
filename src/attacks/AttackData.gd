@@ -16,7 +16,14 @@ var hitstun = .5
 #These variables are supposed to dictate the movements of the attacker as it attacks
 var velocity = 0
 var direction = Vector2()
+
+#TODO This one seems to be unused now
 var anim_time = 0
+
+
+var screenshake_duration = 0
+var screenshake_amp = 0
+
 
 #These variables are intended to dictate the movements of the attacked target
 #is added to get_hit_var

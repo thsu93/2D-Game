@@ -3,6 +3,7 @@ extends Actor
 
 
 signal selected_move_changed(cur_move_num)
+signal player_died
 
 #TODO: PRIORITY SYSTEM FOR ANIMATIONS
 #TODO ADJUST MIDAIR SPEED, AIR DEACCEL, MOVE AWAY FROM HARD STOP 
@@ -79,109 +80,117 @@ func _physics_process(delta):
 	#if there is any slowed-down time, add delta to the slow timer
 	time_slow(delta)
 
-	# Get the controls.
-	var dashing = Input.is_action_just_pressed("dash")
+	#TODO INSERT DEATH CODE HERE
+	#HACK THIS IS NOT GOOD CODING PRACTICE
+	if not char_data.damage_state_ == char_data.DAMAGE_STATE.DEAD:
+		# Get the controls.
+		var dashing = Input.is_action_just_pressed("dash")
 
-	#Can likely get rid of these commands given 
-	var move_left = Input.is_action_pressed("move_left")
-	var move_right = Input.is_action_pressed("move_right")
-	var jump = Input.is_action_pressed("jump")
-	var crouch = Input.is_action_pressed("crouch")
+		#Can likely get rid of these commands given 
+		var move_left = Input.is_action_pressed("move_left")
+		var move_right = Input.is_action_pressed("move_right")
+		var jump = Input.is_action_pressed("jump")
+		var crouch = Input.is_action_pressed("crouch")
 
-	check_change_move()
+		check_change_move()
 
-	#BUG DOES NOT DETECT IS ON FLOOR IF MID-ANIMATION
-	#Player will slide along floor 
-	#ATTACKING
-
-	#TODO How to get immediate moves out (e.g. dashing moves to come out immediately)
-	#TODO buffer move inputs
-	#BUG? moves do not come out when going through transitional state animations
-	#BUG Attacking during the crouchdown/stand up animations is a bit janky
-	#HACK the way attack movement is handled is incredibly janky and should not be done this way
-	#Currently, pass in a movement vector, then the animation player will tell the char when to start playing it
-	#Different types of cancel? 
-
-	if not char_data.uncancellable:
-		check_new_attack()
-
-		if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
-			#if want to have moves that are non-effected by gravity may need to reconsider
-			#However, those can likely handle themselves in the animation player or add to attack data
-			if no_grav == true:
-				no_grav = false
-			if not attack_data.running_type:
-				decelerate(delta)
-
-		if dashing:
-			#HACK should determine if dashing in "facing" direction vs not
-			#TODO: Decide what optimal controls are here
-			dash_count += 1
-			if dash_count <= DASH_MAX:
-				if (move_left and char_data.horizontal_state_ == -1) or (move_right and char_data.horizontal_state_ == 1):
-					char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
-				else:
-					char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
-				
-	
-	#If not in special state
-	#TODO this is a bad wayof handling this interaction
-	#You should do better later
-	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-		
-		# Update sidedness, give a bit of error room 
-		check_side(move_left, move_right)
-		
-		#Obtain directional input buffers
-		check_buffer()
-		update_movements(delta)
-		
-		#Process jump/fall	
-		if not is_on_floor():
-			check_falling(delta, jump)
-
-		if is_on_floor():
-
-			airborne_time = 0
-			dash_count = 0
-
-			if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
-			
-
-			if crouch:
-				check_crouch(delta)
-
-			elif not crouch:
-				# Process logic when character is on floor.
-				if jump:
-					_velocity.y = -JUMP_VELOCITY
-					char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
-					stopping_jump = false
-
-				# old movement update location
-				# update_movements(delta)
-				
-				#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
-				if not jump:
-					check_move_anim()
-					
-	#TODO: Calculate move velocity allowing for:
-		#DASHING
+		#BUG DOES NOT DETECT IS ON FLOOR IF MID-ANIMATION
+		#Player will slide along floor 
 		#ATTACKING
 
-	if not movement_locked:
-		# Unsure how to resolve this issue. Change to feature? unclear 
-		# WILL SLIDE DOWN SLOPES, UNSURE IF DESIRED IMPLEMENTATION.
-		var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
-		_velocity = move_and_slide_with_snap(
-			_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
-			)
-	
-	#BUG WILL NOT WORK IF EXTERNAL_MOVEMNT_DATA IS 0
-	else: #if the player input is locked out
-		external_movement(external_movement_data, remaining_animation_time, delta)
-#endregion
+		#TODO How to get immediate moves out (e.g. dashing moves to come out immediately)
+		#TODO buffer move inputs
+		#BUG? moves do not come out when going through transitional state animations
+		#BUG Attacking during the crouchdown/stand up animations is a bit janky
+		#Currently, pass in a movement vector, then the animation player will tell the char when to start playing it
+		#Different types of cancel? 
+
+		#HACK This deals with trying to attack during damage state idle, but probably not the best.
+		#Should add something within Char_data to force unbreakable damage state
+		if not char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
+			char_data.uncancellable = true
+
+		#check attacks and dashing
+		if not char_data.uncancellable:
+			check_new_attack()
+
+			if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+				#if want to have moves that are non-effected by gravity may need to reconsider
+				#However, those can likely handle themselves in the animation player or add to attack data
+				if no_grav == true:
+					no_grav = false
+				if not attack_data.running_type:
+					decelerate(delta)
+
+			if dashing:
+				#HACK should determine if dashing in "facing" direction vs not
+				#TODO: Decide what optimal controls are here
+				dash_count += 1
+				if dash_count <= DASH_MAX:
+					if (move_left and char_data.horizontal_state_ == -1) or (move_right and char_data.horizontal_state_ == 1):
+						char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
+					else:
+						char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
+					
+		
+		#If not in special state
+		#TODO this is a bad wayof handling this interaction
+		#You should do better later
+		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+			
+			# Update sidedness, give a bit of error room 
+			check_side(move_left, move_right)
+			
+			#Obtain directional input buffers
+			check_buffer()
+			update_movements(delta)
+			
+			#Process jump/fall	
+			if not is_on_floor():
+				check_falling(delta, jump)
+
+			if is_on_floor():
+
+				airborne_time = 0
+				dash_count = 0
+
+				if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+					char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+				
+
+				if crouch:
+					check_crouch(delta)
+
+				elif not crouch:
+					# Process logic when character is on floor.
+					if jump:
+						_velocity.y = -JUMP_VELOCITY
+						char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
+						stopping_jump = false
+
+					# old movement update location
+					# update_movements(delta)
+					
+					#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
+					if not jump:
+						check_move_anim()
+						
+		#TODO: Calculate move velocity allowing for:
+			#DASHING
+			#ATTACKING
+
+		if not movement_locked:
+			# Unsure how to resolve this issue. Change to feature? unclear 
+			# WILL SLIDE DOWN SLOPES, UNSURE IF DESIRED IMPLEMENTATION.
+			var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
+			_velocity = move_and_slide_with_snap(
+				_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
+				)
+		
+		#BUG WILL NOT WORK IF EXTERNAL_MOVEMNT_DATA IS 0
+		else: #if the player input is locked out
+			external_movement(external_movement_data, remaining_animation_time, delta)
+	#endregion
 
 
 
@@ -311,6 +320,8 @@ func check_change_move():
 		emit_signal("selected_move_changed", char_data.cur_move_num)
 	
 
+#BUG gets stuck in attack animation sometimes after taking damage
+#unclear how this happens, need to reproduce	
 #Should find a way to incorporate this + dash into the move buffer
 #TODO Better way to handle crouching vs standing vs dashing vs jumping etc.
 func check_new_attack():
@@ -429,7 +440,7 @@ func _on_AnimationPlayer_animation_changed(_anim_name):
 		no_grav = false
 	char_data.animation_completed()
 
-func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
+func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
 	if body.get_class() == "Actor" and body.actor_type == "enemy":
 
 		# body.stunned = true
@@ -441,17 +452,12 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
 		var hit_pos = get_collision_position(body)
 		emit_hitspark(hit_pos)
 
+		screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
 
 		#HACK TEMPORARY KNOCKBACK CALC
 		attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
 		body.take_damage(attack_data.get_hit_var())
 		slow_time += attack_data.slow_time
-		
-		#TODO How to prevent double-hitting of moves
-		#Is this even necessary? It won't maintain hitting
-		#Should probably handle this differently, given the possibility of hitting through two enemies
-		#attack_hitbox.get_node("CollisionShape2D").disabled = true
-
 
 
 #HACK hitspark location calculation

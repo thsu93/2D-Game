@@ -1,42 +1,45 @@
+#Generic Actor Class
+#Base classs for any moving in-game agent
+#Nodes: "CharacterData", "Sprite", "AnimationPlayer"
+#Vars: _velocity, actor_type, current_animation, knockback, external_movement_data, remaining_animation_time
+#Fxns: _process (grav+knockback handling), get_class, take_damage, external_movement, play_sprite, destroy
+#Signals: Screenshake
 class_name Actor
+
 extends KinematicBody2D
 
 # Both the Player and Enemy inherit this scene as they have shared behaviours
 # such as speed and are affected by gravity.
 
-var actor_type = "unknown"
+signal screenshake(amplitude, duration)
+
+#REQUIRED NODES:
+
+onready var char_data = $CharacterData
+onready var sprite = $Sprite
+onready var animation_player = $AnimationPlayer
+
+#Base actor type
+var actor_type = "Actor"
 
 
 export var speed = Vector2(150.0, 450.0)
 export var no_grav = false
 onready var gravity = ProjectSettings.get("physics/2d/default_gravity")
+export var movement_locked = false
+var external_movement_data = Vector2()
 
 const FLOOR_NORMAL = Vector2.UP
 
 var _velocity = Vector2.ZERO
 var stunned = false
 
-#Be aware that these will require all nodes of agents to be named explicitly as such
-#unless manually overloaded
-onready var char_data = $CharacterData
-
-
-onready var sprite = $Sprite
-
-
-onready var animation_player = $AnimationPlayer
 var current_animation = ""
 
-
-
-export var movement_locked = false
-export(Vector2) var external_movement_data = Vector2()
 var remaining_animation_time = 0
 
 var knockback = Vector2.ZERO
 var stun_time = 0
-
-var overwrite = false
 
 func _ready():
 	char_data.set_name(actor_type)
@@ -46,11 +49,11 @@ func _ready():
 func _physics_process(delta):
 
 	#Should stunned leave vertical falling? choice? 
-	# if stunned:
-	# 	_velocity = Vector2()
-	# 	stun_time -= delta
-	# 	if stun_time <=0:
-	# 		stunned = false
+	if stunned:
+		_velocity.x = 0
+		stun_time -= delta
+		if stun_time <=0:
+			stunned = false
 
 	# else:
 	if no_grav:
@@ -63,11 +66,17 @@ func _physics_process(delta):
 		knockback = knockback.move_toward(Vector2.ZERO, 1000*delta)
 		knockback = move_and_slide(knockback)
 
+	#TODO check that this doesn't result in any problems
+	if is_on_floor():
+		if current_animation.begins_with("Jump"):
+			char_data.change_anim_state(char_data.ANIMATION_STATE.IDLE)
 
 #Overload the get_class() function for hit detection purposes
 func get_class():
 	return "Actor"
 
+#Base class for taking damage. Overloaded in both Player and Enemy currently.
+#should re-evaluate further.
 func take_damage(hit_var):
 	print(hit_var)
 	print(hit_var["knockback_dir"])
@@ -129,3 +138,22 @@ func _on_AnimationPlayer_animation_finished(_anim_name):
 
 func _on_CharacterData_turn_sprite():
 	self.scale.x *= -1
+
+#On character death
+func _on_CharacterData_dead():
+	print("dead")
+	destroy()
+
+#destroy body
+func destroy():
+	animation_player.stop(true)
+	animation_player.play("Death")
+	_velocity = Vector2.ZERO
+	knockback = Vector2(250,0) * -char_data.horizontal_state_
+
+	#HACK turn off collision for anything except world
+	self.collision_mask = 1024
+
+#Shakes screen for 
+func screenshake(duration, amplitude):
+	emit_signal("screenshake", duration, amplitude)

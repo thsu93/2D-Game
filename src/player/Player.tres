@@ -486,7 +486,7 @@ animations = [ {
 "frames": [ ExtResource( 25 ), ExtResource( 46 ), ExtResource( 16 ), ExtResource( 47 ), ExtResource( 26 ), ExtResource( 47 ), ExtResource( 16 ), ExtResource( 46 ), ExtResource( 25 ) ],
 "loop": true,
 "name": "StandDamage",
-"speed": 5.0
+"speed": 9.0
 }, {
 "frames": [ ExtResource( 42 ), ExtResource( 6 ), ExtResource( 44 ), ExtResource( 32 ), ExtResource( 33 ), ExtResource( 18 ) ],
 "loop": true,
@@ -611,5 +611,5 @@ animations = [ {
 "frames": [ ExtResource( 366 ), ExtResource( 369 ), ExtResource( 367 ), ExtResource( 368 ), ExtResource( 370 ), ExtResource( 368 ), ExtResource( 367 ), ExtResource( 369 ), ExtResource( 366 ) ],
 "loop": true,
 "name": "StandStagger",
-"speed": 5.0
+"speed": 9.0
 } ]

@@ -12,8 +12,8 @@ var select
 var slowed = false
 var slowable = true
 
-onready var slowdown_timer = Timer.new()
-onready var slowdown_cd_timer = Timer.new()
+# onready var slowdown_timer = Timer.new()
+# onready var slowdown_cd_timer = Timer.new()
 const BULLET_TIME_LENGTH = 1
 const BULLET_TIME_CD_LENGTH = 1
 
@@ -26,15 +26,15 @@ func _ready():
 
 	UI = get_node(UI_control_path)
 	
-	slowdown_timer.set_one_shot(true)
-	slowdown_timer.set_wait_time(BULLET_TIME_LENGTH)
-	slowdown_timer.connect("timeout", self, "on_timeout_complete")
-	add_child(slowdown_timer)
+	# slowdown_timer.set_one_shot(true)
+	# slowdown_timer.set_wait_time(BULLET_TIME_LENGTH)
+	# slowdown_timer.connect("timeout", self, "on_timeout_complete")
+	# add_child(slowdown_timer)
 	
-	slowdown_cd_timer.set_one_shot(true)
-	slowdown_cd_timer.set_wait_time(BULLET_TIME_CD_LENGTH)
-	slowdown_cd_timer.connect("timeout", self, "on_slowdown_timeout_complete")
-	add_child(slowdown_cd_timer)
+	# slowdown_cd_timer.set_one_shot(true)
+	# slowdown_cd_timer.set_wait_time(BULLET_TIME_CD_LENGTH)
+	# slowdown_cd_timer.connect("timeout", self, "on_slowdown_timeout_complete")
+	# add_child(slowdown_cd_timer)
 
 	UI.set_max_HP(player.get_max_HP())
 	# UI.set_movelist(player.get_movelist())
@@ -43,39 +43,39 @@ func _ready():
 func _physics_process(_delta):
 	if Input.is_action_just_pressed("ui_esc"):
 		UI.pause()
-	if Input.is_action_just_pressed("click") or Input.is_action_just_pressed("rclick"):
-		unslow_time()
-	check_if_slowed()
+	# if Input.is_action_just_pressed("click") or Input.is_action_just_pressed("rclick"):
+	# 	unslow_time()
+	# check_if_slowed()
 	update_HP()
 
 
 #TIMESLOW MECHANICS
-func slow_time():
-	if slowable:
-		slowed = true
-		slowable = false
-		slowdown_timer.start()
+# func slow_time():
+# 	if slowable:
+# 		slowed = true
+# 		slowable = false
+# 		slowdown_timer.start()
 
-func unslow_time():
-	if slowed:
-		slowed = false
-		slowdown_cd_timer.start()
-		_on_slowdown_cooldown()
+# func unslow_time():
+# 	if slowed:
+# 		slowed = false
+# 		slowdown_cd_timer.start()
+# 		_on_slowdown_cooldown()
 
-func on_timeout_complete():
-	unslow_time()
+# func on_timeout_complete():
+# 	unslow_time()
 
-func on_slowdown_timeout_complete():
-	slowable = true
+# func on_slowdown_timeout_complete():
+# # 	slowable = true
 
-func check_if_slowed():
-	if slowed:
-		Engine.time_scale = 0.5
-	else:
-		Engine.time_scale = 1
+# func check_if_slowed():
+# 	if slowed:
+# 		Engine.time_scale = 0.5
+# 	else:
+# 		Engine.time_scale = 1
 
-func _on_slowdown_cooldown():
-	UI.slowdown_cooldown(BULLET_TIME_CD_LENGTH)	
+# func _on_slowdown_cooldown():
+# 	UI.slowdown_cooldown(BULLET_TIME_CD_LENGTH)	
 	
 	
 #POSITIONAL DATA MECHANICS
@@ -95,10 +95,9 @@ func _on_Enemy_combo(num:int):
 	UI.set_combo_count(num)
 
 
-#TODO scale this to weight of hit?
-#TODO use the same function on any char taking damage? IE player, normal mob, boss?
-func _on_Enemy_shake():
-	camera.shake(.1, 50, 1)
+#TODO Frequency changed by attack data, or just duration/amp 
+func _on_Actor_screenshake(duration, amplitude):
+	camera.shake(duration, 300, amplitude)
 	pass
 
 func update_HP():
@@ -120,10 +119,5 @@ func _on_StaticBody2D_start_dialogue(dialogue_path):
 
 
 #SPECIAL MECHANICS
-func _on_Control_special_change(new_selection):
-	player.set_special(new_selection)
-	slow_time()
-
-
 func _on_Player_selected_move_changed(num):
 	UI.change_move(num)

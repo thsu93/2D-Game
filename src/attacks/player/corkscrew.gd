@@ -9,4 +9,8 @@ func _init():
 	direction = Vector2(.5,0)
 	anim_time = .2
 	running_type = false
+	
+	screenshake_duration = .2
+	screenshake_amp = 10
+
 	pass # Replace with function body.

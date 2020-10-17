@@ -35,7 +35,7 @@
 
 [sub_resource type="Animation" id=5]
 resource_name = "StandDamage"
-length = 0.8
+length = 0.5
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
 tracks/0/interp = 1
@@ -67,7 +67,7 @@ tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.6 ),
+"times": PoolRealArray( 0, 0.5 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
@@ -75,7 +75,7 @@ tracks/2/keys = {
 
 [sub_resource type="Animation" id=6]
 resource_name = "StandStagger"
-length = 0.8
+length = 0.5
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
 tracks/0/interp = 1
@@ -107,7 +107,7 @@ tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.6 ),
+"times": PoolRealArray( 0, 0.5 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
@@ -172,7 +172,7 @@ script = ExtResource( 19 )
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "StandStagger"
+animation = "StandDamage"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -222,6 +222,7 @@ shape = SubResource( 4 )
 [connection signal="animation_finished" from="Sprite" to="." method="_on_Sprite_animation_finished"]
 [connection signal="body_shape_entered" from="Sprite/Hitbox" to="." method="_on_Hitbox_body_shape_entered"]
 [connection signal="animation_finished" from="Sprite/Hitbox/Hitspark" to="." method="_on_Hitspark_animation_finished"]
+[connection signal="dead" from="CharacterData" to="." method="_on_CharacterData_dead"]
 [connection signal="new_sprite_animation" from="CharacterData" to="." method="_on_CharacterData_new_sprite_animation"]
 [connection signal="play_animation" from="CharacterData" to="." method="_on_CharacterData_play_animation"]
 [connection signal="turn_sprite" from="CharacterData" to="." method="_on_CharacterData_turn_sprite"]

@@ -52,6 +52,7 @@ enum MOVE_STATE{
 	WALKING,
 	RUNNING,
 	DASHING,
+	BACKDASHING,
 	TRANSITIONING,
 }
 
@@ -70,7 +71,6 @@ var move_state_ = MOVE_STATE.STANDING
 #ATTACK DATA
 #HACK, rewrite this for more complexity later
 var cur_attack = null
-var cur_movename = "Jab"
 
 #ANIMATIONS CONTAINED WITHIN CHAR
 var sprite_library
@@ -193,7 +193,7 @@ func evaluate_state_change(new_state, state_changed):
 		
 		elif new_state == ANIMATION_STATE.BACKDASHING:
 			anim_state_ = ANIMATION_STATE.BACKDASHING
-			move_state_ = MOVE_STATE.DASHING
+			move_state_ = MOVE_STATE.BACKDASHING
 
 		elif new_state == ANIMATION_STATE.ATTACKING:
 			anim_state_ = ANIMATION_STATE.ATTACKING
@@ -280,7 +280,7 @@ func update_current_animation():
 		new_anim = "Backdash"
 	
 	elif anim_state_ == ANIMATION_STATE.ATTACKING:
-		new_anim = cur_movename
+		new_anim = cur_attack.movename
 
 	elif anim_state_ == ANIMATION_STATE.TURNING:
 		new_anim = "Turn"
@@ -297,7 +297,7 @@ func update_current_animation():
 
 	
 	elif anim_state_ == ANIMATION_STATE.ATTACKING:
-		new_anim = cur_movename
+		new_anim = cur_attack.movename
 		pass
 		#no attacking animations current
 		#should probably defer this call to a more complex function given possible variants
@@ -389,8 +389,9 @@ func animation_completed():
 			ANIMATION_STATE.DASHING: 		move_state_ = MOVE_STATE.RUNNING #HACK
 			ANIMATION_STATE.IDLE: 			move_state_change = MOVE_STATE.STANDING
 			_: move_state_change = false
-	
+
 	anim_state_ = ANIMATION_STATE.IDLE
+
 
 	if move_state_change:
 		change_move_state(move_state_)

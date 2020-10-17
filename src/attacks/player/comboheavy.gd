@@ -12,4 +12,9 @@ func _init():
 	anim_time = .2
 	running_type = false
 	stagger = true
+
+	screenshake_duration = .1
+	screenshake_amp = 5
+
+
 	pass # Replace with function body.

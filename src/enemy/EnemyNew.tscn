@@ -528,13 +528,13 @@ cast_to = Vector2( 0, 8 )
 collision_mask = 1024
 
 [node name="FloorDetectorLeft" type="RayCast2D" parent="."]
-position = Vector2( -10, -5 )
+position = Vector2( -7, -5 )
 enabled = true
 cast_to = Vector2( 0, 20 )
 collision_mask = 1024
 
 [node name="FloorDetectorRight" type="RayCast2D" parent="."]
-position = Vector2( 10, -5 )
+position = Vector2( 7, -5 )
 enabled = true
 cast_to = Vector2( 0, 20 )
 collision_mask = 1024
@@ -573,7 +573,7 @@ script = ExtResource( 1 )
 max_HP = 550
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
-position = Vector2( 0.463109, -17.0179 )
+position = Vector2( 0.463112, -16.6437 )
 scale = Vector2( 0.3, 0.3 )
 frames = SubResource( 12 )
 animation = "StandElbow"

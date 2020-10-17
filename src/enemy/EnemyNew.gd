@@ -1,5 +1,4 @@
 #Class that controls the movement and manages hitting data of the enemy
-#Data and attack AI are contained within actor's char_data file
 #TODO how to structure AI
 class_name Enemy2
 extends Actor
@@ -24,6 +23,16 @@ var combo_counter = 0
 var knockback_scaling_mult = 1
 var damage_scaling_mult = 1
 
+var landed_hit = false
+
+
+var ATTACK_TIMER = 1.5
+var timer = 0
+var hit_timer = 0
+#JAB, LUNGE, UPPER, ELBOW
+
+
+
 func _init():
 	actor_type = "enemy"
 
@@ -35,6 +44,7 @@ func _ready():
 	sprite.playing = true
 	sprite.animation = current_animation
 	sprite.speed_scale = 2
+
 
 	animation_player.playback_speed = 1.5
 
@@ -89,7 +99,30 @@ func _physics_process(_delta):
 	# We only update the y value of _velocity as we want to handle the horizontal movement ourselves.
 	_velocity.y = move_and_slide(_velocity, FLOOR_NORMAL).y
 
+	
+	run_ai(_delta)
 
+func run_ai(_delta):
+	timer += _delta
+	if landed_hit:
+		if char_data.cur_attack.movename == "Jab": 
+			char_data.next_move()
+			char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+			timer = 0
+			hit_timer = 0
+		
+		else: 
+			hit_timer = 0
+			char_data.base_move()
+
+		landed_hit = false
+
+	elif timer > ATTACK_TIMER and not char_data.anim_state_ == char_data.ANIMATION_STATE.DAMAGED:
+		timer = 0
+		hit_timer = 0
+		char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+
+	pass
 
 # This function calculates a new velocity whenever you need it.
 # If the enemy encounters a wall or an edge, the horizontal velocity is flipped.
@@ -142,23 +175,6 @@ func take_damage(hit_var):
 	emit_signal("shake")
 	
 
-
-
-#On character death
-func _on_CharacterData_dead():
-	destroy()
-
-#destroy body
-func destroy():
-	animation_player.stop(true)
-	animation_player.play("Death")
-	_velocity = Vector2.ZERO
-	knockback = Vector2(250,0) * -char_data.horizontal_state_
-
-	#HACK turn off collision for anything except world
-	self.collision_mask = 1024
-
-
 func _on_Hitspark_animation_finished():
 	hitspark.visible = false
 	pass # Replace with function body.
@@ -177,13 +193,18 @@ func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
 
 		var attack_data = char_data.cur_attack
 
+		screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
+
 		#HACK TEMPORARY KNOCKBACK CALC
 		attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
 		body.take_damage(attack_data.get_hit_var())
 		
+
+		print("ENEMY HIT")
 		#TODO How to prevent double-hitting of moves
 		#Is this even necessary? It won't maintain hitting
 		#Should probably handle this differently, given the possibility of hitting through two enemies
 		#attack_hitbox.get_node("CollisionShape2D").disabled = true
 
+		landed_hit = true
 
