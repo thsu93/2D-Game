@@ -33,7 +33,7 @@
 [ext_resource path="res://src/player/PlayerData.gd" type="Script" id=377]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_009.png" type="Texture" id=378]
 
-[sub_resource type="Animation" id=5]
+[sub_resource type="Animation" id=1]
 resource_name = "StandDamage"
 length = 0.5
 tracks/0/type = "value"
@@ -73,7 +73,7 @@ tracks/2/keys = {
 "values": [ true, false ]
 }
 
-[sub_resource type="Animation" id=6]
+[sub_resource type="Animation" id=2]
 resource_name = "StandStagger"
 length = 0.5
 tracks/0/type = "value"
@@ -113,23 +113,23 @@ tracks/2/keys = {
 "values": [ true, false ]
 }
 
-[sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 107.756, 37.9429 )
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 69.8521, 71.3048 )
 
-[sub_resource type="SpriteFrames" id=3]
+[sub_resource type="SpriteFrames" id=4]
 animations = [ {
-"frames": [  ],
-"loop": true,
-"name": "Default",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 57 ), ExtResource( 63 ), ExtResource( 81 ), ExtResource( 76 ), ExtResource( 77 ), ExtResource( 82 ), ExtResource( 78 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 378 ) ],
 "loop": false,
 "name": "DashEffect",
 "speed": 10.0
+}, {
+"frames": [  ],
+"loop": true,
+"name": "Default",
+"speed": 5.0
 } ]
 
-[sub_resource type="CapsuleShape2D" id=4]
+[sub_resource type="CapsuleShape2D" id=5]
 radius = 7.08997
 height = 25.0
 
@@ -137,6 +137,7 @@ height = 25.0
 collision_mask = 12
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
+no_grav = true
 movement_locked = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -154,10 +155,10 @@ anims/JumpHook = ExtResource( 12 )
 anims/JumpJab = ExtResource( 10 )
 anims/Overhead = ExtResource( 8 )
 anims/Shoryuken = ExtResource( 7 )
-anims/StandDamage = SubResource( 5 )
+anims/StandDamage = SubResource( 1 )
 anims/StandHook = ExtResource( 6 )
 anims/StandJab = ExtResource( 5 )
-anims/StandStagger = SubResource( 6 )
+anims/StandStagger = SubResource( 2 )
 anims/StandUp = ExtResource( 4 )
 
 [node name="Camera" type="Camera2D" parent="."]
@@ -172,7 +173,7 @@ script = ExtResource( 19 )
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "StandDamage"
+animation = "Backdash"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -183,9 +184,9 @@ collision_mask = 12
 [node name="Hitspark" parent="Sprite/Hitbox" instance=ExtResource( 20 )]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -118.734, -69.828 )
+position = Vector2( -153.826, -72.942 )
 scale = Vector2( 1.13819, 1.02605 )
-shape = SubResource( 2 )
+shape = SubResource( 3 )
 disabled = true
 
 [node name="Hurtbox" type="Area2D" parent="Sprite"]
@@ -201,13 +202,14 @@ disabled = true
 [node name="Effects" type="AnimatedSprite" parent="Sprite"]
 position = Vector2( -59.9952, 93.0344 )
 scale = Vector2( -0.988818, 0.988818 )
-frames = SubResource( 3 )
+frames = SubResource( 4 )
 animation = "Default"
 playing = true
 
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
 max_HP = 100
+uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
 position = Vector2( -0.361423, -8.08499 )
@@ -216,7 +218,7 @@ cast_to = Vector2( 0, 8 )
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -16 )
-shape = SubResource( 4 )
+shape = SubResource( 5 )
 [connection signal="animation_changed" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_changed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
 [connection signal="animation_finished" from="Sprite" to="." method="_on_Sprite_animation_finished"]

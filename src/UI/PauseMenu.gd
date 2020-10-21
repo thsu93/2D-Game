@@ -1,6 +1,7 @@
 extends Control
 
 signal update_abilities(abilities)
+signal unpause()
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -19,6 +20,5 @@ func _ready():
 
 
 func _on_Button_pressed():
-	emit_signal("update_abilities" , $Abilities/CharacterPanel.abilities)
-	get_tree().paused = false
-	self.visible = false
+	# emit_signal("update_abilities" , $Abilities/CharacterPanel.abilities)
+	emit_signal("unpause")

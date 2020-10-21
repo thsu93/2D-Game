@@ -11,6 +11,7 @@ extends KinematicBody2D
 # Both the Player and Enemy inherit this scene as they have shared behaviours
 # such as speed and are affected by gravity.
 
+#sent to the gamemanager, which is then sent to the camera
 signal screenshake(amplitude, duration)
 
 #REQUIRED NODES:
@@ -66,7 +67,7 @@ func _physics_process(delta):
 		knockback = knockback.move_toward(Vector2.ZERO, 1000*delta)
 		knockback = move_and_slide(knockback)
 
-	#TODO check that this doesn't result in any problems
+	#Make sure any jumping move animations are cancelled upon landing
 	if is_on_floor():
 		if current_animation.begins_with("Jump"):
 			char_data.change_anim_state(char_data.ANIMATION_STATE.IDLE)
@@ -75,8 +76,13 @@ func _physics_process(delta):
 func get_class():
 	return "Actor"
 
-#Base class for taking damage. Overloaded in both Player and Enemy currently.
-#should re-evaluate further.
+#Method to flip the actor and state machine immediately, without going through the turn animation
+func flip_actor():
+	self.scale.x *= -1
+	char_data.horizontal_state_ *= -1
+
+#Base fxn for taking damage. Overloaded in both Player and Enemy currently.
+#should re-evaluate further to simplify
 func take_damage(hit_var):
 	print(hit_var)
 	print(hit_var["knockback_dir"])
@@ -89,7 +95,9 @@ func take_damage(hit_var):
 	print(knockback)
 
 #Function to handle non-input/AI movements
-#TODO change to move to a point, vs current move for x time
+#Given a vector for how fast to move, a float of how long to move at that speed
+#delta is passed in to subtract
+#Don't know why this doesn't work without using remaining_animation_time
 func external_movement(new_move_data:Vector2, animation_time:float, delta:float = 0):
 
 	movement_locked = true
@@ -105,8 +113,6 @@ func external_movement(new_move_data:Vector2, animation_time:float, delta:float 
 		no_grav = true
 		temp_move_data = move_and_slide(temp_move_data)
 	pass
-
-
 
 #region ANIMATION PLAY FUNCTION SIGNALS 
 func play_new_sprite():
@@ -154,6 +160,7 @@ func destroy():
 	#HACK turn off collision for anything except world
 	self.collision_mask = 1024
 
-#Shakes screen for 
+#Shakes screen for duration and amplitude
+#TODO Should this contain modifiers for frequency as well?
 func screenshake(duration, amplitude):
 	emit_signal("screenshake", duration, amplitude)

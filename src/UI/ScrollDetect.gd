@@ -57,7 +57,6 @@ func change_selection(num):
 	
 # #take in a list of abilitynodes
 # #set ability node children to said nodes
-# #TODO: Deal with excess moves etc.
 
 # func set_movelist(movelist):
 # 	for i in nodes.size():
@@ -74,7 +73,6 @@ func change_selection(num):
 
 
 #DEPRECATED
-#TODO: Reusable?
 #func check_damage():
 #	if nodes[current_pos].selectable:
 #		nodes[current_pos].activate()

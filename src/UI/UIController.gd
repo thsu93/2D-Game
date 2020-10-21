@@ -2,6 +2,7 @@ extends Control
 
 #TODO:
 #remove references to dash cooldown bar
+#Non-Hardcoded references to objects
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -80,14 +81,13 @@ func _on_DialogueBox_dialogue_complete():
 func change_move(num):
 	grid.change_selection(num)
 
-
-
-
-
 #PAUSE HANDLING
-func pause():
-	$PauseMenu.visible = true
-	get_tree().paused = not get_tree().paused
+func pause(pausing):
+	$PauseMenu.visible = pausing
+	get_tree().paused = pausing
+	
+func _on_PauseMenu_unpause():
+	pause(false)
 
 func _on_PauseMenu_update_abilities(abilities):
 	# $MoveDisplay/Grid.set_new_ability_order(abilities)

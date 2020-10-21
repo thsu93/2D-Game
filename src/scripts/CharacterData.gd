@@ -69,7 +69,6 @@ var move_state_ = MOVE_STATE.STANDING
 
 
 #ATTACK DATA
-#HACK, rewrite this for more complexity later
 var cur_attack = null
 
 #ANIMATIONS CONTAINED WITHIN CHAR
@@ -130,7 +129,6 @@ func take_damage(hit_var):
 			
 		update_current_animation()
 
-#TODO: What does this actually do for gameplay?
 func toggle_invuln():
 	if damage_state_ == DAMAGE_STATE.INVULN:
 		damage_state_ = DAMAGE_STATE.IDLE
@@ -138,31 +136,40 @@ func toggle_invuln():
 		damage_state_ = DAMAGE_STATE.INVULN
 
 
-#region change_horiz_state
+#region Attack Processing
+
+#Handles Character Attacking effects. 
+func process_attack():
+	pass
+
+#endregion
+
+
+#region Change States
+
+#given a new horizontal state, attempt to change to that new state
+#if is not current direction, flip the character
 func change_horiz_state(dir):
 	#if trying to turn to the direction already facing
 	if not dir == horizontal_state_:
 		evaluate_state_change(dir, "HORIZONTAL")
-#endregion
 
-#change mvmt state
-#TODO should add landing frames
+#given a new movement state, attempt to change to that new state
+#if new state is the same as current state, simply refreshes the animation
 func change_move_state(new_state):
-	#if not move_state_ == MOVE_STATE.JUMPING and not move_state_ == MOVE_STATE.FALLING:
-	#should be checked in player via on_floor
-	#unsure how to handle better
-
 	if not new_state == move_state_:
 		evaluate_state_change(new_state, "MOVEMENT")
 	else:
 		update_current_animation()
 
-#change dmg state 
+#given a new damage state, attempt to change to that new state 
+#currently does nothing at all
+func change_damage_state(new_state):
+	pass
 
 
-
-#change animation state
-#HACK should handle this more cleanly
+#given a new animation state, attempt to change to that new state
+#Currently only checks against Dash/Backdash/Attack/Idle
 func change_anim_state(new_state):
 	if new_state == ANIMATION_STATE.DASHING:
 		evaluate_state_change(ANIMATION_STATE.DASHING, "ANIMATION")
@@ -175,9 +182,12 @@ func change_anim_state(new_state):
 	
 	pass
 
+#endregion
+
+#region Evaluate State Change
 
 #See if char is currently able to change state
-#region 
+#Prioritizes Damage -> Animation -> Movement state changes.
 func evaluate_state_change(new_state, state_changed):
 	#HIGHEST PRIORITY
 	if state_changed == "DAMAGE":
@@ -251,13 +261,11 @@ func evaluate_state_change(new_state, state_changed):
 	update_current_animation()
 #endregion
 
-#region HOW CHARACTER WILL HANDLE ATTACKING
-#TODO When Character Attacks
-func process_attack():
-	pass
-#endregion
 
-#region update_current_animation 
+#region Animation Changes
+
+#Updates the actor's animation to fit the current state of the state machine
+#prioritizes damage, then animations, then movement
 func update_current_animation():
 
 	var new_anim = current_animation
@@ -333,10 +341,13 @@ func update_current_animation():
 	else:
 		print("ERROR ANIMATION NOT IN LIBRARY: ", new_anim)
 
-#endregion
 
-#region match the vertical state, if possible
+
+#Fixes the animation to match the movestate of the character, if possible
+#IE will correct for running/in-air/crouching/dashing animations
 func match_vert_state(new_anim):
+	
+	#Create a placeholder animation name, and then append the movestate descriptor to the front
 	var temp_anim = new_anim
 	match move_state_:
 		MOVE_STATE.CROUCHING : 	temp_anim = "Crouch" + new_anim
@@ -345,39 +356,45 @@ func match_vert_state(new_anim):
 		MOVE_STATE.FALLING : 	temp_anim = "Jump" + new_anim
 		MOVE_STATE.WALKING : 	temp_anim = "Walk" + new_anim
 		MOVE_STATE.RUNNING : 	temp_anim = "Run" + new_anim
+		MOVE_STATE.DASHING :	temp_anim = "Dash" + new_anim
 
-		#BUG? this means dash moves will come out while backdashing as well as forward dashing
-		MOVE_STATE.DASHING :	temp_anim = "Dash" + new_anim 
-
-
+	#If movestate+anim exists in the sprite or animation player, 
+	#or if the animation exists on its own without a descriptor,
+	#return the animation value
 	if temp_anim in sprite_library or temp_anim in animation_player_library:
 		return temp_anim
 	elif new_anim in sprite_library or new_anim in animation_player_library:
 		return new_anim
+
+	#Otherwise, check if a standing version exists but the player is not in a matching state
+	#and no movestate-generic animation exists
+	#HACK Probably not the best practice
 	else:
-		#HACK Decide how to handle
+		
 		temp_anim = "Stand" + new_anim
 		if temp_anim in sprite_library or temp_anim in animation_player_library:
 			return temp_anim
 		else: # new_anim in sprite_library or new_anim in animation_player_library
-			return new_anim
-#endregion
+			return new_anim #This seems like it should never be called
 
 
-#region animation_completed()
+#Handle any state changes that automatically occur on completion of an animation
+#Then call to update state depending on which state was changed 
 func animation_completed():
-	#THE TRANSITIONAL ANIMATIONS
+	
+	#Variable to track if the move state should change given the animation
 	var move_state_change = false
-	#
+
+	#Change damage state back at the end of taking damage
 	if anim_state_ == ANIMATION_STATE.DAMAGED:
 		damage_state_ = DAMAGE_STATE.IDLE
 
-	#if turning state, change horizontal state
+	#if in the turning state, change horizontal state
 	if anim_state_ == ANIMATION_STATE.TURNING:
 		horizontal_state_ *= -1 #FLIP SIDE
 		emit_signal("turn_sprite")
 
-	#RunStart
+	#Check if the animation_state was a transitional animation
 	else:
 		move_state_change = true
 		match anim_state_:
@@ -386,18 +403,15 @@ func animation_completed():
 			ANIMATION_STATE.CROUCH_DOWN:	move_state_ = MOVE_STATE.CROUCHING
 			ANIMATION_STATE.STAND_UP:		move_state_ = MOVE_STATE.STANDING
 			ANIMATION_STATE.BACKDASHING:	move_state_ = MOVE_STATE.STANDING
-			ANIMATION_STATE.DASHING: 		move_state_ = MOVE_STATE.RUNNING #HACK
+			ANIMATION_STATE.DASHING: 		move_state_ = MOVE_STATE.RUNNING #Forces player into run post-dash if fowrward dashing
 			ANIMATION_STATE.IDLE: 			move_state_change = MOVE_STATE.STANDING
 			_: move_state_change = false
 
 	anim_state_ = ANIMATION_STATE.IDLE
 
-
+	
 	if move_state_change:
 		change_move_state(move_state_)
 	else: 
 		evaluate_state_change(anim_state_, "ANIMATION")
 #endregion
-
-func get_new_animation():
-	return current_animation

@@ -1,64 +1,61 @@
 extends Node
+
+#Class that contains all the data regarding an attack
 class_name AttackData
 
 #region ATTACK-RELATED VARIABLES
-var movename = "None" #Perhaps should have different names for internal and Player-facing tracking
-var dmg = 0
-var attacker = "None" 
 
-var cost = 0
+var movename = "None" #Perhaps should have different names for internal and Player-facing tracking. Default: "None"
+var dmg = 0 #How much damage the move inflicts. Default: 0
+var attacker = "None" #field for noting which actor began usued the attack. Unclear if necessary. Default: "None"
 
-var slow_time = .25
+var cost = 0 #How much HP the move costs to use. Default: 0
 
-
-var hitstun = .5
-
-#These variables are supposed to dictate the movements of the attacker as it attacks
-var velocity = 0
-var direction = Vector2()
-
-#TODO This one seems to be unused now
-var anim_time = 0
+var slow_time = .25 #How much time slowdown the move gives. Default: .25
 
 
-var screenshake_duration = 0
-var screenshake_amp = 0
+var hitstun = .75 #How long the enemy is stunned for. Default: .5
+
+
+var screenshake_duration = 0 #How long to shake the screen for, in msec. Default: 0
+var screenshake_amp = 0 #how many pixels the screen should shake up and down. Default: 0
 
 
 #These variables are intended to dictate the movements of the attacked target
-#is added to get_hit_var
-var knockback_val = 150
-var knockback_dir = Vector2(1,0)
+
+var knockback_val = 150 #How hard the move knocks the enemy back. Default: 150
+var knockback_dir = Vector2(1,0) #field for which direction to knock back. Default: Vector2(1,0)
+
 
 #Is the move allowed to occur from a particular state? 
 #IE if char is crouching and does a non-crouch-type move, will not come out. 
-var ground_type = true #can occur when standing on ground
-var air_type = true #can occur when in the air
-var crouch_type = true #can occur while crouching
-var running_type = false #can occur while running (ie does not stop momentum)
-var dashing_type = false #can occur while dashing (ie does not cancel dash)
+
+var ground_type = true #can occur when standing on ground. Default: True
+var air_type = true #can occur when in the air. Default: True
+var crouch_type = true #can occur while crouching. Default: True
+var running_type = false #can occur while running (ie does not stop momentum). Default: False
+var dashing_type = false #can occur while dashing (ie does not cancel dash). Default: False
 
 
-
-var priority = 0 #? unsure if will have this system
+var priority = 0 #? unsure if will have this system. Currently Unused. Default: 0
 
 #How much knockback/damage scaling for combos
-#TODO DO YOU WANT THIS TO BE MULTIPLICATIVE VS ADDITIVE
-var damage_scaling = .1
-var knockback_scaling = .2
+var damage_scaling = .1 #How much less subsequent hits damage, multiplicative. Default: .1
+var knockback_scaling = .25 #How much knockback is added to each subsequent hit, multiplicative. Default .25
 var hitstun_scaling = 1 #UNIMPLEMENTED
 
 
 #Special properties of the attack, for the attacker
-var invincibility = false
-var invincibility_time = 0
+var invincibility = false #UNIMPLEMENTED. Default: false
+var invincibility_time = 0 #UNIMPLEMENTED. Default: 0
 
 #Special properties of the attack, when hitting the defender
 #TODO Consider ways to implement ground-bounce/wall-bounce/wall-splats etc.
-var rooted = false
-var wall_bounces = false
-var ground_bounces = false
-var stagger = false
+
+var rooted = false #Does this root the target in place? I.E. remove all knockback. Default: false
+var wall_bounces = false #UNIMPLEMENTED
+var ground_bounces = false #UNIMPLEMENTED
+var stagger = false #Does this move cause a stagger state. Default: false
 
 #Timers related to the attack
 var duration = 0 #How long the attack lasts for.  Unsure if necessary.
@@ -72,16 +69,17 @@ var attack_sound #sound char makes when attacking
 var hit_sound #sound move makes on hit
 
 #Other sprites to bring out 
-var associated_scenes = null #Any external scenes (projectiles, summons, etc.)
+var associated_scenes = null #Any external scenes (projectiles, summons, etc.). Default: null
 var attack_effects #particles or other external effects
-var hitspark = "default" #Type of hitspark to play on hit
+var hitspark = "default" #Type of hitspark to play on hit. Default: "default"
 
 #endregion
 
-#Data passed to agent hit by attack
+#Generates the data passed to agent hit by attack
+#currently contains: attacker, movename, dmg, knocback_dir, knocback_val, knockback_scaling, damage_scaling, stun, rooted, stagger
 func get_hit_var():
 
-    var updated_hit_var = {
+    var hit_var = {
     "attacker" : attacker,
     "movename" : movename,
     "dmg": dmg,
@@ -92,11 +90,12 @@ func get_hit_var():
     "stun" : hitstun,
     "rooted" : rooted,
     "stagger" : stagger,
-    
     }
     
-    return updated_hit_var
+    return hit_var
 
+#Prints out how much damage a move will do
+#For debugging purposes only
 func print_data():
 	print(dmg)
 

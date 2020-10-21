@@ -7,7 +7,7 @@ extends AttackData
 func _init():
 	dmg = 5
 	movename = "Jab"
-	knockback_val = 50
+	knockback_val = 75
 	damage_scaling = .3
 	hitstun = .3
 	pass # Replace with function body.

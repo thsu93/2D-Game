@@ -26,8 +26,10 @@ anchor_right = 1.0
 
 [node name="PauseMenu" parent="." instance=ExtResource( 5 )]
 visible = false
-margin_top = -402.0
-margin_bottom = 398.0
+margin_left = -284.915
+margin_top = -192.72
+margin_right = 272.085
+margin_bottom = 178.28
 
 [node name="Panel" type="Panel" parent="."]
 margin_right = 108.0
@@ -44,4 +46,5 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 [connection signal="dialogue_complete" from="Dialogue" to="." method="_on_DialogueBox_dialogue_complete"]
+[connection signal="unpause" from="PauseMenu" to="." method="_on_PauseMenu_unpause"]
 [connection signal="update_abilities" from="PauseMenu" to="." method="_on_PauseMenu_update_abilities"]

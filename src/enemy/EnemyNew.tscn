@@ -233,7 +233,7 @@ tracks/1/keys = {
 "values": [ 0 ]
 }
 
-[sub_resource type="Animation" id=15]
+[sub_resource type="Animation" id=4]
 resource_name = "StandElbow"
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -284,7 +284,7 @@ tracks/3/keys = {
 "values": [ Vector2( 40.3711, 18.3126 ) ]
 }
 
-[sub_resource type="Animation" id=4]
+[sub_resource type="Animation" id=5]
 length = 1.5
 loop = true
 step = 0.25
@@ -301,7 +301,7 @@ tracks/0/keys = {
 "values": [ "StandIdle" ]
 }
 
-[sub_resource type="Animation" id=14]
+[sub_resource type="Animation" id=6]
 resource_name = "StandJab"
 length = 0.5
 tracks/0/type = "value"
@@ -353,8 +353,7 @@ tracks/3/keys = {
 "values": [ true, false, true ]
 }
 
-[sub_resource type="Animation" id=5]
-resource_name = "StandStagger"
+[sub_resource type="Animation" id=7]
 length = 0.8
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
@@ -381,10 +380,10 @@ tracks/1/keys = {
 "values": [ 0 ]
 }
 
-[sub_resource type="Animation" id=6]
+[sub_resource type="Animation" id=8]
 length = 0.15
 
-[sub_resource type="Animation" id=7]
+[sub_resource type="Animation" id=9]
 loop = true
 step = 0.25
 tracks/0/type = "value"
@@ -412,18 +411,18 @@ tracks/1/keys = {
 "values": [ true ]
 }
 
-[sub_resource type="CanvasItemMaterial" id=8]
+[sub_resource type="CanvasItemMaterial" id=10]
 blend_mode = 1
 
-[sub_resource type="Gradient" id=9]
+[sub_resource type="Gradient" id=11]
 offsets = PoolRealArray( 0.5, 1 )
 colors = PoolColorArray( 1, 1, 1, 1, 0, 0, 0, 1 )
 
-[sub_resource type="GradientTexture" id=10]
-gradient = SubResource( 9 )
+[sub_resource type="GradientTexture" id=12]
+gradient = SubResource( 11 )
 width = 256
 
-[sub_resource type="ParticlesMaterial" id=11]
+[sub_resource type="ParticlesMaterial" id=13]
 emission_shape = 1
 emission_sphere_radius = 8.0
 flag_disable_z = true
@@ -435,12 +434,47 @@ orbit_velocity = 0.0
 orbit_velocity_random = 0.0
 angle_random = 1.0
 scale_random = 1.0
-color_ramp = SubResource( 10 )
+color_ramp = SubResource( 12 )
 hue_variation = 0.05
 hue_variation_random = 0.46
 
-[sub_resource type="SpriteFrames" id=12]
+[sub_resource type="SpriteFrames" id=14]
 animations = [ {
+"frames": [ ExtResource( 83 ), ExtResource( 82 ), ExtResource( 81 ), ExtResource( 84 ), ExtResource( 85 ), ExtResource( 86 ), ExtResource( 87 ), ExtResource( 88 ), ExtResource( 89 ), ExtResource( 74 ), ExtResource( 75 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 78 ), ExtResource( 73 ), ExtResource( 67 ), ExtResource( 76 ), ExtResource( 68 ), ExtResource( 77 ), ExtResource( 69 ), ExtResource( 70 ), ExtResource( 71 ), ExtResource( 72 ) ],
+"loop": true,
+"name": "Death",
+"speed": 10.0
+}, {
+"frames": [ ExtResource( 60 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 63 ), ExtResource( 66 ), ExtResource( 57 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 55 ), ExtResource( 56 ) ],
+"loop": true,
+"name": "Walk",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 28 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 25 ), ExtResource( 26 ) ],
+"loop": true,
+"name": "CrouchDown",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
+"loop": true,
+"name": "StandDamage",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 36 ), ExtResource( 53 ), ExtResource( 35 ), ExtResource( 49 ), ExtResource( 44 ), ExtResource( 42 ), ExtResource( 52 ), ExtResource( 45 ) ],
+"loop": true,
+"name": "CrouchDamage",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
+"loop": true,
+"name": "StandUp",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
+"loop": true,
+"name": "StandStagger",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 101 ), ExtResource( 94 ), ExtResource( 105 ), ExtResource( 104 ), ExtResource( 113 ) ],
 "loop": true,
 "name": "StandJab",
@@ -451,44 +485,9 @@ animations = [ {
 "name": "StandIdle",
 "speed": 10.0
 }, {
-"frames": [ ExtResource( 83 ), ExtResource( 82 ), ExtResource( 81 ), ExtResource( 84 ), ExtResource( 85 ), ExtResource( 86 ), ExtResource( 87 ), ExtResource( 88 ), ExtResource( 89 ), ExtResource( 74 ), ExtResource( 75 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 78 ), ExtResource( 73 ), ExtResource( 67 ), ExtResource( 76 ), ExtResource( 68 ), ExtResource( 77 ), ExtResource( 69 ), ExtResource( 70 ), ExtResource( 71 ), ExtResource( 72 ) ],
-"loop": true,
-"name": "Death",
-"speed": 10.0
-}, {
-"frames": [ ExtResource( 36 ), ExtResource( 53 ), ExtResource( 35 ), ExtResource( 49 ), ExtResource( 44 ), ExtResource( 42 ), ExtResource( 52 ), ExtResource( 45 ) ],
-"loop": true,
-"name": "CrouchDamage",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 60 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 63 ), ExtResource( 66 ), ExtResource( 57 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 55 ), ExtResource( 56 ) ],
-"loop": true,
-"name": "Walk",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
-"loop": true,
-"name": "StandDamage",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 28 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 25 ), ExtResource( 26 ) ],
-"loop": true,
-"name": "CrouchDown",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
-"loop": true,
-"name": "StandUp",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 64 ), ExtResource( 65 ) ],
 "loop": true,
 "name": "WalkStart",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
-"loop": true,
-"name": "StandStagger",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 102 ), ExtResource( 100 ), ExtResource( 103 ), ExtResource( 97 ), ExtResource( 106 ), ExtResource( 112 ), ExtResource( 107 ), ExtResource( 96 ), ExtResource( 98 ), ExtResource( 108 ) ],
@@ -507,7 +506,7 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=13]
+[sub_resource type="RectangleShape2D" id=15]
 extents = Vector2( 16.7533, 11.3087 )
 
 [node name="Enemy" type="KinematicBody2D"]
@@ -542,16 +541,16 @@ collision_mask = 1024
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Death = SubResource( 2 )
 anims/StandDamage = SubResource( 3 )
-anims/StandElbow = SubResource( 15 )
-anims/StandIdle = SubResource( 4 )
-anims/StandJab = SubResource( 14 )
-anims/StandStagger = SubResource( 5 )
-anims/StandTurn = SubResource( 6 )
-anims/Walk = SubResource( 7 )
+anims/StandElbow = SubResource( 4 )
+anims/StandIdle = SubResource( 5 )
+anims/StandJab = SubResource( 6 )
+anims/StandStagger = SubResource( 7 )
+anims/StandTurn = SubResource( 8 )
+anims/Walk = SubResource( 9 )
 
 [node name="Explosion" type="Particles2D" parent="."]
 self_modulate = Color( 1, 1, 1, 0.12 )
-material = SubResource( 8 )
+material = SubResource( 10 )
 emitting = false
 amount = 32
 lifetime = 0.5
@@ -559,7 +558,7 @@ one_shot = true
 speed_scale = 1.2
 explosiveness = 0.76
 draw_order = 215832976
-process_material = SubResource( 11 )
+process_material = SubResource( 13 )
 texture = ExtResource( 3 )
 
 [node name="Hit" type="AudioStreamPlayer2D" parent="."]
@@ -570,12 +569,12 @@ stream = ExtResource( 4 )
 
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 1 )
-max_HP = 550
+max_HP = 150
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
 position = Vector2( 0.463112, -16.6437 )
 scale = Vector2( 0.3, 0.3 )
-frames = SubResource( 12 )
+frames = SubResource( 14 )
 animation = "StandElbow"
 frame = 9
 speed_scale = 2.0
@@ -586,7 +585,7 @@ collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
 position = Vector2( 40.3711, 18.3126 )
-shape = SubResource( 13 )
+shape = SubResource( 15 )
 disabled = true
 
 [node name="Hitspark" parent="Sprite/Hitbox" instance=ExtResource( 136 )]

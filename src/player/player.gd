@@ -14,22 +14,22 @@ const WALK_VELOCITY = 125.0
 const JUMP_VELOCITY = 500
 const STOP_JUMP_FORCE = 450.0
 const DASH_SPEED = 300
+const DASH_MAX = 2
+
 const FLOOR_DETECT_DISTANCE = 20.0
+
 const BUFFER_MAX = 10
 
-
-var siding_left = false
-var jumping = false
 var stopping_jump = false
 var slow_time = 0
 
 onready var camera = $Camera
-
 onready var platform_detector = $PlatformDetector
-
-
 onready var attack_hitbox = $Sprite/Hitbox
 onready var hitspark = $Sprite/Hitbox/Hitspark
+
+
+
 var floor_h_velocity = 0.0
 
 var airborne_time = 0
@@ -41,7 +41,7 @@ var buffered_movements = []
 var held_buffer = false
 
 var dash_count = 0
-var DASH_MAX = 2
+
 
 func _init():
 	actor_type = "player"
@@ -76,6 +76,9 @@ func _ready():
 #TODO deal with uncancellable+movement_locked
 #probably change to all input locked vs just movement locked
 func _physics_process(delta):
+
+	if Input.is_action_pressed("slow_time_debug"):
+		slow_time += delta
 
 	#if there is any slowed-down time, add delta to the slow timer
 	time_slow(delta)
@@ -448,9 +451,13 @@ func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
 		#HITSTOP
 		OS.delay_msec(25)
 
-		#HACK hitspark
+		#HACK hitspark, needs improvement
 		var hit_pos = get_collision_position(body)
 		emit_hitspark(hit_pos)
+
+		#HACK flip enemy to face 
+		if (hit_pos.x - self.global_position.x) * body.char_data.horizontal_state_> 0:
+			body.flip_actor() 
 
 		screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
 
@@ -489,7 +496,7 @@ func _on_Hitspark_animation_finished():
 
 func time_slow(delta):
 	if slow_time > 0:
-		Engine.time_scale = .5
+		Engine.time_scale = .1
 		slow_time -= delta
 	else:
 		Engine.time_scale = 1

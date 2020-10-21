@@ -6,15 +6,15 @@ func _init():
 	movename = "Combo (Heavy)"
 	knockback_val = 250
 	hitspark = "slash"
-	knockback_dir = Vector2(1,0) #KNOCKBACK AWAY + LAUNCH
-	velocity = 350
-	direction = Vector2(.75,0)
-	anim_time = .2
+	knockback_dir = Vector2(1,-.2) #KNOCKBACK AWAY + LAUNCH
+
 	running_type = false
 	stagger = true
 
 	screenshake_duration = .1
 	screenshake_amp = 5
+
+	hitstun = .75
 
 
 	pass # Replace with function body.

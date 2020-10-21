@@ -42,7 +42,7 @@ func _ready():
 
 func _physics_process(_delta):
 	if Input.is_action_just_pressed("ui_esc"):
-		UI.pause()
+		UI.pause(not get_tree().paused)
 	# if Input.is_action_just_pressed("click") or Input.is_action_just_pressed("rclick"):
 	# 	unslow_time()
 	# check_if_slowed()
