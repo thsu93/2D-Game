@@ -1,3 +1,5 @@
+#DEPRECATED currently
+
 # extends Node
 
 # const SCENEDICTIONARY = {

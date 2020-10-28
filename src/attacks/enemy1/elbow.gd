@@ -5,9 +5,9 @@ extends AttackData
 # var b = "text"
 # Called when the node enters the scene tree for the first time.
 func _init():
-	dmg = 50
+	dmg = 30
 	movename = "Elbow"
-	knockback_val = 150
+	knockback_val = 350
 	damage_scaling = .3
 	hitstun = .3
 

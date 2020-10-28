@@ -1,24 +1,27 @@
 extends Control
 
-#TODO:
-#remove references to dash cooldown bar
-#Non-Hardcoded references to objects
+signal update_abilities(abilities_list)
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
 const INITIAL = 0
 
 onready var grid = $MoveDisplay/Grid
 onready var length = grid.length
+
 onready var combo_counter = $Panel/Label
+
+onready var pause_menu = $PauseMenu
+
+onready var HP_bar = $CooldownBars/HPBar
+
+onready var dialogue_box = $Dialogue
+
+onready var move_display = $MoveDisplay
+
 var curr_length
 var selected = INITIAL
-#
-#onready var dash_cd_bar = $CooldownBars/DashCooldownBar
+
 #var dash_cd_remaining = 0
 #var max_dash_cd
-onready var HP_bar = $CooldownBars/HPBar
 var slowdown_cd_remaining = 0
 var max_slowdown_cd
 
@@ -28,20 +31,17 @@ signal dialogue_finished
 func _ready():
 	curr_length = length
 
-func _process(delta):
-	pass
-
 func get_total_cd():
 	return grid.get_total_cd()
 
 func set_movelist(movelist):
-	grid.set_movelist(movelist)
+	pause_menu.set_movelist(movelist)
 
 func set_max_HP(maxHP):
 	HP_bar.set_maxHP(maxHP)
 
 func show_HP(curr_hp):
-	$CooldownBars/HPBar.value = curr_hp
+	HP_bar.value = curr_hp
 
 	# if not on cooldown, put on cooldown
 	# if on cooldown, take damage, then swap to next closest upper. If none above, then lower. If none, then stay (char should be dead)
@@ -66,16 +66,14 @@ func set_combo_count(num):
 #DIALOGUE HANDLING
 func set_dialogue(dialogue):
 	print(dialogue)
-	$Dialogue.start(dialogue)
-	$Dialogue.visible = true
-	$CooldownBars.visible = false
-	$MoveDisplay.visible = false
+	dialogue_box.start(dialogue)
+	dialogue_box.visible = true
+	move_display.visible = false
 
 func _on_DialogueBox_dialogue_complete():
 	emit_signal("dialogue_finished")
-	$Dialogue.visible = false
-	$CooldownBars.visible = true
-	$MoveDisplay.visible = true
+	dialogue_box.visible = false
+	move_display.visible = true
 
 
 func change_move(num):
@@ -83,14 +81,18 @@ func change_move(num):
 
 #PAUSE HANDLING
 func pause(pausing):
-	$PauseMenu.visible = pausing
+	pause_menu.visible = pausing
+
+	if not pausing:
+		#Send movelist update
+		pass
+	
 	get_tree().paused = pausing
 	
 func _on_PauseMenu_unpause():
 	pause(false)
 
 func _on_PauseMenu_update_abilities(abilities):
-	# $MoveDisplay/Grid.set_new_ability_order(abilities)
+	emit_signal("update_abilities", abilities)
 	pass
-
-
+	

@@ -1,3 +1,5 @@
+#DEPRECATED currently
+
 extends Node2D
 
 
@@ -173,7 +175,6 @@ func r_click_action(mouseloc, offset):
 			var dir = ((mouseloc+offset)-offset).normalized()
 			player.force_movement(dir, move.get_speed(), move.get_anim_time())
 
-			#TODO: This should probably just be baked into the move animations
 
 
 	# if not player.special_on_lockout():

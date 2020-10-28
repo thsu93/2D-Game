@@ -1,59 +1,70 @@
 extends Panel
 class_name AbilitySlotClass
 
-export(Global.SlotType) var slotType = Global.SlotType.SLOT_DEFAULT;
+export(Global.MoveType) var moveType = Global.MoveType.DEFAULT;
 
 var slotIndex;
-var item = null;
+var ability = null;
+var abilityName
 var style;
 
 func _init():
 	mouse_filter = Control.MOUSE_FILTER_PASS;
-	rect_min_size = Vector2(80, 80);
 	style = StyleBoxFlat.new();
 	refreshColors();
 	style.set_border_width_all(2);
 	set('custom_styles/panel', style);
 
-func setItem(newItem):
-	add_child(newItem);
-	item = newItem;
-	item.itemSlot = self;
+func setAbility(newAbility):
+	delete_children()
+	add_child(newAbility)
+
+	ability = newAbility
+	ability.abilitySlot = self
+	moveType = ability.moveType
+
+	update_ability_info()
+	refreshColors()
+
+func pickAbility():
+	ability.pickAbility();
+	remove_child(ability);
+	get_tree().get_root().add_child(ability);
+	print(ability.get_parent())
+	ability = null;
 	refreshColors();
 
-func pickItem():
-	item.pickItem();
-	remove_child(item);
-	get_tree().get_root().add_child(item);
-	item = null;
+func putAbility(newAbility):
+	ability = newAbility;
+	ability.abilitySlot = self;
+	ability.putAbility();
+	get_tree().get_root().remove_child(newAbility);
+	add_child(ability);
 	refreshColors();
 
-func putItem(newItem):
-	item = newItem;
-	item.itemSlot = self;
-	item.putItem();
-	get_tree().get_root().remove_child(item);
-	add_child(item);
+func removeAbility():
+	remove_child(ability);
+	ability = null;
 	refreshColors();
 
-func removeItem():
-	remove_child(item);
-	item = null;
-	refreshColors();
-
-func equipItem(newItem, rightClick =  true):
-	item = newItem;
-	item.itemSlot = self;
-	item.putItem();
+func equipAbility(newAbility, rightClick =  true):
 	if !rightClick:
-		get_tree().get_root().remove_child(item);
-	add_child(item);
+		get_tree().get_root().remove_child(newAbility);
+	putAbility(newAbility)
 	refreshColors();
 
 func refreshColors():
-	if item:
-		style.bg_color = Color(Global.RarityColor[item.rarity].background);
-		style.border_color = Color(Global.RarityColor[item.rarity].border);
+	if ability:
+		style.bg_color = ability.color;
+		style.border_color = Color(Color.black);
 	else:
 		style.bg_color = Color("#8B7258");
 		style.border_color = Color("#534434");
+
+func delete_children():
+	for n in get_children():
+		self.remove_child(n)
+		n.queue_free()
+
+func update_ability_info():
+	abilityName = ability.abilityName

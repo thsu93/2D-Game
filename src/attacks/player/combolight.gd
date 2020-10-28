@@ -7,6 +7,7 @@ func _init():
 	knockback_val = 60
 	knockback_dir = Vector2(1,-.2) #KNOCKBACK AWAY + LAUNCH
 	running_type = false
+	air_type = false
 
 	screenshake_duration = .05
 	screenshake_amp = 3

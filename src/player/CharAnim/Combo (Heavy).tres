@@ -121,7 +121,7 @@ tracks/9/keys = {
 "times": PoolRealArray( 0.2, 0.8 ),
 "transitions": PoolRealArray( 1, 1 ),
 "values": [ {
-"args": [ Vector2( 250, 0 ), 0.25, 0.0 ],
+"args": [ Vector2( 150, 0 ), 0.25, 0.0 ],
 "method": "external_movement"
 }, {
 "args": [ Vector2( 200, 0 ), 0.2, 0.0 ],

@@ -1,32 +1,36 @@
 extends TextureRect
 class_name Ability
 
-var itemIcon;
-var itemName;
-var itemValue;
-var itemSlot;
-var slotType;
+var abilityDef
+var abilityName
+var moveType = 0
+var color = null
+var abilitySlot = null
 var picked = false;
-var rarity = 0;
 
-var rng = RandomNumberGenerator.new()
+func _init(_definition, _slot):
 
-func _init(_itemName, _itemTexture, _itemSlot, _itemValue, _slotType):
-	rng.randomize();
-	self.itemName = _itemName;
-	self.itemValue = _itemValue;
-	self.itemSlot = _itemSlot;
-	self.slotType = _slotType;
-	self.rarity = rng.randi_range(Global.ItemRarity.NORMAL, Global.ItemRarity.LEGENDARY);
-	texture = _itemTexture;
+	abilityDef = _definition
+
+	abilityName = abilityDef["abilityName"]
+
+	moveType = abilityDef["MoveType"]
+
+	color = abilityDef["bg_color"]
+
+	abilitySlot = _slot
+	
+	texture = abilityDef["abilityIcon"]
 	mouse_filter = Control.MOUSE_FILTER_PASS;
+
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND;
 
-func pickItem():
+
+func pickAbility():
 	mouse_filter = Control.MOUSE_FILTER_IGNORE;
 	picked = true;
 
-func putItem():
+func putAbility():
 	rect_position = Vector2(0, 0);
 	mouse_filter = Control.MOUSE_FILTER_PASS;
 	picked = false;

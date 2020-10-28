@@ -21,8 +21,9 @@ enum ANIMATION_STATE{
 	RUN_START,
 	RUN_STOP,
 	TURNING,
-	BLOCKING,
+	GUARDING,
 	DODGING,
+	PARRYING,
 	ATTACKING,
 	DAMAGED,
 	DISABLED, #TODO NECESSARY?
@@ -30,6 +31,7 @@ enum ANIMATION_STATE{
 
 enum DAMAGE_STATE{
 	IDLE, #Currently not taking damage
+	GUARDING, #Currently reducing damage
 	DAMAGED, #Normal Damage State
 	STAGGERED, #Special Damage State
 	HIT, #Normal Hit, no special modifiers
@@ -102,7 +104,7 @@ func take_damage(hit_var):
 		# 		damage_state_ = DAMAGE_STATE.COUNTERHIT
 		# 		emit_signal("damage_state_change", damage_state_)
 		# 		#multiplied damage
-		# 	#STATE.BLOCKING:
+		# 	#STATE.GUARDING:
 		# 		#reduced damage
 		# 	_:
 		# 		HP -= dmg
@@ -121,7 +123,6 @@ func take_damage(hit_var):
 		if HP <= 0:
 			emit_signal("dead")
 			damage_state_ = DAMAGE_STATE.DEAD
-			return
 
 		else:
 			#DO THE DAMAGE THINGS
@@ -140,6 +141,7 @@ func toggle_invuln():
 
 #Handles Character Attacking effects. 
 func process_attack():
+	return true
 	pass
 
 #endregion
@@ -163,8 +165,9 @@ func change_move_state(new_state):
 		update_current_animation()
 
 #given a new damage state, attempt to change to that new state 
-#currently does nothing at all
+#currently does nothing at all, never called.
 func change_damage_state(new_state):
+	damage_state_ = new_state
 	pass
 
 
@@ -177,6 +180,10 @@ func change_anim_state(new_state):
 		evaluate_state_change(ANIMATION_STATE.BACKDASHING, "ANIMATION")
 	if new_state == ANIMATION_STATE.ATTACKING:
 		evaluate_state_change(ANIMATION_STATE.ATTACKING, "ANIMATION")
+	if new_state == ANIMATION_STATE.PARRYING:
+		evaluate_state_change(ANIMATION_STATE.PARRYING, "ANIMATION")
+	if new_state == ANIMATION_STATE.GUARDING:
+		evaluate_state_change(ANIMATION_STATE.GUARDING, "ANIMATION")
 	if new_state == ANIMATION_STATE.IDLE:
 		anim_state_ = ANIMATION_STATE.IDLE
 	
@@ -190,6 +197,7 @@ func change_anim_state(new_state):
 #Prioritizes Damage -> Animation -> Movement state changes.
 func evaluate_state_change(new_state, state_changed):
 	#HIGHEST PRIORITY
+	#Currently does not check this ever, as damage state changes always pass and thus never need to be evaluated
 	if state_changed == "DAMAGE":
 		pass
 		#Should probably change animation state to idle to indicate deferring
@@ -205,9 +213,16 @@ func evaluate_state_change(new_state, state_changed):
 			anim_state_ = ANIMATION_STATE.BACKDASHING
 			move_state_ = MOVE_STATE.BACKDASHING
 
+		elif new_state == ANIMATION_STATE.PARRYING:
+			anim_state_ = ANIMATION_STATE.PARRYING
+		
 		elif new_state == ANIMATION_STATE.ATTACKING:
-			anim_state_ = ANIMATION_STATE.ATTACKING
-			process_attack()
+			if process_attack():
+				anim_state_ = ANIMATION_STATE.ATTACKING
+
+		elif new_state == ANIMATION_STATE.GUARDING:
+			anim_state_ = ANIMATION_STATE.GUARDING
+
 
 	if anim_state_ == ANIMATION_STATE.IDLE:
 		#start turn
@@ -271,7 +286,9 @@ func update_current_animation():
 	var new_anim = current_animation
 
 	if not damage_state_ == DAMAGE_STATE.IDLE:
-		if damage_state_ == DAMAGE_STATE.STAGGERED:
+		if damage_state_ ==DAMAGE_STATE.DEAD:
+			new_anim = "Death"
+		elif damage_state_ == DAMAGE_STATE.STAGGERED:
 			new_anim = "Stagger"
 		else:
 			new_anim = "Damage"
@@ -289,6 +306,9 @@ func update_current_animation():
 	
 	elif anim_state_ == ANIMATION_STATE.ATTACKING:
 		new_anim = cur_attack.movename
+
+	elif anim_state_ == ANIMATION_STATE.PARRYING:
+		new_anim = "Parry"
 
 	elif anim_state_ == ANIMATION_STATE.TURNING:
 		new_anim = "Turn"
@@ -309,7 +329,8 @@ func update_current_animation():
 		pass
 		#no attacking animations current
 		#should probably defer this call to a more complex function given possible variants
-	elif anim_state_ == ANIMATION_STATE.BLOCKING:
+	elif anim_state_ == ANIMATION_STATE.GUARDING:
+		new_anim = "Guard"
 		pass
 		#no attacking animations current
 		#have jumping/crouching/standing variants to consider as well 

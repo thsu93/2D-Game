@@ -1,20 +1,24 @@
 class_name Player
 extends Actor
 
-
+#If scrolled, tell the UI element to scroll via a signal to the game manager
 signal selected_move_changed(cur_move_num)
+
+#Inform the game manager that the player has died
+#Currently unused, as no death behavior.
 signal player_died
 
 #TODO: PRIORITY SYSTEM FOR ANIMATIONS
-#TODO ADJUST MIDAIR SPEED, AIR DEACCEL, MOVE AWAY FROM HARD STOP 
+#TODO ADJUST MIDAIR SPEED, AIR DECEL, MOVE AWAY FROM HARD STOP 
 const WALK_ACCEL = 450.0
-const WALK_DEACCEL = 3500.0
+const WALK_DECEL = 3500.0
 const MAX_VELOCITY = 200.0
 const WALK_VELOCITY = 125.0
 const JUMP_VELOCITY = 500
 const STOP_JUMP_FORCE = 450.0
 const DASH_SPEED = 300
 const DASH_MAX = 2
+const GUARD_SPEED_MODIFIER = .25
 
 const FLOOR_DETECT_DISTANCE = 20.0
 
@@ -27,10 +31,6 @@ onready var camera = $Camera
 onready var platform_detector = $PlatformDetector
 onready var attack_hitbox = $Sprite/Hitbox
 onready var hitspark = $Sprite/Hitbox/Hitspark
-
-
-
-var floor_h_velocity = 0.0
 
 var airborne_time = 0
 
@@ -61,6 +61,9 @@ func _ready():
 	char_data.sprite_library = sprite.frames.get_animation_names()
 	char_data.animation_player_library = animation_player.get_animation_list()
 
+	#HACK
+	char_data.select_attack(false)
+	attack_data = char_data.get_move_data()
 
 #Priority in calculations:
 #If in locked animations (dash, attacks, dodges)
@@ -89,22 +92,17 @@ func _physics_process(delta):
 		# Get the controls.
 		var dashing = Input.is_action_just_pressed("dash")
 
-		#Can likely get rid of these commands given 
+		#TODO Find way to clean these inputs out to not duplicate signals
 		var move_left = Input.is_action_pressed("move_left")
 		var move_right = Input.is_action_pressed("move_right")
 		var jump = Input.is_action_pressed("jump")
-		var crouch = Input.is_action_pressed("crouch")
 
 		check_change_move()
 
-		#BUG DOES NOT DETECT IS ON FLOOR IF MID-ANIMATION
-		#Player will slide along floor 
 		#ATTACKING
 
 		#TODO How to get immediate moves out (e.g. dashing moves to come out immediately)
 		#TODO buffer move inputs
-		#BUG? moves do not come out when going through transitional state animations
-		#BUG Attacking during the crouchdown/stand up animations is a bit janky
 		#Currently, pass in a movement vector, then the animation player will tell the char when to start playing it
 		#Different types of cancel? 
 
@@ -117,6 +115,10 @@ func _physics_process(delta):
 		if not char_data.uncancellable:
 			check_new_attack()
 
+			#HACK, needs more work
+			#Does not contain any parry data right now, only controls the animation/state
+			check_parry(delta)
+
 			if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
 				#if want to have moves that are non-effected by gravity may need to reconsider
 				#However, those can likely handle themselves in the animation player or add to attack data
@@ -128,6 +130,8 @@ func _physics_process(delta):
 			if dashing:
 				#HACK should determine if dashing in "facing" direction vs not
 				#TODO: Decide what optimal controls are here
+				#BUG Backdash while in air and off a running jump leads to a backdash back into forward fall
+
 				dash_count += 1
 				if dash_count <= DASH_MAX:
 					if (move_left and char_data.horizontal_state_ == -1) or (move_right and char_data.horizontal_state_ == 1):
@@ -137,13 +141,13 @@ func _physics_process(delta):
 					
 		
 		#If not in special state
-		#TODO this is a bad wayof handling this interaction
+		#TODO this is a bad way of handling this interaction. 
 		#You should do better later
 		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
 			
 			# Update sidedness, give a bit of error room 
 			check_side(move_left, move_right)
-			
+
 			#Obtain directional input buffers
 			check_buffer()
 			update_movements(delta)
@@ -159,47 +163,40 @@ func _physics_process(delta):
 
 				if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
 					char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+
+				if jump:
+					_velocity.y = -JUMP_VELOCITY if not _velocity.y < 0 else _velocity.y - JUMP_VELOCITY 
+					char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
+					stopping_jump = false
+
+				# old movement update location
+				# update_movements(delta)
 				
-
-				if crouch:
-					check_crouch(delta)
-
-				elif not crouch:
-					# Process logic when character is on floor.
-					if jump:
-						_velocity.y = -JUMP_VELOCITY
-						char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
-						stopping_jump = false
-
-					# old movement update location
-					# update_movements(delta)
-					
-					#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
-					if not jump:
-						check_move_anim()
+				#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
+				if not jump:
+					check_move_anim()
 						
 		#TODO: Calculate move velocity allowing for:
 			#DASHING
 			#ATTACKING
 
-		if not movement_locked:
-			# Unsure how to resolve this issue. Change to feature? unclear 
-			# WILL SLIDE DOWN SLOPES, UNSURE IF DESIRED IMPLEMENTATION.
+		#If the player is being moved by external forces, use that function.
+		#Else, use the players movement
+		if movement_locked:
+			external_movement(external_movement_data, remaining_animation_time, delta)
+				
+		else: #if the player input is locked out
 			var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
 			_velocity = move_and_slide_with_snap(
 				_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
 				)
-		
-		#BUG WILL NOT WORK IF EXTERNAL_MOVEMNT_DATA IS 0
-		else: #if the player input is locked out
-			external_movement(external_movement_data, remaining_animation_time, delta)
 	#endregion
 
 
 
 #region MOVEMENT BUFFER PROCESSSING
 
-func get_buttons_pressed():
+func get_dir_buttons_pressed():
 	var new_input = 5
 	if Input.is_action_pressed("move_right"):
 		if Input.is_action_pressed("move_left"):
@@ -227,7 +224,7 @@ func get_buttons_pressed():
 	return new_input
 
 func check_buffer():
-	var new_move = get_buttons_pressed()
+	var new_move = get_dir_buttons_pressed()
 	buffered_movements.append(new_move)
 	check_held()
 	if buffered_movements.size() > BUFFER_MAX:
@@ -252,7 +249,7 @@ func update_movements(delta):
 			# if _velocity.x > -MAX_VELOCITY:
 			# 	_velocity.x -= WALK_ACCEL * delta
 			# else:
-			# 	_velocity.x += WALK_DEACCEL * 2 * delta
+			# 	_velocity.x += WALK_DECEL * 2 * delta
 		elif buffered_movements[-1] == 6:
 			if check_run([6,5,6]) or held_buffer:
 				_velocity.x = MAX_VELOCITY
@@ -261,13 +258,19 @@ func update_movements(delta):
 		elif buffered_movements[-1] == 5:
 			decelerate(delta)
 
-func decelerate(delta):
-	if is_on_floor():
-		var xv = abs(_velocity.x)
-		xv -= WALK_DEACCEL * delta
-		if xv < 0:
-			xv = 0
-		_velocity.x = sign(_velocity.x) * xv
+func decelerate(delta, mod = 1):
+	# if is_on_floor():
+	# 	var xv = abs(_velocity.x)
+	# 	xv -= WALK_DECEL * delta
+	# 	if xv < 0:
+	# 		xv = 0
+	# 	_velocity.x = sign(_velocity.x) * xv
+
+	if abs(_velocity.x) > 0 and is_on_floor():
+		var decel = WALK_DECEL * delta * mod
+		var new_velocity = _velocity.x - decel if _velocity.x - decel > 0 else 0
+		_velocity.x = new_velocity
+
 
 
 func check_run(sequence):
@@ -294,7 +297,10 @@ func flush_buffer():
 	buffered_movements = []
 #endregion
 
-#TODO try to improve this so it can be usued in base Actor script	
+
+#region Input checks
+
+#Evaluates which side the player is currently on, and turns the player when 
 func check_side(move_left, move_right):
 	if _velocity.x < 0.5 and move_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
 		char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
@@ -313,14 +319,14 @@ func check_change_move():
 
 	if scroll_down:
 		char_data.select_next_move()
-		slow_time += .1
 
 	if scroll_up:
 		char_data.select_prev_move()
-		slow_time += .1
 
 	if not char_data.cur_move_num == temp_num:
 		emit_signal("selected_move_changed", char_data.cur_move_num)
+		if slow_time <= .5:
+			slow_time += .25
 	
 
 #BUG gets stuck in attack animation sometimes after taking damage
@@ -346,13 +352,13 @@ func check_new_attack():
 			char_data.MOVE_STATE.JUMPING: matching_move_state = attack_data.air_type
 			char_data.MOVE_STATE.FALLING: matching_move_state = attack_data.air_type
 			#char_data.MOVE_STATE.DASHING: matching_move_state = attack_data.dashing_type
-			#BUG this does not let moves cancel out of dash. removed. Unsure if this will have significant impact on Dash-type moves
 			_: matching_move_state = true
 
 
 		if matching_move_state:
 
 			if airborne_time > .1:
+
 				#HACK force into idle
 				char_data.anim_state_ = char_data.ANIMATION_STATE.IDLE
 				char_data.change_move_state(char_data.MOVE_STATE.FALLING)
@@ -363,6 +369,16 @@ func check_new_attack():
 
 			if not attack_data.running_type and not (attack_data.dashing_type and char_data.move_state_ == char_data.MOVE_STATE.DASHING):
 				speed_reset()
+
+
+#Checks to see if player has hit the parry button
+#Also then checks to see if 
+func check_parry(delta):
+	var parry = Input.is_action_pressed("parry")
+	if parry:
+		char_data.change_anim_state(char_data.ANIMATION_STATE.PARRYING)
+	if char_data.anim_state_  == char_data.ANIMATION_STATE.PARRYING or char_data.anim_state_  == char_data.ANIMATION_STATE.GUARDING:
+		decelerate(delta, 2.5)
 
 
 #Check to see if char is falling or not
@@ -381,14 +397,14 @@ func check_falling(delta, jump):
 		if stopping_jump:
 			_velocity.y += STOP_JUMP_FORCE * delta
 
-func check_crouch(delta):
-	if char_data.move_state_ == char_data.MOVE_STATE.CROUCHING:
-		if abs(_velocity.x) > 0:
-			var deaccel = WALK_DEACCEL * delta * 5
-			var new_velocity = _velocity.x - deaccel if _velocity.x - deaccel > 0 else 0
-			_velocity.x = new_velocity
-	else:
-		char_data.change_move_state(char_data.MOVE_STATE.CROUCHING)
+# func check_crouch(delta):
+# 	if char_data.move_state_ == char_data.MOVE_STATE.CROUCHING:
+# 		if abs(_velocity.x) > 0:
+# 			var decel = WALK_DECEL * delta * 5
+# 			var new_velocity = _velocity.x - decel if _velocity.x - decel > 0 else 0
+# 			_velocity.x = new_velocity
+# 	else:
+# 		char_data.change_move_state(char_data.MOVE_STATE.CROUCHING)
 
 #Check whether run or 
 func check_move_anim():
@@ -404,11 +420,9 @@ func check_move_anim():
 	elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
 		char_data.change_move_state(char_data.MOVE_STATE.STANDING)
 
+#endregion
 
-#HACK this should be fixed to a reasonable system
-func speed_reset():
-	if not (char_data.move_state_ == char_data.MOVE_STATE.JUMPING or char_data.move_state_ == char_data.MOVE_STATE.FALLING):
-		_velocity.x = 0
+
 
 #SIGNALS FROM GAMESTATE CHANGES
 #region 
@@ -466,17 +480,24 @@ func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
 		body.take_damage(attack_data.get_hit_var())
 		slow_time += attack_data.slow_time
 
+		knockback = attack_data.self_knockback
+
 
 #HACK hitspark location calculation
 #Uses the average position between the attack hitbox and the target hurtbox.  Not ideal way to calculate. 
 #Ideal would probably be find both hitbox+hurtbox position and extents, calculate the overlapped regions and then find the middle of the overlapped region
 func get_collision_position(body):
-	var body_area_pos = body.get_node("CollisionShape2D").global_position
-	var self_body_pos = $Sprite/Hitbox/CollisionShape2D.global_position
+	var collision_shape = body.get_node("CollisionShape2D")
+	var self_attack_collision_shape = attack_hitbox.get_node("CollisionShape2D")
+
+	var body_area_pos = collision_shape.global_position
+	var self_body_pos = self_attack_collision_shape.global_position
+
 	return (body_area_pos + self_body_pos) / 2
 
 
-#Emit a hitspark sprite at the given position		
+#Emit a hitspark sprite at a given global position
+#Will select from hitboxes associated with the attackdata
 func emit_hitspark(hit_pos):
 	#Find where the hitspark should be located
 	hitspark.global_position = hit_pos
@@ -496,14 +517,28 @@ func _on_Hitspark_animation_finished():
 
 func time_slow(delta):
 	if slow_time > 0:
-		Engine.time_scale = .1
+		Engine.time_scale = .4
 		slow_time -= delta
 	else:
 		Engine.time_scale = 1
 		slow_time = 0
 	
+#HACK this should be fixed to a reasonable system
+func speed_reset():
+	if not (char_data.move_state_ == char_data.MOVE_STATE.JUMPING or char_data.move_state_ == char_data.MOVE_STATE.FALLING):
+		_velocity.x = 0
+
+	
+#Signals to gamemanager
+
 func get_HP():
 	return char_data.HP
 
 func get_max_HP():
 	return char_data.max_HP
+
+func get_movelist():
+	return char_data.get_movelist_names()
+
+func set_movelist(movenames):
+	char_data.set_movelist(movenames)

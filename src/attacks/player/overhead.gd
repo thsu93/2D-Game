@@ -2,7 +2,7 @@ extends AttackData
 
 
 func _init():
-	cost = 50
+	cost = 25
 	dmg = 25
 	movename = "Overhead"
 	running_type = true

@@ -37,7 +37,7 @@ func _ready():
 	# add_child(slowdown_cd_timer)
 
 	UI.set_max_HP(player.get_max_HP())
-	# UI.set_movelist(player.get_movelist())
+	UI.set_movelist(player.get_movelist())
 
 
 func _physics_process(_delta):
@@ -46,47 +46,13 @@ func _physics_process(_delta):
 	# if Input.is_action_just_pressed("click") or Input.is_action_just_pressed("rclick"):
 	# 	unslow_time()
 	# check_if_slowed()
-	update_HP()
-
-
-#TIMESLOW MECHANICS
-# func slow_time():
-# 	if slowable:
-# 		slowed = true
-# 		slowable = false
-# 		slowdown_timer.start()
-
-# func unslow_time():
-# 	if slowed:
-# 		slowed = false
-# 		slowdown_cd_timer.start()
-# 		_on_slowdown_cooldown()
-
-# func on_timeout_complete():
-# 	unslow_time()
-
-# func on_slowdown_timeout_complete():
-# # 	slowable = true
-
-# func check_if_slowed():
-# 	if slowed:
-# 		Engine.time_scale = 0.5
-# 	else:
-# 		Engine.time_scale = 1
-
-# func _on_slowdown_cooldown():
-# 	UI.slowdown_cooldown(BULLET_TIME_CD_LENGTH)	
-	
+	update_HP()	
 	
 #POSITIONAL DATA MECHANICS
 func get_player_pos():
 	return player.get_position()
 	
 	
-#func _on_Char_dash_cooldown(DASH_COOLDOWN):
-#	UI.dash_cooldown(DASH_COOLDOWN)
-#
-
 #CHAR HP MANAGEMENT MECHANICS
 func _on_Char_game_over():
 	get_tree().change_scene(title_scene)
@@ -121,3 +87,15 @@ func _on_StaticBody2D_start_dialogue(dialogue_path):
 #SPECIAL MECHANICS
 func _on_Player_selected_move_changed(num):
 	UI.change_move(num)
+
+#DOES NOT WORK
+func _input(event):
+	if event.is_action_pressed("ui_esc"):
+		if get_tree().paused:
+			UI.pause(false)
+
+func update_player_movelist(movelist):
+	player.set_movelist(movelist)
+
+func _on_Control_update_abilities(abilities):
+	update_player_movelist(abilities)

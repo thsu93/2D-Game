@@ -1,0 +1,165 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://src/Inventory/AbilitiesPanel.gd" type="Script" id=1]
+[ext_resource path="res://src/Inventory/AbilitySlot.gd" type="Script" id=2]
+[ext_resource path="res://src/Inventory/Tooltip.gd" type="Script" id=3]
+[ext_resource path="res://src/Inventory/images/tooltip.png" type="Texture" id=4]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.203922, 0.203922, 0.203922, 1 )
+
+[node name="CharacterPanel" type="Panel"]
+self_modulate = Color( 1, 1, 1, 0.282353 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -69.0
+margin_top = -148.0
+margin_right = 69.0
+margin_bottom = 116.0
+mouse_filter = 1
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Header" type="Panel" parent="."]
+anchor_right = 1.0
+margin_bottom = 28.0
+custom_styles/panel = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Header"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Character Abilities"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 50.0
+margin_bottom = -10.0
+custom_constants/separation = 10
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Normals" type="GridContainer" parent="HBoxContainer"]
+margin_left = 14.0
+margin_right = 64.0
+margin_bottom = 204.0
+custom_constants/vseparation = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability1" type="Panel" parent="HBoxContainer/Normals"]
+margin_right = 50.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability2" type="Panel" parent="HBoxContainer/Normals"]
+margin_top = 54.0
+margin_right = 50.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 50, 50 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability3" type="Panel" parent="HBoxContainer/Normals"]
+margin_top = 108.0
+margin_right = 50.0
+margin_bottom = 158.0
+rect_min_size = Vector2( 50, 50 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Specials" type="GridContainer" parent="HBoxContainer"]
+margin_left = 74.0
+margin_right = 124.0
+margin_bottom = 204.0
+custom_constants/vseparation = 4
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability1" type="Panel" parent="HBoxContainer/Specials"]
+margin_right = 50.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability2" type="Panel" parent="HBoxContainer/Specials"]
+margin_top = 54.0
+margin_right = 50.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 50, 50 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability3" type="Panel" parent="HBoxContainer/Specials"]
+margin_top = 108.0
+margin_right = 50.0
+margin_bottom = 158.0
+rect_min_size = Vector2( 50, 50 )
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Tooltip" type="NinePatchRect" parent="."]
+visible = false
+margin_left = 244.0
+margin_top = 243.0
+margin_right = 372.0
+margin_bottom = 371.0
+texture = ExtResource( 4 )
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability Name" type="Label" parent="Tooltip"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -59.0
+margin_top = 8.0
+margin_right = 59.0
+margin_bottom = 23.0
+text = "Item Name"
+align = 1
+
+[node name="Ability Type" type="Label" parent="Tooltip"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -59.0
+margin_top = 31.5323
+margin_right = 59.0
+margin_bottom = 46.5323
+text = "Value: 0"

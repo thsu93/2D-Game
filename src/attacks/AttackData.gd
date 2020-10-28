@@ -20,6 +20,7 @@ var hitstun = .75 #How long the enemy is stunned for. Default: .5
 var screenshake_duration = 0 #How long to shake the screen for, in msec. Default: 0
 var screenshake_amp = 0 #how many pixels the screen should shake up and down. Default: 0
 
+var self_knockback = Vector2(50,0) #Amount that the player moves back if the move hits
 
 #These variables are intended to dictate the movements of the attacked target
 
@@ -41,7 +42,7 @@ var priority = 0 #? unsure if will have this system. Currently Unused. Default: 
 
 #How much knockback/damage scaling for combos
 var damage_scaling = .1 #How much less subsequent hits damage, multiplicative. Default: .1
-var knockback_scaling = .25 #How much knockback is added to each subsequent hit, multiplicative. Default .25
+var knockback_scaling = .15 #How much knockback is added to each subsequent hit, multiplicative. Default .15
 var hitstun_scaling = 1 #UNIMPLEMENTED
 
 

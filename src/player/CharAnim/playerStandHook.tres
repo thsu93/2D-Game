@@ -98,3 +98,17 @@ tracks/7/keys = {
 "update": 0,
 "values": [ Vector2( 0, -20 ) ]
 }
+tracks/8/type = "method"
+tracks/8/path = NodePath(".")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [ Vector2( 50, 0 ), 0.3, 0.0 ],
+"method": "external_movement"
+} ]
+}

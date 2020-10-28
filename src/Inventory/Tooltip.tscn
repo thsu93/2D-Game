@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://src/Inventory/Tooltip.gd" type="Script" id=1]
+[ext_resource path="res://src/Inventory/images/tooltip.png" type="Texture" id=2]
+
+[node name="Tooltip" type="NinePatchRect"]
+visible = false
+margin_left = 244.0
+margin_top = 243.0
+margin_right = 372.0
+margin_bottom = 371.0
+texture = ExtResource( 2 )
+patch_margin_left = 4
+patch_margin_top = 4
+patch_margin_right = 4
+patch_margin_bottom = 4
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ability Name" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -59.0
+margin_top = 8.0
+margin_right = 59.0
+margin_bottom = 23.0
+text = "Item Name"
+align = 1
+
+[node name="Ability Type" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -59.0
+margin_top = 31.5323
+margin_right = 59.0
+margin_bottom = 46.5323
+text = "Value: 0"

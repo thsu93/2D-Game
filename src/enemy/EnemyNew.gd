@@ -7,15 +7,16 @@ extends Actor
 signal combo(num)
 signal shake
 
+onready var HP_Bar = $HP_Bar
 onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
+onready var player_detector = $PlayerDetector
 onready var hurtbox = $CollisionShape2D
 
 onready var hitspark = $Sprite/Hitbox/Hitspark
 onready var hitbox = $Sprite/Hitbox
 
-#HACK 
 var dir_switch_time = .2
 
 var combo_counter = 0
@@ -53,6 +54,8 @@ func _ready():
 
 	char_data.horizontal_state_ = char_data.HORIZONTAL_STATE.R
 	_velocity.x = speed.x
+
+	HP_Bar.visible = false
 
 # Physics process is a built-in loop in Godot.
 # If you define _physics_process on a node, Godot will call it every frame.
@@ -102,6 +105,11 @@ func _physics_process(_delta):
 	
 	run_ai(_delta)
 
+	display_HP()
+
+#Function that runs the AI for the enemy
+#Currently very basic, requires far more work
+#Current plan: Will attack if player enters collider in front of enemy, with a timer changing when the enemy attacks.
 func run_ai(_delta):
 	timer += _delta
 	if landed_hit:
@@ -118,11 +126,24 @@ func run_ai(_delta):
 		landed_hit = false
 
 	elif timer > ATTACK_TIMER and not char_data.anim_state_ == char_data.ANIMATION_STATE.DAMAGED:
-		timer = 0
-		hit_timer = 0
-		char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+		if player_detector.is_colliding():
+			timer = 0
+			hit_timer = 0
+			char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
 
-	pass
+
+#TODO: Make the HP bars flip. Probably have them be in their own scene with own handler. 	
+
+#Function that displays the HP bar above the enemy, if their HP is less than maximum
+#More for debug purposes at the moment, will have to consider for full game
+func display_HP():
+	if char_data.HP < char_data.max_HP:
+		HP_Bar.visible = true
+		HP_Bar.value = char_data.HP/char_data.max_HP * 100
+	else:
+		HP_Bar.visible = false
+
+	#If want to use flip of HP_bar, rect_scale.x, not scale.x
 
 # This function calculates a new velocity whenever you need it.
 # If the enemy encounters a wall or an edge, the horizontal velocity is flipped.
@@ -153,6 +174,9 @@ func calculate_move_velocity(linear_velocity):
 func take_damage(hit_var):
 
 	#HACK
+	hitbox.get_node("CollisionShape2D").disabled = true
+	
+	#HACK
 	hit_var["dmg"] /= damage_scaling_mult
 	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
 	
@@ -174,11 +198,13 @@ func take_damage(hit_var):
 	emit_signal("combo", combo_counter)
 	emit_signal("shake")
 	
-
+#Turns off hitspark when given a signal by the hitspark
 func _on_Hitspark_animation_finished():
 	hitspark.visible = false
 	pass # Replace with function body.
 
+
+#What to do when the enemy hits the player	
 func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
 	if body.get_class() == "Actor" and body.actor_type == "player":
 

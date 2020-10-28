@@ -9,6 +9,7 @@ func _init():
 	knockback_dir = Vector2(1,-.2) #KNOCKBACK AWAY + LAUNCH
 
 	running_type = false
+	air_type = false
 	stagger = true
 
 	screenshake_duration = .1

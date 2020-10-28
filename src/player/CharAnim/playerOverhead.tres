@@ -100,3 +100,15 @@ tracks/7/keys = {
 "method": "external_movement"
 } ]
 }
+tracks/8/type = "value"
+tracks/8/path = NodePath("CharacterData:uncancellable")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/keys = {
+"times": PoolRealArray( 0.3, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}

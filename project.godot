@@ -219,7 +219,7 @@ dash={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":32,"unicode":0,"echo":false,"script":null)
  ]
 }
-crouch={
+parry={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777234,"unicode":0,"echo":false,"script":null)
 , Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":83,"unicode":0,"echo":false,"script":null)
@@ -268,14 +268,15 @@ slow_time_debug={
 
 [layer_names]
 
-2d_render/layer_1="Player"
+2d_render/layer_1="PlayerHurtbox"
 2d_physics/layer_1="Player"
 2d_render/layer_2="PlayerAttack"
 2d_physics/layer_2="Player_Hitbox"
-2d_render/layer_3="Enemy"
+2d_render/layer_3="EnemyHurtbox"
 2d_physics/layer_3="Enemy"
 2d_render/layer_4="EnemyAttack"
 2d_physics/layer_4="Enemy_Hitbox"
+2d_render/layer_5="Actor"
 2d_render/layer_7="World"
 2d_physics/layer_11="World"
 
