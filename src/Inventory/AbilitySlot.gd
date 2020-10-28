@@ -30,7 +30,6 @@ func pickAbility():
 	ability.pickAbility();
 	remove_child(ability);
 	get_tree().get_root().add_child(ability);
-	print(ability.get_parent())
 	ability = null;
 	refreshColors();
 
