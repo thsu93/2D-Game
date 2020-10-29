@@ -19,7 +19,7 @@ const BULLET_TIME_CD_LENGTH = 1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	
+
 	player = get_node(player_path)
 
 	camera = player.camera

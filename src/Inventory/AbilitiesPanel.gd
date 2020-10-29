@@ -34,11 +34,12 @@ func initialize_all_slots():
 
 func mouse_enter_slot(_slot : AbilitySlotClass):
 	if _slot.ability:
-		tooltip.display(_slot.ability, get_global_mouse_position());
+		tooltip.set_hovering()
+		tooltip.display(_slot.ability, get_global_mouse_position())
 
 func mouse_exit_slot(_slot : AbilitySlotClass):
 	if tooltip.visible:
-		tooltip.hide();
+		tooltip.set_not_hovering();
 
 #Given a X by 2 array, create appropriate abilitys in each slot that match current moveset
 func populate(array):

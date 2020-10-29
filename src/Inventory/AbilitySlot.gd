@@ -7,6 +7,7 @@ var slotIndex;
 var ability = null;
 var abilityName
 var style;
+var UI = null
 
 func _init():
 	mouse_filter = Control.MOUSE_FILTER_PASS;
@@ -15,7 +16,18 @@ func _init():
 	style.set_border_width_all(2);
 	set('custom_styles/panel', style);
 
+
+func _ready():
+	pass
+
 func setAbility(newAbility):
+
+	
+#HACK SUPER HARD CODED GROSS
+#TODO THIS DOES NOT SCALE WHEN MAXIMIZING WINDOW
+	if UI == null:
+		UI = get_tree().get_root().get_node("Stage").UI
+
 	delete_children()
 	add_child(newAbility)
 
@@ -29,7 +41,7 @@ func setAbility(newAbility):
 func pickAbility():
 	ability.pickAbility();
 	remove_child(ability);
-	get_tree().get_root().add_child(ability);
+	UI.add_child(ability);
 	ability = null;
 	refreshColors();
 
@@ -37,7 +49,7 @@ func putAbility(newAbility):
 	ability = newAbility;
 	ability.abilitySlot = self;
 	ability.putAbility();
-	get_tree().get_root().remove_child(newAbility);
+	UI.remove_child(newAbility);
 	add_child(ability);
 	refreshColors();
 
@@ -48,7 +60,7 @@ func removeAbility():
 
 func equipAbility(newAbility, rightClick =  true):
 	if !rightClick:
-		get_tree().get_root().remove_child(newAbility);
+		UI.remove_child(newAbility);
 	putAbility(newAbility)
 	refreshColors();
 
