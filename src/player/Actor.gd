@@ -19,6 +19,7 @@ signal screenshake(amplitude, duration)
 onready var char_data = $CharacterData
 onready var sprite = $Sprite
 onready var animation_player = $AnimationPlayer
+onready var hurtbox = $Hurtbox
 
 #Base actor type
 var actor_type = "Actor"
@@ -44,6 +45,7 @@ var stun_time = 0
 
 func _ready():
 	char_data.set_name(actor_type)
+	hurtbox.set_actor_type(actor_type)
 
 # _physics_process is called after the inherited _physics_process function.
 # This allows the Player and Enemy scenes to be affected by gravity.
@@ -164,3 +166,6 @@ func destroy():
 #TODO Should this contain modifiers for frequency as well?
 func screenshake(duration, amplitude):
 	emit_signal("screenshake", duration, amplitude)
+
+
+	

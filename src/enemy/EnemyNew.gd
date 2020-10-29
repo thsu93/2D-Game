@@ -12,7 +12,6 @@ onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
 onready var player_detector = $PlayerDetector
-onready var hurtbox = $CollisionShape2D
 
 onready var hitspark = $Sprite/Hitbox/Hitspark
 onready var hitbox = $Sprite/Hitbox
@@ -205,8 +204,11 @@ func _on_Hitspark_animation_finished():
 
 
 #What to do when the enemy hits the player	
-func _on_Hitbox_body_shape_entered(body_id, body, body_shape, area_shape):
-	if body.get_class() == "Actor" and body.actor_type == "player":
+func _on_Hitbox_area_entered(area):
+	print("tested")
+	if area.get_class() == "Hurtbox" and area.actor_type == "player":
+
+		var body = area.get_parent()
 
 		# body.stunned = true
 

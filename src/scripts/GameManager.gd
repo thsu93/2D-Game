@@ -96,6 +96,7 @@ func _input(event):
 
 func update_player_movelist(movelist):
 	player.set_movelist(movelist)
+	UI.set_movelist(player.get_movelist())
 
 func _on_Control_update_abilities(abilities):
 	update_player_movelist(abilities)

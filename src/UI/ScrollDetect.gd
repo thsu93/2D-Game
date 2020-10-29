@@ -1,4 +1,4 @@
-extends GridContainer
+extends PanelContainer
 
 
 const INITIAL = 0
@@ -9,10 +9,11 @@ var length = 0
 var selected = INITIAL
 var nodes = []
 var current_pos = 0
+onready var grid = $Grid
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	for child in get_children():
+	for child in grid.get_children():
 		if child.get_class() == "TextureProgress":
 			nodes.append(child)
 	length = nodes.size()
@@ -51,6 +52,14 @@ func reset_all_nodes():
 func change_selection(num):
 	reset_all_nodes()
 	nodes[num].set_selected()
+	current_pos = num
+
+func set_movelist(movelist):
+	for i in nodes.size():
+		nodes[i].set_name(movelist[0][i] + " \n" + "x" + "\n" + movelist[1][i])
+	reset_all_nodes()
+	nodes[current_pos].set_selected()
+	
 
 # func get_selected_special():
 # 	return current_pos

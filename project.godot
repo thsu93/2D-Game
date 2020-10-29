@@ -34,7 +34,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/attacks/AttackData.gd"
 }, {
-"base": "Reference",
+"base": "RigidBody2D",
 "class": "Bullet",
 "language": "GDScript",
 "path": "res://src/player/bullet.gd"
@@ -44,7 +44,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/scripts/CharacterData.gd"
 }, {
-"base": "Reference",
+"base": "Area2D",
 "class": "Coin",
 "language": "GDScript",
 "path": "res://src/coin/coin.gd"
@@ -74,7 +74,12 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/Inventory/Global.gd"
 }, {
-"base": "Reference",
+"base": "Area2D",
+"class": "Hurtbox",
+"language": "GDScript",
+"path": "res://src/Generic/Hurtbox.gd"
+}, {
+"base": "Node2D",
 "class": "MovingPlatform",
 "language": "GDScript",
 "path": "res://src/platform/moving_platform.gd"
@@ -113,6 +118,7 @@ _global_script_class_icons={
 "Enemy": "",
 "Enemy2": "",
 "Global": "",
+"Hurtbox": "",
 "MovingPlatform": "",
 "NanayaCharacterData": "",
 "OLDEnemyOLD": "",
@@ -269,14 +275,15 @@ slow_time_debug={
 [layer_names]
 
 2d_render/layer_1="PlayerHurtbox"
-2d_physics/layer_1="Player"
+2d_physics/layer_1="Actor"
 2d_render/layer_2="PlayerAttack"
-2d_physics/layer_2="Player_Hitbox"
+2d_physics/layer_2="Player Hurtbox"
 2d_render/layer_3="EnemyHurtbox"
-2d_physics/layer_3="Enemy"
+2d_physics/layer_3="Player Hitbox"
 2d_render/layer_4="EnemyAttack"
-2d_physics/layer_4="Enemy_Hitbox"
+2d_physics/layer_4="Enemy Hurtbox"
 2d_render/layer_5="Actor"
+2d_physics/layer_5="Enemy Hitbox"
 2d_render/layer_7="World"
 2d_physics/layer_11="World"
 

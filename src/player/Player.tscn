@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://src/player/Player.tres" type="SpriteFrames" id=1]
 [ext_resource path="res://src/player/CharAnim/Combo (Heavy).tres" type="Animation" id=2]
@@ -20,6 +20,7 @@
 [ext_resource path="res://src/player/CharAnim/Combo (Light).tres" type="Animation" id=18]
 [ext_resource path="res://src/UI/Camera.gd" type="Script" id=19]
 [ext_resource path="res://src/attacks/Hitspark.tscn" type="PackedScene" id=20]
+[ext_resource path="res://src/Generic/Hurtbox.gd" type="Script" id=21]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_000.png" type="Texture" id=57]
 [ext_resource path="res://assets/effects (MBAC PC)/ef24_001.png" type="Texture" id=63]
 [ext_resource path="res://src/player/player.gd" type="Script" id=71]
@@ -135,6 +136,30 @@ tracks/2/keys = {
 "update": 1,
 "values": [ true, false ]
 }
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Sprite/ParryBox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
 
 [sub_resource type="Animation" id=3]
 length = 1.1
@@ -205,10 +230,10 @@ tracks/5/loop_wrap = true
 tracks/5/imported = false
 tracks/5/enabled = true
 tracks/5/keys = {
-"times": PoolRealArray( 0.1, 0.6 ),
+"times": PoolRealArray( 0.2, 0.6 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
-"values": [ true, false ]
+"values": [ false, true ]
 }
 
 [sub_resource type="Animation" id=4]
@@ -249,9 +274,33 @@ tracks/2/keys = {
 "update": 1,
 "values": [ true, false ]
 }
+tracks/3/type = "value"
+tracks/3/path = NodePath("Sprite/ParryBox/CollisionShape2D:disabled")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Sprite/Hitbox/CollisionShape2D:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
 
-[sub_resource type="RectangleShape2D" id=5]
-extents = Vector2( 64.9234, 85.1348 )
+[sub_resource type="RectangleShape2D" id=9]
+extents = Vector2( 109.299, 37.0859 )
 
 [sub_resource type="SpriteFrames" id=6]
 animations = [ {
@@ -266,18 +315,22 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=8]
+[sub_resource type="RectangleShape2D" id=7]
 extents = Vector2( 156.489, 124.046 )
 
-[sub_resource type="CapsuleShape2D" id=7]
+[sub_resource type="CapsuleShape2D" id=8]
 radius = 7.08997
 height = 25.0
 
+[sub_resource type="RectangleShape2D" id=10]
+extents = Vector2( 10, 11.9686 )
+
 [node name="Player" type="KinematicBody2D"]
-collision_layer = 17
-collision_mask = 1028
+collision_mask = 1025
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
+no_grav = true
+movement_locked = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Backdash = ExtResource( 3 )
@@ -319,26 +372,16 @@ speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
 position = Vector2( -8.10574, 0.90065 )
-collision_layer = 2
-collision_mask = 12
+collision_layer = 4
+collision_mask = 8
 
 [node name="Hitspark" parent="Sprite/Hitbox" instance=ExtResource( 20 )]
 speed_scale = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -143.033, -130.327 )
+position = Vector2( -140.332, -44.6038 )
 scale = Vector2( 1.13819, 1.02605 )
-shape = SubResource( 5 )
-disabled = true
-
-[node name="Hurtbox" type="Area2D" parent="Sprite"]
-collision_mask = 8
-
-[node name="Hurtbox" type="CollisionPolygon2D" parent="Sprite/Hurtbox"]
-position = Vector2( -103.055, -23.4282 )
-scale = Vector2( 7.02018, 5.81359 )
-build_mode = 1
-polygon = PoolVector2Array( 15.7907, 12.5291, 2.96703, 12.5291, 3.76661, -20.0755, 15.5805, -20.4761 )
+shape = SubResource( 9 )
 disabled = true
 
 [node name="Effects" type="AnimatedSprite" parent="Sprite"]
@@ -349,12 +392,12 @@ animation = "Default"
 playing = true
 
 [node name="ParryBox" type="Area2D" parent="Sprite"]
-collision_layer = 2
-collision_mask = 8
+collision_layer = 4
+collision_mask = 16
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/ParryBox"]
 position = Vector2( -17.1756, -97.3282 )
-shape = SubResource( 8 )
+shape = SubResource( 7 )
 disabled = true
 
 [node name="CharacterData" type="Node" parent="."]
@@ -369,11 +412,20 @@ cast_to = Vector2( 0, 8 )
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -16 )
-shape = SubResource( 7 )
+shape = SubResource( 8 )
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 16
+script = ExtResource( 21 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2( -8.83883, -27.2236 )
+shape = SubResource( 10 )
 [connection signal="animation_changed" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_changed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
 [connection signal="animation_finished" from="Sprite" to="." method="_on_Sprite_animation_finished"]
-[connection signal="body_shape_entered" from="Sprite/Hitbox" to="." method="_on_Hitbox_body_shape_entered"]
+[connection signal="area_entered" from="Sprite/Hitbox" to="." method="_on_Hitbox_area_entered"]
 [connection signal="animation_finished" from="Sprite/Hitbox/Hitspark" to="." method="_on_Hitspark_animation_finished"]
 [connection signal="dead" from="CharacterData" to="." method="_on_CharacterData_dead"]
 [connection signal="new_sprite_animation" from="CharacterData" to="." method="_on_CharacterData_new_sprite_animation"]

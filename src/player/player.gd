@@ -111,13 +111,14 @@ func _physics_process(delta):
 		if not char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
 			char_data.uncancellable = true
 
+		#HACK, needs more work
+		#Does not contain any parry data right now, only controls the animation/state
+		check_parry(delta)
+
 		#check attacks and dashing
 		if not char_data.uncancellable:
 			check_new_attack()
 
-			#HACK, needs more work
-			#Does not contain any parry data right now, only controls the animation/state
-			check_parry(delta)
 
 			if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
 				#if want to have moves that are non-effected by gravity may need to reconsider
@@ -375,11 +376,13 @@ func check_new_attack():
 #Also then checks to see if 
 func check_parry(delta):
 	var parry = Input.is_action_pressed("parry")
-	if parry:
-		char_data.change_anim_state(char_data.ANIMATION_STATE.PARRYING)
+
+	#TODO which states can you cancel into parry from
+	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE or char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+		if parry:
+			char_data.change_anim_state(char_data.ANIMATION_STATE.PARRYING)
 	if char_data.anim_state_  == char_data.ANIMATION_STATE.PARRYING or char_data.anim_state_  == char_data.ANIMATION_STATE.GUARDING:
 		decelerate(delta, 2.5)
-
 
 #Check to see if char is falling or not
 func check_falling(delta, jump):
@@ -426,6 +429,9 @@ func check_move_anim():
 
 #SIGNALS FROM GAMESTATE CHANGES
 #region 
+
+#animations
+#region 
 func _on_Sprite_animation_finished():
 	#HACK reset speeds shouldn't be like this
 	if not current_animation in animation_player.get_animation_list():
@@ -457,9 +463,20 @@ func _on_AnimationPlayer_animation_changed(_anim_name):
 		no_grav = false
 	char_data.animation_completed()
 
-func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
-	if body.get_class() == "Actor" and body.actor_type == "enemy":
 
+#endregion
+
+
+#attacks
+#region 
+
+func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
+	pass
+
+func _on_Hitbox_area_entered(area):
+	if area.get_class() == "Hurtbox" and area.actor_type == "enemy":
+
+		var body = area.get_parent()
 		# body.stunned = true
 
 		#HITSTOP
@@ -483,18 +500,21 @@ func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
 		knockback = attack_data.self_knockback
 
 
+
+#TODO Can probably eventually be made generic		
 #HACK hitspark location calculation
 #Uses the average position between the attack hitbox and the target hurtbox.  Not ideal way to calculate. 
 #Ideal would probably be find both hitbox+hurtbox position and extents, calculate the overlapped regions and then find the middle of the overlapped region
 func get_collision_position(body):
-	var collision_shape = body.get_node("CollisionShape2D")
-	var self_attack_collision_shape = attack_hitbox.get_node("CollisionShape2D")
+	# var collision_shape = body.hurtbox.get_node("CollisionShape2D")
+	# var self_attack_collision_shape = attack_hitbox.get_node("CollisionShape2D")
 
-	var body_area_pos = collision_shape.global_position
-	var self_body_pos = self_attack_collision_shape.global_position
+	# var body_area_pos = collision_shape.global_position
+	# var self_body_pos = self_attack_collision_shape.global_position
 
-	return (body_area_pos + self_body_pos) / 2
+	# return (body_area_pos + self_body_pos) / 2
 
+	return attack_hitbox.get_node("CollisionShape2D").global_position
 
 #Emit a hitspark sprite at a given global position
 #Will select from hitboxes associated with the attackdata
@@ -510,6 +530,10 @@ func emit_hitspark(hit_pos):
 func _on_Hitspark_animation_finished():
 	hitspark.visible = false
 #endregion
+
+#endregion
+
+
 
 
 #HACK current means of playing with time manipulation

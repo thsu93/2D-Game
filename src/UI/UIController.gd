@@ -4,8 +4,6 @@ signal update_abilities(abilities_list)
 
 const INITIAL = 0
 
-onready var grid = $MoveDisplay/Grid
-onready var length = grid.length
 
 onready var combo_counter = $Panel/Label
 
@@ -27,15 +25,10 @@ var max_slowdown_cd
 
 signal dialogue_finished
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	curr_length = length
-
-func get_total_cd():
-	return grid.get_total_cd()
 
 func set_movelist(movelist):
 	pause_menu.set_movelist(movelist)
+	move_display.set_movelist(movelist)
 
 func set_max_HP(maxHP):
 	HP_bar.set_maxHP(maxHP)
@@ -55,8 +48,8 @@ func slowdown_cooldown(time):
 #	dash_cd_remaining = time
 #	max_dash_cd = time
 
-func update_cooldowns(dmg):
-	grid.increase_cooldown(dmg)
+# func update_cooldowns(dmg):
+# 	move_display.increase_cooldown(dmg)
 
 
 func set_combo_count(num):
@@ -77,7 +70,7 @@ func _on_DialogueBox_dialogue_complete():
 
 
 func change_move(num):
-	grid.change_selection(num)
+	move_display.change_selection(num)
 
 #PAUSE HANDLING
 func pause(pausing):
