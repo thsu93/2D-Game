@@ -1,4 +1,4 @@
-[gd_scene load_steps=156 format=2]
+[gd_scene load_steps=157 format=2]
 
 [ext_resource path="res://src/enemy/NanayaCharacterData.gd" type="Script" id=1]
 [ext_resource path="res://src/enemy/EnemyNew.gd" type="Script" id=2]
@@ -137,6 +137,7 @@
 [ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi03_014.png" type="Texture" id=135]
 [ext_resource path="res://src/attacks/Hitspark.tscn" type="PackedScene" id=136]
 [ext_resource path="res://src/Generic/Hurtbox.gd" type="Script" id=137]
+[ext_resource path="res://src/Generic/Hitbox.gd" type="Script" id=138]
 
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 6.0
@@ -524,6 +525,8 @@ scale = Vector2( 1.5, 1.5 )
 collision_mask = 1025
 script = ExtResource( 2 )
 speed = Vector2( 100, 450 )
+no_grav = null
+movement_locked = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, -5 )
@@ -591,6 +594,7 @@ speed_scale = 2.0
 [node name="Hitbox" type="Area2D" parent="Sprite"]
 collision_layer = 16
 collision_mask = 2
+script = ExtResource( 138 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
 position = Vector2( 40.3711, 18.3126 )

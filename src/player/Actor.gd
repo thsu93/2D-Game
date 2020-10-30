@@ -20,6 +20,7 @@ onready var char_data = $CharacterData
 onready var sprite = $Sprite
 onready var animation_player = $AnimationPlayer
 onready var hurtbox = $Hurtbox
+onready var hitbox = $Sprite/Hitbox
 
 #Base actor type
 var actor_type = "Actor"
@@ -46,6 +47,7 @@ var stun_time = 0
 func _ready():
 	char_data.set_name(actor_type)
 	hurtbox.set_actor_type(actor_type)
+	hitbox.set_actor(self)
 
 # _physics_process is called after the inherited _physics_process function.
 # This allows the Player and Enemy scenes to be affected by gravity.

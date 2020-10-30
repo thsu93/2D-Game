@@ -14,7 +14,6 @@ onready var floor_detector_right = $FloorDetectorRight
 onready var player_detector = $PlayerDetector
 
 onready var hitspark = $Sprite/Hitbox/Hitspark
-onready var hitbox = $Sprite/Hitbox
 
 var dir_switch_time = .2
 
@@ -173,7 +172,7 @@ func calculate_move_velocity(linear_velocity):
 func take_damage(hit_var):
 
 	#HACK
-	hitbox.get_node("CollisionShape2D").disabled = true
+	hitbox.shape.disabled = true
 	
 	#HACK
 	hit_var["dmg"] /= damage_scaling_mult

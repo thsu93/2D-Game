@@ -41,6 +41,7 @@ func setAbility(newAbility):
 func pickAbility():
 	ability.pickAbility();
 	remove_child(ability);
+	UI = get_tree().get_root().get_node("Stage").UI
 	UI.add_child(ability);
 	ability = null;
 	refreshColors();

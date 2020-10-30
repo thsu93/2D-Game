@@ -38,7 +38,8 @@ size_flags_horizontal = 2
 size_flags_vertical = 0
 text = "Current Controls:
 WASD/Arrow keys to move
-Down to  parry (functionality currently unimplemented)
+Double tap Left/Right to run
+Down to  parry
 Space to backdash
 Forward+space to dash
 L for basic attack

@@ -30,7 +30,7 @@ var slow_time = 0
 onready var camera = $Camera
 onready var platform_detector = $PlatformDetector
 onready var attack_hitbox = $Sprite/Hitbox
-onready var hitspark = $Sprite/Hitbox/Hitspark
+onready var parry_box = $Sprite/ParryBox
 
 var airborne_time = 0
 
@@ -484,7 +484,7 @@ func _on_Hitbox_area_entered(area):
 
 		#HACK hitspark, needs improvement
 		var hit_pos = get_collision_position(body)
-		emit_hitspark(hit_pos)
+		hitbox.emit_hitspark(hit_pos, char_data.horizontal_state_, attack_data.hitspark)
 
 		#HACK flip enemy to face 
 		if (hit_pos.x - self.global_position.x) * body.char_data.horizontal_state_> 0:
@@ -502,7 +502,7 @@ func _on_Hitbox_area_entered(area):
 
 
 #TODO Can probably eventually be made generic		
-#HACK hitspark location calculation
+#HACK hitspark location calculation ENTIRELY USSELESS RIGHT NOW
 #Uses the average position between the attack hitbox and the target hurtbox.  Not ideal way to calculate. 
 #Ideal would probably be find both hitbox+hurtbox position and extents, calculate the overlapped regions and then find the middle of the overlapped region
 func get_collision_position(body):
@@ -516,19 +516,24 @@ func get_collision_position(body):
 
 	return attack_hitbox.get_node("CollisionShape2D").global_position
 
-#Emit a hitspark sprite at a given global position
-#Will select from hitboxes associated with the attackdata
-func emit_hitspark(hit_pos):
-	#Find where the hitspark should be located
-	hitspark.global_position = hit_pos
-	hitspark.visible = true
-	hitspark.frame = 0
-	hitspark.scale.x = abs(hitspark.scale.x) * char_data.horizontal_state_
-	hitspark.play(attack_data.hitspark)
 
 
-func _on_Hitspark_animation_finished():
-	hitspark.visible = false
+func _on_ParryBox_area_entered(area):
+	if area.get_class() == "Hitbox":
+
+		var temp_data = area.get_attack_data()
+		char_data.HP += temp_data.dmg
+
+		area.shape.disabled = true
+		print("PARRIED")
+
+		hitbox.emit_hitspark(area.global_position, char_data.horizontal_state_, "parry")
+
+		char_data.uncancellable = false
+		parry_box.get_node("CollisionShape2D").disabled = true
+		hurtbox.enable()
+	pass # Replace with function body.
+
 #endregion
 
 #endregion
@@ -566,3 +571,5 @@ func get_movelist():
 
 func set_movelist(movenames):
 	char_data.set_movelist(movenames)
+
+
