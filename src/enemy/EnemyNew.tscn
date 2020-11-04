@@ -447,21 +447,6 @@ animations = [ {
 "name": "CrouchDamage",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 83 ), ExtResource( 82 ), ExtResource( 81 ), ExtResource( 84 ), ExtResource( 85 ), ExtResource( 86 ), ExtResource( 87 ), ExtResource( 88 ), ExtResource( 89 ), ExtResource( 74 ), ExtResource( 75 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 78 ), ExtResource( 73 ), ExtResource( 67 ), ExtResource( 76 ), ExtResource( 68 ), ExtResource( 77 ), ExtResource( 69 ), ExtResource( 70 ), ExtResource( 71 ), ExtResource( 72 ) ],
-"loop": true,
-"name": "Death",
-"speed": 10.0
-}, {
-"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
-"loop": true,
-"name": "StandStagger",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 60 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 63 ), ExtResource( 66 ), ExtResource( 57 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 55 ), ExtResource( 56 ) ],
-"loop": true,
-"name": "Walk",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
 "loop": true,
 "name": "StandDamage",
@@ -472,9 +457,9 @@ animations = [ {
 "name": "StandIdle",
 "speed": 10.0
 }, {
-"frames": [ ExtResource( 28 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 25 ), ExtResource( 26 ) ],
+"frames": [ ExtResource( 60 ), ExtResource( 62 ), ExtResource( 61 ), ExtResource( 63 ), ExtResource( 66 ), ExtResource( 57 ), ExtResource( 58 ), ExtResource( 59 ), ExtResource( 55 ), ExtResource( 56 ) ],
 "loop": true,
-"name": "CrouchDown",
+"name": "Walk",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
@@ -482,19 +467,34 @@ animations = [ {
 "name": "StandUp",
 "speed": 5.0
 }, {
+"frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
+"loop": true,
+"name": "StandStagger",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 101 ), ExtResource( 94 ), ExtResource( 105 ), ExtResource( 104 ), ExtResource( 113 ) ],
 "loop": true,
 "name": "StandJab",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 114 ), ExtResource( 115 ), ExtResource( 109 ), ExtResource( 95 ), ExtResource( 99 ), ExtResource( 110 ), ExtResource( 111 ), ExtResource( 90 ), ExtResource( 91 ), ExtResource( 92 ), ExtResource( 93 ), ExtResource( 118 ) ],
+"frames": [ ExtResource( 28 ), ExtResource( 30 ), ExtResource( 29 ), ExtResource( 25 ), ExtResource( 26 ) ],
 "loop": true,
-"name": "StandUpper",
+"name": "CrouchDown",
 "speed": 5.0
+}, {
+"frames": [ ExtResource( 83 ), ExtResource( 82 ), ExtResource( 81 ), ExtResource( 84 ), ExtResource( 85 ), ExtResource( 86 ), ExtResource( 87 ), ExtResource( 88 ), ExtResource( 89 ), ExtResource( 74 ), ExtResource( 75 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 78 ), ExtResource( 73 ), ExtResource( 67 ), ExtResource( 76 ), ExtResource( 68 ), ExtResource( 77 ), ExtResource( 69 ), ExtResource( 70 ), ExtResource( 71 ), ExtResource( 72 ) ],
+"loop": true,
+"name": "Death",
+"speed": 10.0
 }, {
 "frames": [ ExtResource( 102 ), ExtResource( 100 ), ExtResource( 103 ), ExtResource( 97 ), ExtResource( 106 ), ExtResource( 112 ), ExtResource( 107 ), ExtResource( 96 ), ExtResource( 98 ), ExtResource( 108 ) ],
 "loop": true,
 "name": "StandElbow",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 64 ), ExtResource( 65 ) ],
+"loop": true,
+"name": "WalkStart",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 117 ), ExtResource( 134 ), ExtResource( 131 ), ExtResource( 121 ), ExtResource( 129 ), ExtResource( 116 ), ExtResource( 130 ), ExtResource( 120 ), ExtResource( 122 ), ExtResource( 126 ), ExtResource( 127 ), ExtResource( 119 ), ExtResource( 123 ), ExtResource( 133 ), ExtResource( 135 ), ExtResource( 128 ), ExtResource( 124 ), ExtResource( 125 ), ExtResource( 132 ) ],
@@ -502,9 +502,9 @@ animations = [ {
 "name": "StandLunge",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 64 ), ExtResource( 65 ) ],
+"frames": [ ExtResource( 114 ), ExtResource( 115 ), ExtResource( 109 ), ExtResource( 95 ), ExtResource( 99 ), ExtResource( 110 ), ExtResource( 111 ), ExtResource( 90 ), ExtResource( 91 ), ExtResource( 92 ), ExtResource( 93 ), ExtResource( 118 ) ],
 "loop": true,
-"name": "WalkStart",
+"name": "StandUpper",
 "speed": 5.0
 } ]
 
@@ -584,11 +584,10 @@ script = ExtResource( 1 )
 max_HP = 150
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
-position = Vector2( 0.351875, -16.6962 )
+position = Vector2( 0.351875, -16.8728 )
 scale = Vector2( 0.3, 0.3 )
 frames = SubResource( 14 )
-animation = "StandElbow"
-frame = 9
+animation = "Death"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]

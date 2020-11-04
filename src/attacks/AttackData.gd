@@ -53,7 +53,7 @@ var invincibility_time = 0 #UNIMPLEMENTED. Default: 0
 #Special properties of the attack, when hitting the defender
 #TODO Consider ways to implement ground-bounce/wall-bounce/wall-splats etc.
 
-var rooted = false #Does this root the target in place? I.E. remove all knockback. Default: false
+var rooted = false #IS THIS NECESSARY? Does this root the target in place? I.E. remove all knockback. Default: false 
 var wall_bounces = false #UNIMPLEMENTED
 var ground_bounces = false #UNIMPLEMENTED
 var stagger = false #Does this move cause a stagger state. Default: false

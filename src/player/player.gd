@@ -8,64 +8,86 @@ signal selected_move_changed(cur_move_num)
 #Currently unused, as no death behavior.
 signal player_died
 
-#TODO: PRIORITY SYSTEM FOR ANIMATIONS
-#TODO ADJUST MIDAIR SPEED, AIR DECEL, MOVE AWAY FROM HARD STOP 
+
+signal time_slowed
+signal time_unslowed
+
+
 const WALK_ACCEL = 450.0
 const WALK_DECEL = 3500.0
-const MAX_VELOCITY = 200.0
 const WALK_VELOCITY = 125.0
+const MAX_VELOCITY = 200.0
+
+
 const JUMP_VELOCITY = 500
 const STOP_JUMP_FORCE = 450.0
+
+
 const DASH_SPEED = 300
 const DASH_MAX = 2
-const GUARD_SPEED_MODIFIER = .25
+
+
+const GUARD_SPEED_MODIFIER = .25 
+
 
 const FLOOR_DETECT_DISTANCE = 20.0
 
-const BUFFER_MAX = 10
+const MAX_BUFFER_SIZE = 10
 
+#Tracks when player lets go of jump button
 var stopping_jump = false
-var slow_time = 0
 
+#Counter that counts how long player is off the ground
+var airborne_time = 0
+
+
+#links to nodes
 onready var camera = $Camera
 onready var platform_detector = $PlatformDetector
 onready var attack_hitbox = $Sprite/Hitbox
 onready var parry_box = $Sprite/ParryBox
 
-var airborne_time = 0
 
-var attack_data
 
+
+#movement buffer of size MAX_BUFFER_SIZE
+var buffer = []
+
+#Length of the current buffer
 var buffer_length = 0
-var buffered_movements = []
+
+#Holds whether a move has been buffered or not
+#Used to track that player is dashing
+#Questionable implementation
 var held_buffer = false
 
+#Use to track how many dashes the player has used
+#Resets when on ground
+#Maximum value is DASH_MAX
 var dash_count = 0
 
 
+#Timer of how much timeslow remains
+var slow_time = 0
+
+#Set player actor type before Actor class calculates it
 func _init():
 	actor_type = "player"
 
+
 func _ready():
-
-	no_grav = false
-
-	current_animation = "StandIdle"
-	sprite.playing = true
-	sprite.animation = current_animation
 
 	self.scale.x = -1
 	sprite.speed_scale = 3
 	animation_player.playback_speed = 1.5
 
-	char_data.sprite_library = sprite.frames.get_animation_names()
-	char_data.animation_player_library = animation_player.get_animation_list()
 
 	#HACK
 	char_data.select_attack(false)
 	attack_data = char_data.get_move_data()
 
-#Priority in calculations:
+
+#Priority in animation calculations:
 #If in locked animations (dash, attacks, dodges)
 #If turning
 #If in air, calculate jump/fall
@@ -74,10 +96,7 @@ func _ready():
 
 #PROCESS INPUT + CALCULATE PHYSICS
 #region 
-#TODO Ability to save movement state + data (speed, etc.) ?
 #TODO Refactor code to use input buffer rather than repeat move checks
-#TODO deal with uncancellable+movement_locked
-#probably change to all input locked vs just movement locked
 func _physics_process(delta):
 
 	if Input.is_action_pressed("slow_time_debug"):
@@ -131,9 +150,11 @@ func _physics_process(delta):
 			if dashing:
 				#HACK should determine if dashing in "facing" direction vs not
 				#TODO: Decide what optimal controls are here
-				#BUG Backdash while in air and off a running jump leads to a backdash back into forward fall
+				#BUG Backdash while in air and off a running jump leads to a backdash then back into forward fall for a "7"-shaped move
 
 				dash_count += 1
+
+
 				if dash_count <= DASH_MAX:
 					if (move_left and char_data.horizontal_state_ == -1) or (move_right and char_data.horizontal_state_ == 1):
 						char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
@@ -184,7 +205,7 @@ func _physics_process(delta):
 		#If the player is being moved by external forces, use that function.
 		#Else, use the players movement
 		if movement_locked:
-			external_movement(external_movement_data, remaining_animation_time, delta)
+			external_movement(external_movement_data, remaining_animation_time, delta, no_grav_during_move)
 				
 		else: #if the player input is locked out
 			var snap_vector = Vector2.DOWN * 16 if (is_on_floor() and not jump) else Vector2.ZERO
@@ -197,6 +218,15 @@ func _physics_process(delta):
 
 #region MOVEMENT BUFFER PROCESSSING
 
+#update movements, etc.
+func check_buffer():
+	var new_move = get_dir_buttons_pressed()
+	buffer.append(new_move)
+	check_held()
+	if buffer.size() > MAX_BUFFER_SIZE:
+		buffer.remove(0)
+
+#gets the player input at the current moment in terms of numpad-notation
 func get_dir_buttons_pressed():
 	var new_input = 5
 	if Input.is_action_pressed("move_right"):
@@ -224,25 +254,19 @@ func get_dir_buttons_pressed():
 		new_input = 8
 	return new_input
 
-func check_buffer():
-	var new_move = get_dir_buttons_pressed()
-	buffered_movements.append(new_move)
-	check_held()
-	if buffered_movements.size() > BUFFER_MAX:
-		buffered_movements.remove(0)
-
+	
 #Check if still running, preserving if character is jumping while running
 func check_held():
 	#If more than two movements stored in buffer that do not match
-	if buffered_movements.size() > 2 and not buffered_movements[-1] == buffered_movements[-2]:
+	if buffer.size() > 2 and not buffer[-1] == buffer[-2]:
 		#If the mismatch is not resulting from a jump
-		if not ((buffered_movements[-1] in [4,7] and buffered_movements[-2] in [4,7]) 
-			or (buffered_movements[-1] in [6,9] and buffered_movements[-2] in [6,9])):
+		if not ((buffer[-1] in [4,7] and buffer[-2] in [4,7]) 
+			or (buffer[-1] in [6,9] and buffer[-2] in [6,9])):
 			held_buffer = false
 
 func update_movements(delta):
-	if buffered_movements.size() > 1:
-		if buffered_movements[-1] == 4:
+	if buffer.size() > 1:
+		if buffer[-1] == 4:
 			if check_run([4,5,4]) or held_buffer:
 				_velocity.x = -MAX_VELOCITY
 			else:
@@ -251,12 +275,12 @@ func update_movements(delta):
 			# 	_velocity.x -= WALK_ACCEL * delta
 			# else:
 			# 	_velocity.x += WALK_DECEL * 2 * delta
-		elif buffered_movements[-1] == 6:
+		elif buffer[-1] == 6:
 			if check_run([6,5,6]) or held_buffer:
 				_velocity.x = MAX_VELOCITY
 			else:
 				_velocity.x = WALK_VELOCITY
-		elif buffered_movements[-1] == 5:
+		elif buffer[-1] == 5:
 			decelerate(delta)
 
 func decelerate(delta, mod = 1):
@@ -276,7 +300,7 @@ func decelerate(delta, mod = 1):
 
 func check_run(sequence):
 	var found = false
-	var temp_buffer = buffered_movements.duplicate(true)
+	var temp_buffer = buffer.duplicate(true)
 	var count = sequence.size()
 	if temp_buffer.size() > sequence.size():
 		for i in sequence:
@@ -295,7 +319,7 @@ func check_run(sequence):
 	pass
 
 func flush_buffer():
-	buffered_movements = []
+	buffer = []
 #endregion
 
 
@@ -330,8 +354,7 @@ func check_change_move():
 			slow_time += .25
 	
 
-#BUG gets stuck in attack animation sometimes after taking damage
-#unclear how this happens, need to reproduce	
+#unclear how this happens, need to reproduce
 #Should find a way to incorporate this + dash into the move buffer
 #TODO Better way to handle crouching vs standing vs dashing vs jumping etc.
 func check_new_attack():
@@ -470,35 +493,31 @@ func _on_AnimationPlayer_animation_changed(_anim_name):
 #attacks
 #region 
 
-func _on_Hitbox_body_shape_entered(_body_id, body, _body_shape, _area_shape):
-	pass
-
 func _on_Hitbox_area_entered(area):
 	if area.get_class() == "Hurtbox" and area.actor_type == "enemy":
-
+		
 		var body = area.get_parent()
 		# body.stunned = true
+		if not body.char_data.damage_state_ == char_data.DAMAGE_STATE.INVULN:
+			#HITSTOP
+			OS.delay_msec(25)
 
-		#HITSTOP
-		OS.delay_msec(25)
+			#HACK hitspark, needs improvement
+			var hit_pos = get_collision_position(body)
+			hitbox.emit_hitspark(hit_pos, char_data.horizontal_state_, attack_data.hitspark)
 
-		#HACK hitspark, needs improvement
-		var hit_pos = get_collision_position(body)
-		hitbox.emit_hitspark(hit_pos, char_data.horizontal_state_, attack_data.hitspark)
+			#HACK flip enemy to face 
+			if (hit_pos.x - self.global_position.x) * body.char_data.horizontal_state_> 0:
+				body.flip_actor() 
 
-		#HACK flip enemy to face 
-		if (hit_pos.x - self.global_position.x) * body.char_data.horizontal_state_> 0:
-			body.flip_actor() 
+			screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
 
-		screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
+			#HACK TEMPORARY KNOCKBACK CALC
+			attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
+			body.take_damage(attack_data.get_hit_var())
+			slow_time += attack_data.slow_time
 
-		#HACK TEMPORARY KNOCKBACK CALC
-		attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
-		body.take_damage(attack_data.get_hit_var())
-		slow_time += attack_data.slow_time
-
-		knockback = attack_data.self_knockback
-
+			knockback = attack_data.self_knockback * char_data.horizontal_state_ * -1
 
 
 #TODO Can probably eventually be made generic		
@@ -544,13 +563,15 @@ func _on_ParryBox_area_entered(area):
 #HACK current means of playing with time manipulation
 #TODO improve overall time-slow situation
 
-func time_slow(delta):
+func time_slow(delta, slow_mod = .4):
 	if slow_time > 0:
-		Engine.time_scale = .4
+		Engine.time_scale = slow_mod
 		slow_time -= delta
+		emit_signal("time_slowed")
 	else:
 		Engine.time_scale = 1
 		slow_time = 0
+		emit_signal("time_unslowed")
 	
 #HACK this should be fixed to a reasonable system
 func speed_reset():

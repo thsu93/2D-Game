@@ -23,6 +23,9 @@ __meta__ = {
 self_modulate = Color( 1, 1, 1, 0 )
 anchor_right = 1.0
 anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TextureRect" type="TextureRect" parent="Panel"]
 modulate = Color( 0.619608, 0.109804, 0.109804, 0.670588 )

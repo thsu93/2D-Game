@@ -10,6 +10,7 @@ func _init():
 	knockback_val = 75
 	damage_scaling = .1
 	hitstun = .5
+	slow_time = 0.1
 	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

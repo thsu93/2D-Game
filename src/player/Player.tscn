@@ -37,7 +37,6 @@
 
 [sub_resource type="Animation" id=1]
 resource_name = "Death"
-length = 0.7
 tracks/0/type = "value"
 tracks/0/path = NodePath("Sprite:animation")
 tracks/0/interp = 1
@@ -69,7 +68,7 @@ tracks/2/loop_wrap = true
 tracks/2/imported = false
 tracks/2/enabled = true
 tracks/2/keys = {
-"times": PoolRealArray( 0, 0.7 ),
+"times": PoolRealArray( 0, 1 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
@@ -97,6 +96,44 @@ tracks/4/keys = {
 "transitions": PoolRealArray( 1, 1 ),
 "update": 0,
 "values": [ Vector2( 0, -20 ), Vector2( 0, -10 ) ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Sprite:playing")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0.7, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ false, false ]
+}
+tracks/6/type = "method"
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 1 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "queue_free"
+} ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath(".:modulate")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0, 0.7, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 0.901961, 0.0784314, 0.0784314, 1 ), Color( 0.901961, 0.0784314, 0.0784314, 1 ) ]
 }
 
 [sub_resource type="Animation" id=2]
@@ -312,20 +349,20 @@ tracks/4/keys = {
 "values": [ true ]
 }
 
-[sub_resource type="RectangleShape2D" id=9]
-extents = Vector2( 109.299, 37.0859 )
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 74.1374, 98.194 )
 
 [sub_resource type="SpriteFrames" id=6]
 animations = [ {
-"frames": [ ExtResource( 57 ), ExtResource( 63 ), ExtResource( 81 ), ExtResource( 76 ), ExtResource( 77 ), ExtResource( 82 ), ExtResource( 78 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 378 ) ],
-"loop": false,
-"name": "DashEffect",
-"speed": 10.0
-}, {
 "frames": [  ],
 "loop": true,
 "name": "Default",
 "speed": 5.0
+}, {
+"frames": [ ExtResource( 57 ), ExtResource( 63 ), ExtResource( 81 ), ExtResource( 76 ), ExtResource( 77 ), ExtResource( 82 ), ExtResource( 78 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 378 ) ],
+"loop": false,
+"name": "DashEffect",
+"speed": 10.0
 } ]
 
 [sub_resource type="RectangleShape2D" id=7]
@@ -335,13 +372,15 @@ extents = Vector2( 156.489, 124.046 )
 radius = 7.08997
 height = 25.0
 
-[sub_resource type="RectangleShape2D" id=10]
+[sub_resource type="RectangleShape2D" id=9]
 extents = Vector2( 5.05406, 11.9686 )
 
 [node name="Player" type="KinematicBody2D"]
 collision_mask = 1025
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
+no_grav = true
+movement_locked = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Backdash = ExtResource( 3 )
@@ -378,7 +417,7 @@ script = ExtResource( 19 )
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "StandParry"
+animation = "Overhead"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -391,9 +430,9 @@ script = ExtResource( 22 )
 speed_scale = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -140.332, -44.6038 )
+position = Vector2( -167.36, -60.4738 )
 scale = Vector2( 1.13819, 1.02605 )
-shape = SubResource( 9 )
+shape = SubResource( 5 )
 disabled = true
 
 [node name="Effects" type="AnimatedSprite" parent="Sprite"]
@@ -415,6 +454,7 @@ disabled = true
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
 max_HP = 100
+uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
 position = Vector2( -0.361423, -8.08499 )
@@ -432,7 +472,7 @@ script = ExtResource( 21 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 position = Vector2( -7.60139, -27.9307 )
-shape = SubResource( 10 )
+shape = SubResource( 9 )
 [connection signal="animation_changed" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_changed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
 [connection signal="animation_finished" from="Sprite" to="." method="_on_Sprite_animation_finished"]

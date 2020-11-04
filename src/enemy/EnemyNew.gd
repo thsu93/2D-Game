@@ -7,6 +7,8 @@ extends Actor
 signal combo(num)
 signal shake
 
+
+
 onready var HP_Bar = $HP_Bar
 onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
@@ -28,6 +30,7 @@ var landed_hit = false
 var ATTACK_TIMER = 1.5
 var timer = 0
 var hit_timer = 0
+
 #JAB, LUNGE, UPPER, ELBOW
 
 
@@ -55,6 +58,8 @@ func _ready():
 
 	HP_Bar.visible = false
 
+
+
 # Physics process is a built-in loop in Godot.
 # If you define _physics_process on a node, Godot will call it every frame.
 
@@ -80,6 +85,8 @@ func _physics_process(_delta):
 			knockback_scaling_mult = 1
 			damage_scaling_mult = 1
 			emit_signal("combo", combo_counter)
+			invuln_timer.start()
+			char_data.toggle_invuln()
 
 	if char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
 		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
@@ -171,12 +178,10 @@ func calculate_move_velocity(linear_velocity):
 #stun effects
 func take_damage(hit_var):
 
-	#HACK
 	hitbox.shape.disabled = true
 	
-	#HACK
 	hit_var["dmg"] /= damage_scaling_mult
-	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
+	
 	
 	char_data.take_damage(hit_var)
 
@@ -191,10 +196,15 @@ func take_damage(hit_var):
 	
 
 	stunned = true
+	
 	stun_time = hit_var["stun"]
 	combo_counter += 1
+
+
 	emit_signal("combo", combo_counter)
 	emit_signal("shake")
+
+	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
 	
 #Turns off hitspark when given a signal by the hitspark
 func _on_Hitspark_animation_finished():
@@ -204,7 +214,7 @@ func _on_Hitspark_animation_finished():
 
 #What to do when the enemy hits the player	
 func _on_Hitbox_area_entered(area):
-	print("tested")
+
 	if area.get_class() == "Hurtbox" and area.actor_type == "player":
 
 		var body = area.get_parent()
@@ -218,7 +228,7 @@ func _on_Hitbox_area_entered(area):
 		# var hit_pos = get_collision_position(body)
 		# emit_hitspark(hit_pos)
 
-		var attack_data = char_data.cur_attack
+		attack_data = char_data.cur_attack
 
 		screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
 

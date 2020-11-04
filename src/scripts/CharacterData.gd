@@ -113,23 +113,35 @@ func take_damage(hit_var):
 		
 		HP -= hit_var["dmg"]
 		
+		var new_anim = null
+
 		if hit_var["stagger"]:
-			damage_state_ = DAMAGE_STATE.STAGGERED
+			new_anim = "Stagger"
 		else:
-			damage_state_ = DAMAGE_STATE.HIT
-			
+			new_anim = "Damage"
+
+		if anim_state_ == ANIMATION_STATE.ATTACKING or damage_state_ == DAMAGE_STATE.COUNTERHIT:
+			damage_state_ = DAMAGE_STATE.COUNTERHIT
+		else:
+			damage_state_ = DAMAGE_STATE.DAMAGED
+
 		anim_state_ = ANIMATION_STATE.DAMAGED
+		move_state_ = MOVE_STATE.STANDING
 		
 		if HP <= 0:
 			emit_signal("dead")
 			damage_state_ = DAMAGE_STATE.DEAD
+			new_anim = "Death"
 
 		else:
 			#DO THE DAMAGE THINGS
 			pass
-			
-		update_current_animation()
 
+		#pass in the damage animation
+		update_current_animation(new_anim)
+
+
+#Toggle invincibility state
 func toggle_invuln():
 	if damage_state_ == DAMAGE_STATE.INVULN:
 		damage_state_ = DAMAGE_STATE.IDLE
@@ -225,7 +237,7 @@ func evaluate_state_change(new_state, state_changed):
 
 
 	if anim_state_ == ANIMATION_STATE.IDLE:
-		#start turn
+		#start turning
 		if state_changed == "HORIZONTAL":
 			anim_state_ = ANIMATION_STATE.TURNING
 				
@@ -281,17 +293,15 @@ func evaluate_state_change(new_state, state_changed):
 
 #Updates the actor's animation to fit the current state of the state machine
 #prioritizes damage, then animations, then movement
-func update_current_animation():
+func update_current_animation(new_anim = null):
 
-	var new_anim = current_animation
+	if not new_anim:
+		new_anim = current_animation
 
 	if not damage_state_ == DAMAGE_STATE.IDLE:
-		if damage_state_ ==DAMAGE_STATE.DEAD:
-			new_anim = "Death"
-		elif damage_state_ == DAMAGE_STATE.STAGGERED:
-			new_anim = "Stagger"
-		else:
-			new_anim = "Damage"
+		
+		#DAMAGE ANIMATIONS HANDLED WITHIN TAKE_DAMAGE
+
 		pass #deal with 
 
 	

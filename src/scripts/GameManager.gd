@@ -4,9 +4,11 @@ export(String)var title_scene
 
 export(NodePath)var player_path
 export(NodePath)var UI_control_path
+export(NodePath)var panel_path
 
 var player
 var UI
+var panel
 var camera
 var select
 var slowed = false
@@ -26,6 +28,9 @@ func _ready():
 
 	UI = get_node(UI_control_path)
 	
+	panel = get_node(panel_path)
+
+
 	# slowdown_timer.set_one_shot(true)
 	# slowdown_timer.set_wait_time(BULLET_TIME_LENGTH)
 	# slowdown_timer.connect("timeout", self, "on_timeout_complete")
@@ -46,7 +51,8 @@ func _physics_process(_delta):
 	# if Input.is_action_just_pressed("click") or Input.is_action_just_pressed("rclick"):
 	# 	unslow_time()
 	# check_if_slowed()
-	update_HP()	
+	if not player == null:
+		update_HP()	
 	
 #POSITIONAL DATA MECHANICS
 func get_player_pos():
@@ -100,3 +106,10 @@ func update_player_movelist(movelist):
 
 func _on_Control_update_abilities(abilities):
 	update_player_movelist(abilities)
+
+
+func _on_Player_time_slowed():
+	panel.visible = true
+
+func _on_Player_time_unslowed():
+	panel.visible = false

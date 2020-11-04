@@ -23,7 +23,16 @@ onready var hurtbox = $Hurtbox
 onready var hitbox = $Sprite/Hitbox
 
 #Base actor type
-var actor_type = "Actor"
+#Currently include "actor", "player", "enemy"
+#Used in get_class() to convey what actor type
+var actor_type = "actor"
+
+#Attack data of the currently selected move
+var attack_data = null
+
+#Amount of time player will be invulnerable for after combo-ed.
+#Temporary, eventually want to get to a point where resets and such maybe?
+const INVULN_TIME = .3
 
 
 export var speed = Vector2(150.0, 450.0)
@@ -31,23 +40,43 @@ export var no_grav = false
 onready var gravity = ProjectSettings.get("physics/2d/default_gravity")
 export var movement_locked = false
 var external_movement_data = Vector2()
+var no_grav_during_move = true
 
 const FLOOR_NORMAL = Vector2.UP
 
 var _velocity = Vector2.ZERO
 var stunned = false
 
-var current_animation = ""
+var current_animation = "StandIdle"
 
 var remaining_animation_time = 0
 
 var knockback = Vector2.ZERO
 var stun_time = 0
 
+onready var invuln_timer = Timer.new()
+
+#initialize data associated with character
+#start animations
 func _ready():
+
 	char_data.set_name(actor_type)
 	hurtbox.set_actor_type(actor_type)
 	hitbox.set_actor(self)
+
+
+	sprite.playing = true
+	sprite.animation = current_animation
+
+	
+	char_data.sprite_library = sprite.frames.get_animation_names()
+	char_data.animation_player_library = animation_player.get_animation_list()
+
+	invuln_timer.set_one_shot(true)
+	invuln_timer.set_wait_time(INVULN_TIME)
+	invuln_timer.connect("timeout", self, "on_invuln_end")
+	add_child(invuln_timer)
+
 
 # _physics_process is called after the inherited _physics_process function.
 # This allows the Player and Enemy scenes to be affected by gravity.
@@ -98,13 +127,20 @@ func take_damage(hit_var):
 
 	print(knockback)
 
+func on_invuln_end():
+	if char_data.damage_state_ == char_data.DAMAGE_STATE.INVULN:
+		char_data.toggle_invuln()
+
+
 #Function to handle non-input/AI movements
 #Given a vector for how fast to move, a float of how long to move at that speed
 #delta is passed in to subtract
+#no_grav_during to set to only control X or not
 #Don't know why this doesn't work without using remaining_animation_time
-func external_movement(new_move_data:Vector2, animation_time:float, delta:float = 0):
+func external_movement(new_move_data:Vector2, animation_time:float, delta:float = 0, no_grav_during = true):
 
 	movement_locked = true
+	no_grav_during_move = no_grav_during
 	external_movement_data = new_move_data #CONVOLUTED WHY
 	var temp_move_data = new_move_data
 	temp_move_data.x = new_move_data.x * char_data.horizontal_state_
@@ -114,7 +150,9 @@ func external_movement(new_move_data:Vector2, animation_time:float, delta:float 
 		movement_locked = false
 		no_grav = false
 	else:
-		no_grav = true
+		no_grav = no_grav_during_move
+		if not no_grav:
+			temp_move_data.y = _velocity.y
 		temp_move_data = move_and_slide(temp_move_data)
 	pass
 

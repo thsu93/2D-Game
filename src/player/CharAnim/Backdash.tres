@@ -109,7 +109,7 @@ tracks/8/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "values": [ {
-"args": [ Vector2( -300, 0 ), 0.35, 0.0 ],
+"args": [ Vector2( -300, 0 ), 0.15, 0.0 ],
 "method": "external_movement"
 } ]
 }
