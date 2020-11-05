@@ -225,11 +225,15 @@ __meta__ = {
 "Actors",
 ] instance=ExtResource( 12 )]
 position = Vector2( -43.835, 644.641 )
+no_grav = false
+movement_locked = false
 
 [node name="Enemy2" parent="Props/Enemies" groups=[
 "Actors",
 ] instance=ExtResource( 12 )]
 position = Vector2( -419.835, 643.641 )
+no_grav = false
+movement_locked = false
 
 [node name="Player" parent="." groups=[
 "Actors",

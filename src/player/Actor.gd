@@ -105,11 +105,25 @@ func _physics_process(delta):
 		if current_animation.begins_with("Jump"):
 			char_data.change_anim_state(char_data.ANIMATION_STATE.IDLE)
 
+#Getters for GameManager
+
+#Get actor's current HP
+func get_HP():
+	return char_data.HP
+
+#Get actor's current Max HP
+func get_max_HP():
+	return char_data.max_HP
+
 #Overload the get_class() function for hit detection purposes
 func get_class():
 	return "Actor"
 
-#Method to flip the actor and state machine immediately, without going through the turn animation
+
+
+#Method to flip the actor and state machine immediately, without processing the turn animation
+#Called to flip actor to face damaged side.
+#TODO Should have back-stab damage, animations?
 func flip_actor():
 	self.scale.x *= -1
 	char_data.horizontal_state_ *= -1
