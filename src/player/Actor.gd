@@ -54,6 +54,13 @@ var remaining_animation_time = 0
 var knockback = Vector2.ZERO
 var stun_time = 0
 
+var combo_counter = 0
+
+var knockback_scaling_mult = 1
+var damage_scaling_mult = 1
+
+
+
 onready var invuln_timer = Timer.new()
 
 #initialize data associated with character
@@ -120,6 +127,13 @@ func get_class():
 	return "Actor"
 
 
+#reset the hitboxes to base states
+#Will reset attack hitbox to off 
+#Will reset hurtbox to on
+func reset_all_hitboxes():
+	hitbox.shape.disabled = true
+	hurtbox.shape.disabled = false
+
 
 #Method to flip the actor and state machine immediately, without processing the turn animation
 #Called to flip actor to face damaged side.
@@ -131,16 +145,21 @@ func flip_actor():
 #Base fxn for taking damage. Overloaded in both Player and Enemy currently.
 #should re-evaluate further to simplify
 func take_damage(hit_var):
+
 	print(hit_var)
 	print(hit_var["knockback_dir"])
+
 	knockback = hit_var["knockback_dir"] * hit_var["knockback_val"]
 	char_data.take_damage(hit_var)
 
 	stunned = true
 	stun_time += hit_var["stun"]
 
+	reset_all_hitboxes()
+
 	print(knockback)
 
+#At the end of invuln, turn it off in character data
 func on_invuln_end():
 	if char_data.damage_state_ == char_data.DAMAGE_STATE.INVULN:
 		char_data.toggle_invuln()

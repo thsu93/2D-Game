@@ -31,6 +31,13 @@ func _ready():
 	panel = get_node(panel_path)
 
 
+
+# get_viewport().connect("size_changed", self, "window_resize")
+
+# func window_resize():
+#     get_viewport().set_size_override(true, OS.get_window_size())
+
+
 	# slowdown_timer.set_one_shot(true)
 	# slowdown_timer.set_wait_time(BULLET_TIME_LENGTH)
 	# slowdown_timer.connect("timeout", self, "on_timeout_complete")

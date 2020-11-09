@@ -19,10 +19,6 @@ onready var hitspark = $Sprite/Hitbox/Hitspark
 
 var dir_switch_time = .2
 
-var combo_counter = 0
-
-var knockback_scaling_mult = 1
-var damage_scaling_mult = 1
 
 var landed_hit = false
 
@@ -178,7 +174,7 @@ func calculate_move_velocity(linear_velocity):
 #stun effects
 func take_damage(hit_var):
 
-	hitbox.shape.disabled = true
+
 	
 	hit_var["dmg"] /= damage_scaling_mult
 	
@@ -204,7 +200,8 @@ func take_damage(hit_var):
 	emit_signal("combo", combo_counter)
 	emit_signal("shake")
 
-	print("TOOK DAMAGE    ", hit_var["dmg"], "     ", hit_var["movename"])
+
+	reset_all_hitboxes()
 	
 #Turns off hitspark when given a signal by the hitspark
 func _on_Hitspark_animation_finished():

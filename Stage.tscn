@@ -215,6 +215,7 @@ position = Vector2( 1201.4, 424.76 )
 
 [node name="OneWayPlatform" parent="Props" instance=ExtResource( 5 )]
 position = Vector2( 463.849, 560.405 )
+collision_layer = 1024
 
 [node name="Enemies" type="Node2D" parent="Props"]
 __meta__ = {
@@ -238,6 +239,7 @@ movement_locked = false
 [node name="Player" parent="." groups=[
 "Actors",
 ] instance=ExtResource( 6 )]
+pause_mode = 0
 position = Vector2( 125.968, 666.14 )
 
 [node name="ParallaxBg" parent="." instance=ExtResource( 8 )]

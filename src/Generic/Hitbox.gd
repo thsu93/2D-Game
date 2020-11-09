@@ -5,7 +5,7 @@ class_name Hitbox
 # var a = 2
 # var b = "text"
 
-var actor = null
+var actor_type = null
 onready var shape = $CollisionShape2D
 onready var hitspark = $Hitspark
 
@@ -19,13 +19,13 @@ func get_class():
 #func _process(delta):
 #	pass
 
-#sets a pointer to the actor that controls this hitbox  
+#sets a pointer to the actor_type that controls this hitbox  
 func set_actor(_actor):
-	actor = _actor
+	actor_type = _actor
 
-#gets the attack data currently withhin the actor
+#gets the attack data currently withhin the actor_type
 func get_attack_data():
-	return actor.char_data.cur_attack
+	return actor_type.char_data.cur_attack
 
 #Emit a hitspark sprite at a given global position
 #Will select from hitboxes associated with the attackdata

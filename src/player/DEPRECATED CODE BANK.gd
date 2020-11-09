@@ -389,7 +389,19 @@
 	# 	char_data.anim_state_ = char_data.ANIMATION_STATE.IDLE
 	# 	play_new_sprite()
 	# #endregion
+
 	
+	# func check_crouch(delta):
+# 	if char_data.move_state_ == char_data.MOVE_STATE.CROUCHING:
+# 		if abs(_velocity.x) > 0:
+# 			var decel = WALK_DECEL * delta * 5
+# 			var new_velocity = _velocity.x - decel if _velocity.x - decel > 0 else 0
+# 			_velocity.x = new_velocity
+# 	else:
+# 		char_data.change_move_state(char_data.MOVE_STATE.CROUCHING)
+
+
+
 	# #SIGNALS FROM GAMESTATE CHANGES
 	# #region 
 	# func _on_CharacterData_anim_state_change(_state):

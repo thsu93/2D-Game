@@ -442,11 +442,6 @@ hue_variation_random = 0.46
 
 [sub_resource type="SpriteFrames" id=14]
 animations = [ {
-"frames": [ ExtResource( 36 ), ExtResource( 53 ), ExtResource( 35 ), ExtResource( 49 ), ExtResource( 44 ), ExtResource( 42 ), ExtResource( 52 ), ExtResource( 45 ) ],
-"loop": false,
-"name": "CrouchDamage",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
 "loop": true,
 "name": "StandDamage",
@@ -462,14 +457,19 @@ animations = [ {
 "name": "Walk",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
-"loop": true,
-"name": "StandUp",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 46 ), ExtResource( 33 ), ExtResource( 47 ), ExtResource( 32 ), ExtResource( 31 ), ExtResource( 39 ), ExtResource( 37 ), ExtResource( 48 ) ],
 "loop": true,
 "name": "StandStagger",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 36 ), ExtResource( 53 ), ExtResource( 35 ), ExtResource( 49 ), ExtResource( 44 ), ExtResource( 42 ), ExtResource( 52 ), ExtResource( 45 ) ],
+"loop": false,
+"name": "CrouchDamage",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 27 ), ExtResource( 24 ), ExtResource( 23 ), ExtResource( 22 ) ],
+"loop": true,
+"name": "StandUp",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 101 ), ExtResource( 94 ), ExtResource( 105 ), ExtResource( 104 ), ExtResource( 113 ) ],
@@ -497,14 +497,14 @@ animations = [ {
 "name": "WalkStart",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 117 ), ExtResource( 134 ), ExtResource( 131 ), ExtResource( 121 ), ExtResource( 129 ), ExtResource( 116 ), ExtResource( 130 ), ExtResource( 120 ), ExtResource( 122 ), ExtResource( 126 ), ExtResource( 127 ), ExtResource( 119 ), ExtResource( 123 ), ExtResource( 133 ), ExtResource( 135 ), ExtResource( 128 ), ExtResource( 124 ), ExtResource( 125 ), ExtResource( 132 ) ],
-"loop": true,
-"name": "StandLunge",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 114 ), ExtResource( 115 ), ExtResource( 109 ), ExtResource( 95 ), ExtResource( 99 ), ExtResource( 110 ), ExtResource( 111 ), ExtResource( 90 ), ExtResource( 91 ), ExtResource( 92 ), ExtResource( 93 ), ExtResource( 118 ) ],
 "loop": true,
 "name": "StandUpper",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 117 ), ExtResource( 134 ), ExtResource( 131 ), ExtResource( 121 ), ExtResource( 129 ), ExtResource( 116 ), ExtResource( 130 ), ExtResource( 120 ), ExtResource( 122 ), ExtResource( 126 ), ExtResource( 127 ), ExtResource( 119 ), ExtResource( 123 ), ExtResource( 133 ), ExtResource( 135 ), ExtResource( 128 ), ExtResource( 124 ), ExtResource( 125 ), ExtResource( 132 ) ],
+"loop": true,
+"name": "StandLunge",
 "speed": 5.0
 } ]
 
@@ -620,7 +620,7 @@ position = Vector2( 0, -10 )
 rotation = -1.5708
 enabled = true
 cast_to = Vector2( 0, 15 )
-collision_mask = 2
+collision_mask = 3
 collide_with_areas = true
 
 [node name="Hurtbox" type="Area2D" parent="."]

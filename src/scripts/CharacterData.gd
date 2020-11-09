@@ -217,23 +217,24 @@ func evaluate_state_change(new_state, state_changed):
 	#TODO THIS IS WHERE THE PRIORITY SYSTEM WOULD GO
 	
 	if state_changed == "ANIMATION":
-		if new_state == ANIMATION_STATE.DASHING:
-			anim_state_ = ANIMATION_STATE.DASHING
-			move_state_ = MOVE_STATE.DASHING
-		
-		elif new_state == ANIMATION_STATE.BACKDASHING:
-			anim_state_ = ANIMATION_STATE.BACKDASHING
-			move_state_ = MOVE_STATE.BACKDASHING
+		if not anim_state_ == ANIMATION_STATE.TURNING:
+			if new_state == ANIMATION_STATE.DASHING:
+				anim_state_ = ANIMATION_STATE.DASHING
+				move_state_ = MOVE_STATE.DASHING
+			
+			elif new_state == ANIMATION_STATE.BACKDASHING:
+				anim_state_ = ANIMATION_STATE.BACKDASHING
+				move_state_ = MOVE_STATE.BACKDASHING
 
-		elif new_state == ANIMATION_STATE.PARRYING:
-			anim_state_ = ANIMATION_STATE.PARRYING
-		
-		elif new_state == ANIMATION_STATE.ATTACKING:
-			if process_attack():
-				anim_state_ = ANIMATION_STATE.ATTACKING
+			elif new_state == ANIMATION_STATE.PARRYING:
+				anim_state_ = ANIMATION_STATE.PARRYING
+			
+			elif new_state == ANIMATION_STATE.ATTACKING:
+				if process_attack():
+					anim_state_ = ANIMATION_STATE.ATTACKING
 
-		elif new_state == ANIMATION_STATE.GUARDING:
-			anim_state_ = ANIMATION_STATE.GUARDING
+			elif new_state == ANIMATION_STATE.GUARDING:
+				anim_state_ = ANIMATION_STATE.GUARDING
 
 
 	if anim_state_ == ANIMATION_STATE.IDLE:

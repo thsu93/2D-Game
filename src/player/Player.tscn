@@ -280,7 +280,7 @@ tracks/5/loop_wrap = true
 tracks/5/imported = false
 tracks/5/enabled = true
 tracks/5/keys = {
-"times": PoolRealArray( 0, 0.4 ),
+"times": PoolRealArray( 0.1, 0.4 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ false, true ]
@@ -292,10 +292,22 @@ tracks/6/loop_wrap = true
 tracks/6/imported = false
 tracks/6/enabled = true
 tracks/6/keys = {
-"times": PoolRealArray( 0, 0.4 ),
+"times": PoolRealArray( 0.1, 0.4 ),
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Sprite:frame")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
 }
 
 [sub_resource type="Animation" id=4]
@@ -374,19 +386,19 @@ tracks/5/keys = {
 }
 
 [sub_resource type="RectangleShape2D" id=5]
-extents = Vector2( 74.1374, 98.194 )
+extents = Vector2( 65.5655, 55.3936 )
 
 [sub_resource type="SpriteFrames" id=6]
 animations = [ {
-"frames": [  ],
-"loop": true,
-"name": "Default",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 57 ), ExtResource( 63 ), ExtResource( 81 ), ExtResource( 76 ), ExtResource( 77 ), ExtResource( 82 ), ExtResource( 78 ), ExtResource( 79 ), ExtResource( 80 ), ExtResource( 378 ) ],
 "loop": false,
 "name": "DashEffect",
 "speed": 10.0
+}, {
+"frames": [  ],
+"loop": true,
+"name": "Default",
+"speed": 5.0
 } ]
 
 [sub_resource type="RectangleShape2D" id=7]
@@ -400,6 +412,7 @@ height = 25.0
 extents = Vector2( 5.05406, 11.9686 )
 
 [node name="Player" type="KinematicBody2D"]
+pause_mode = 2
 collision_mask = 1025
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
@@ -441,7 +454,8 @@ script = ExtResource( 19 )
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "Overhead"
+animation = "StandParry"
+frame = 1
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -454,7 +468,7 @@ script = ExtResource( 22 )
 speed_scale = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -167.36, -60.4738 )
+position = Vector2( -181.032, -92.8011 )
 scale = Vector2( 1.13819, 1.02605 )
 shape = SubResource( 5 )
 disabled = true
