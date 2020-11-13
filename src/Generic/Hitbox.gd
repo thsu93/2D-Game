@@ -1,13 +1,14 @@
-extends Area2D
 class_name Hitbox
+extends GenericBox
+
 
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
 
-var actor_type = null
-onready var shape = $CollisionShape2D
 onready var hitspark = $Hitspark
+var actor = null
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -19,13 +20,12 @@ func get_class():
 #func _process(delta):
 #	pass
 
-#sets a pointer to the actor_type that controls this hitbox  
 func set_actor(_actor):
-	actor_type = _actor
+	actor = _actor
 
 #gets the attack data currently withhin the actor_type
 func get_attack_data():
-	return actor_type.char_data.cur_attack
+	return actor.char_data.cur_attack
 
 #Emit a hitspark sprite at a given global position
 #Will select from hitboxes associated with the attackdata

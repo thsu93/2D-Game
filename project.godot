@@ -27,7 +27,7 @@ _global_script_classes=[ {
 "base": "KinematicBody2D",
 "class": "Actor",
 "language": "GDScript",
-"path": "res://src/player/Actor.gd"
+"path": "res://src/Generic/Actor.gd"
 }, {
 "base": "Node",
 "class": "AttackData",
@@ -69,6 +69,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/enemy/EnemyNew.gd"
 }, {
+"base": "Area2D",
+"class": "GenericBox",
+"language": "GDScript",
+"path": "res://src/Generic/GenericBox.gd"
+}, {
 "base": "Node",
 "class": "Global",
 "language": "GDScript",
@@ -79,7 +84,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/Generic/Hitbox.gd"
 }, {
-"base": "Area2D",
+"base": "GenericBox",
 "class": "Hurtbox",
 "language": "GDScript",
 "path": "res://src/Generic/Hurtbox.gd"
@@ -122,6 +127,7 @@ _global_script_class_icons={
 "DialogueAction": "",
 "Enemy": "",
 "Enemy2": "",
+"GenericBox": "",
 "Global": "",
 "Hitbox": "",
 "Hurtbox": "",

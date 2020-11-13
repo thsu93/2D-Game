@@ -14,11 +14,11 @@ signal time_unslowed
 
 
 const WALK_ACCEL = 450.0
-const WALK_DECEL = 3500.0
+const WALK_DECEL = 700.0
 const WALK_VELOCITY = 125.0
 const MAX_VELOCITY = 200.0
 
-const JUMP_VELOCITY = 500
+const JUMP_VELOCITY = 450
 const STOP_JUMP_FORCE = 450.0
 
 
@@ -149,41 +149,31 @@ func _physics_process(delta):
 		#Obtain directional input buffers
 		check_buffer()
 
-		
 
+		#check dashing, attacking, and parrying
+		check_start_dash()
+		check_new_attack()
+		check_parry()
 
-		#check attacks and dashing
-		#THIS LIKELY SHOULD NOT BE HANDLED HERE
-		#SHOULD BE PROCESSED WITHIN STATE MACHINE
-		if not char_data.uncancellable:
+		# Update sidedness, give a bit of error room 
+		check_side()
 
-			check_start_dash()
-			check_new_attack()
-			check_parry(delta)
+		update_movements(delta)
 
-			if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
-				#if want to have moves that are non-effected by gravity may need to reconsider
-				#However, those can likely handle themselves in the animation player or add to attack data
-				if no_grav == true:
-					no_grav = false
-				if not attack_data.running_type:
-					decelerate(delta)
-			
-			#If not in special animation state
-			#TODO this is a bad way of handling this interaction. 
-			#You should do better later
-			if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-				
-				# Update sidedness, give a bit of error room 
-				check_side()
+		update_move_anim(delta)
 
-				update_movements(delta)
-
-				update_move_anim(delta)
-							
-			#TODO: Calculate move velocity allowing for:
-				#DASHING
-				#ATTACKING
+		#TODO: Calculate move velocity allowing for:
+			#DASHING
+			#ATTACKING
+		if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+			#if want to have moves that are non-effected by gravity may need to reconsider
+			#However, those can likely handle themselves in the animation player or add to attack data
+			if no_grav == true:
+				no_grav = false
+			if not attack_data.running_type:
+				decelerate(delta)
+		elif char_data.anim_state_ == char_data.ANIMATION_STATE.PARRYING or char_data.anim_state_  == char_data.ANIMATION_STATE.GUARDING:
+			decelerate(delta)
 
 		#If the player is being moved by external forces, use that function.
 		#Else, use the players movement
@@ -197,25 +187,26 @@ func _physics_process(delta):
 				_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
 				)
 
+					
+		
 	#endregion
 
 #If dash command is within the input buffer, initiate character dashing
 func check_start_dash():
-	if 1 in cmd_buffer:
-		#TODO: Decide what optimal controls are here re: backdashing
-		dash_count += 1
+	if not char_data.uncancellable:
+		if 1 in cmd_buffer:
+			#TODO: Decide what optimal controls are here re: backdashing
+			dash_count += 1
 
-		if dash_count <= DASH_MAX:
-			if (mvmt_buffer[-1]==4 and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1]==6 and char_data.horizontal_state_ == 1):
-				char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
-				_velocity.x = char_data.horizontal_state_ * MAX_VELOCITY
-			else:
-				char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
-				_velocity.x = -1 * char_data.horizontal_state_ * MAX_VELOCITY
-				#BUG if holding back while backdashing, char will backdash forever (trying to turn, then start backdash once again)
-				#Could be interesting mechanically, but currently nexplicably fast. 
+			if dash_count <= DASH_MAX:
+				if (mvmt_buffer[-1]==4 and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1]==6 and char_data.horizontal_state_ == 1):
+					char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
+					_velocity.x = char_data.horizontal_state_ * MAX_VELOCITY
+				else:
+					char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
+					_velocity.x = -1 * char_data.horizontal_state_ * MAX_VELOCITY
 
-		flush_buffer(false, true)
+			flush_buffer(false, true)
 
 
 #region MOVEMENT mvmt_buffer PROCESSSING
@@ -271,23 +262,20 @@ func check_run_buffered():
 			held_run = false
 
 func update_movements(delta):
-	if mvmt_buffer.size() > 1:
-		if mvmt_buffer[-1] == 4 or mvmt_buffer[-1] == 7:
-			if check_run([4,5,4]) or held_run:
-				_velocity.x = -MAX_VELOCITY
-			else:
-				_velocity.x = -WALK_VELOCITY
-			# if _velocity.x > -MAX_VELOCITY:
-			# 	_velocity.x -= WALK_ACCEL * delta
-			# else:
-			# 	_velocity.x += WALK_DECEL * 2 * delta
-		elif mvmt_buffer[-1] == 6 or mvmt_buffer[-1] == 9:
-			if check_run([6,5,6]) or held_run:
-				_velocity.x = MAX_VELOCITY
-			else:
-				_velocity.x = WALK_VELOCITY
-		elif mvmt_buffer[-1] == 5:
-			decelerate(delta)
+	if not char_data.uncancellable and char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+		if mvmt_buffer.size() > 1:
+			if mvmt_buffer[-1] == 4 or mvmt_buffer[-1] == 7:
+				if check_run([4,5,4]) or held_run:
+					_velocity.x = -MAX_VELOCITY
+				else:
+					_velocity.x = -WALK_VELOCITY
+			elif mvmt_buffer[-1] == 6 or mvmt_buffer[-1] == 9:
+				if check_run([6,5,6]) or held_run:
+					_velocity.x = MAX_VELOCITY
+				else:
+					_velocity.x = WALK_VELOCITY
+			elif mvmt_buffer[-1] == 5:
+				decelerate(delta)
 
 func decelerate(delta, mod = 1):
 	# if is_on_floor():
@@ -299,8 +287,9 @@ func decelerate(delta, mod = 1):
 
 	if abs(_velocity.x) > 0 and is_on_floor():
 		var decel = WALK_DECEL * delta * mod
-		var new_velocity = _velocity.x - decel if _velocity.x - decel > 0 else 0
-		_velocity.x = new_velocity
+		var new_velocity = abs(_velocity.x) - decel
+		var decel_velocity = char_data.horizontal_state_ * new_velocity if new_velocity > 0 else 0
+		_velocity.x = decel_velocity
 
 
 func check_run(sequence):
@@ -325,14 +314,15 @@ func check_run(sequence):
 
 #Evaluates which side the player is currently on, and turns the player when 
 func check_side():
-	var side_left = mvmt_buffer.size() > 0 and mvmt_buffer[-1]==4
-	var side_right = mvmt_buffer.size() > 0 and mvmt_buffer[-1]==6
+	var side_left = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [1,4,7]
+	var side_right = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [3,6,9]
 
-	if _velocity.x < 0.5 and side_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
-		char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
-	
-	if _velocity.x > -0.5 and side_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
-		char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
+	if char_data.anim_state_== char_data.ANIMATION_STATE.IDLE:
+		if _velocity.x < 0.5 and side_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
+			char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
+		
+		if _velocity.x > -0.5 and side_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
+			char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
 
 
 #clear buffers
@@ -369,8 +359,6 @@ func check_swap_move():
 		slow_time = SWAP_SLOW_TIME
 
 
-#BUG game will freak out when trying to turn and then trying to initiate any other animation
-#Likely the stem of all the other bugs noted below
 func get_command_inputs():
 	var dash = Input.is_action_just_pressed("dash")
 	var lclick = Input.is_action_just_pressed("lclick")
@@ -395,8 +383,6 @@ func get_command_inputs():
 #unclear how this happens, need to reproduce
 #Should find a way to incorporate this + dash into the move mvmt_buffer
 #TODO Better way to handle crouching vs standing vs dashing vs jumping etc.
-#BUG can get stuck moving during the start of the attack causing weird state
-#Probably due to RunStart? Unsure though
 func check_new_attack():
 	
 	var matching_move_state = false
@@ -404,52 +390,53 @@ func check_new_attack():
 	var rclick = 2 in cmd_buffer
 	var lclick = 3 in cmd_buffer
 
-	if lclick or rclick:
 
-		#Did the player click R or L
-		#R click is of a higher priority
-		char_data.select_attack(rclick)
+	if not char_data.uncancellable:
+		if lclick or rclick:
 
-		attack_data = char_data.get_move_data()
+			#Did the player click R or L
+			#R click is of a higher priority
+			char_data.select_attack(rclick)
 
-		#THIS SHOULD MOVE TO STATE MACHINE
+			attack_data = char_data.get_move_data()
 
-		#match player move state to check if can perform the move
-		match char_data.move_state_:
-			char_data.MOVE_STATE.CROUCHING: matching_move_state = attack_data.crouch_type
-			char_data.MOVE_STATE.JUMPING: matching_move_state = attack_data.air_type
-			char_data.MOVE_STATE.FALLING: matching_move_state = attack_data.air_type
-			#char_data.MOVE_STATE.DASHING: matching_move_state = attack_data.dashing_type
-			_: matching_move_state = true
+			#THIS SHOULD MOVE TO STATE MACHINE
 
-		if matching_move_state:
+			#match player move state to check if can perform the move
+			match char_data.move_state_:
+				char_data.MOVE_STATE.CROUCHING: matching_move_state = attack_data.crouch_type
+				char_data.MOVE_STATE.JUMPING: matching_move_state = attack_data.air_type
+				char_data.MOVE_STATE.FALLING: matching_move_state = attack_data.air_type
+				#char_data.MOVE_STATE.DASHING: matching_move_state = attack_data.dashing_type
+				_: matching_move_state = true
 
-			if airborne_time > .1:
+			if matching_move_state:
 
-				#HACK force into idle
-				char_data.anim_state_ = char_data.ANIMATION_STATE.IDLE
-				char_data.change_move_state(char_data.MOVE_STATE.FALLING)
+				if airborne_time > .1:
 
-			char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+					#HACK force into idle
+					char_data.anim_state_ = char_data.ANIMATION_STATE.IDLE
+					char_data.change_move_state(char_data.MOVE_STATE.FALLING)
 
-			# slow_time = 0
+				char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
 
-			if not attack_data.running_type and not (attack_data.dashing_type and char_data.move_state_ == char_data.MOVE_STATE.DASHING):
-				speed_reset()
+				# slow_time = 0
 
-		flush_buffer(false, true)
+				if not attack_data.running_type and not (attack_data.dashing_type and char_data.move_state_ == char_data.MOVE_STATE.DASHING):
+					speed_reset()
+
+			flush_buffer(false, true)
 
 
 #Checks to see if player has hit the parry button
 #Also then checks to see if 
-func check_parry(delta):
+func check_parry():
 	#TODO which states can you cancel into parry from
-	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE or char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
 		if 1 in mvmt_buffer or 2 in mvmt_buffer or 3 in mvmt_buffer:
 			char_data.change_anim_state(char_data.ANIMATION_STATE.PARRYING)
 			flush_buffer()
-	if char_data.anim_state_  == char_data.ANIMATION_STATE.PARRYING or char_data.anim_state_  == char_data.ANIMATION_STATE.GUARDING:
-		decelerate(delta, 2.5)
+		#TODO THIS DECELERATE FUNCTION IS BAD, IT DOES NOT ALWAYS RUN WHEN IT SHOULD BE DUE TO UNCANCELLABLE NOT CALLING TO THIS FUNCTION ANYMORE
 
 #Check to see if char is jumping/falling
 #Will change state if 
@@ -477,41 +464,42 @@ func check_falling(delta, jump):
 #based on character movement speed
 func update_move_anim(delta):
 
-	var jump = mvmt_buffer[-1] in [7,8,9]
-	#Process jump/fall	
-	#BUG will not register turn+landing after attack midair
-	if not is_on_floor():
-		check_falling(delta, jump)
+	if not char_data.uncancellable and char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
+		#Did the player push up at all
+		var jump = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [7,8,9]
 
-	if is_on_floor():
+		if not is_on_floor():
+			check_falling(delta, jump)
 
-		airborne_time = 0
-		dash_count = 0
+		if is_on_floor():
 
-		if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-			char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+			airborne_time = 0
+			dash_count = 0
 
-		if jump:
-			_velocity.y = -JUMP_VELOCITY if not _velocity.y < 0 else _velocity.y - JUMP_VELOCITY 
-			char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
-			stopping_jump = false
+			if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
 
-		# old movement update location
-		# update_movements(delta)
-		
-		#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
-			# if not jump:
-		#CORRECT FOR OVERSPEED
-		if abs(_velocity.x) > MAX_VELOCITY:
-			_velocity.x = sign(_velocity.x) * MAX_VELOCITY
-		#CHANGE ANIMATIONS TO MATCH SPEED
-		if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
-			char_data.change_move_state(char_data.MOVE_STATE.WALKING)
-		elif abs(_velocity.x) > WALK_VELOCITY and sign(_velocity.x) == char_data.horizontal_state_:
-			#CANNOT RUN WHILE MOVING BACKWARDS
-			char_data.change_move_state(char_data.MOVE_STATE.RUNNING)
-		elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-			char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+			if jump:
+				_velocity.y = -JUMP_VELOCITY if not _velocity.y < 0 else _velocity.y - JUMP_VELOCITY 
+				char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
+				stopping_jump = false
+
+			# old movement update location
+			# update_movements(delta)
+			
+			#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
+				# if not jump:
+			#CORRECT FOR OVERSPEED
+			if abs(_velocity.x) > MAX_VELOCITY:
+				_velocity.x = sign(_velocity.x) * MAX_VELOCITY
+			#CHANGE ANIMATIONS TO MATCH SPEED
+			if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
+				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
+			elif abs(_velocity.x) > WALK_VELOCITY and sign(_velocity.x) == char_data.horizontal_state_:
+				#CANNOT RUN WHILE MOVING BACKWARDS
+				char_data.change_move_state(char_data.MOVE_STATE.RUNNING)
+			elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
 
 #endregion
 
@@ -610,7 +598,7 @@ func _on_ParryBox_area_entered(area):
 		var temp_data = area.get_attack_data()
 		char_data.HP += temp_data.dmg
 
-		area.shape.disabled = true
+		area.disable()
 		print("PARRIED")
 
 		hitbox.emit_hitspark(area.global_position, char_data.horizontal_state_, "parry")
@@ -627,6 +615,7 @@ func _on_ParryBox_area_entered(area):
 
 #endregion
 
+#BUG this is trhowing errors "Can't Change While Flushign Queries"
 func reset_all_hitboxes():
 	hitbox.shape.disabled = true
 	hurtbox.enable()

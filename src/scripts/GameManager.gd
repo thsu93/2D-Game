@@ -70,9 +70,16 @@ func get_player_pos():
 func _on_Char_game_over():
 	get_tree().change_scene(title_scene)
 
+
+#set combo counter to a given number
+#TODO this math should be switched to be on player and not enemy side	
 func _on_Enemy_combo(num:int):
 	UI.set_combo_count(num)
 
+
+#placeholder for later
+func _on_Enemy_shake():
+	pass
 
 #TODO Frequency changed by attack data, or just duration/amp 
 func _on_Actor_screenshake(duration, amplitude):

@@ -207,6 +207,7 @@ func change_anim_state(new_state):
 
 #See if char is currently able to change state
 #Prioritizes Damage -> Animation -> Movement state changes.
+#TODO this has gotta be better somehow, it's a convoluted mess
 func evaluate_state_change(new_state, state_changed):
 	#HIGHEST PRIORITY
 	#Currently does not check this ever, as damage state changes always pass and thus never need to be evaluated

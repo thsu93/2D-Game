@@ -116,9 +116,9 @@ func run_ai(_delta):
 	if landed_hit:
 		if char_data.cur_attack.movename == "Jab": 
 			char_data.next_move()
-			char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+			attack()
 			timer = 0
-			hit_timer = 0
+			
 		
 		else: 
 			hit_timer = 0
@@ -129,9 +129,13 @@ func run_ai(_delta):
 	elif timer > ATTACK_TIMER and not char_data.anim_state_ == char_data.ANIMATION_STATE.DAMAGED:
 		if player_detector.is_colliding():
 			timer = 0
-			hit_timer = 0
-			char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+			attack()
+			
 
+func attack():
+	hitbox.enable()
+	hit_timer = 0
+	char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
 
 #TODO: Make the HP bars flip. Probably have them be in their own scene with own handler. 	
 
@@ -211,34 +215,34 @@ func _on_Hitspark_animation_finished():
 
 #What to do when the enemy hits the player	
 func _on_Hitbox_area_entered(area):
+	if hitbox.active:
+		if area.get_class() == "Hurtbox" and area.actor_type == "player":
 
-	if area.get_class() == "Hurtbox" and area.actor_type == "player":
+			var body = area.get_parent()
 
-		var body = area.get_parent()
+			# body.stunned = true
 
-		# body.stunned = true
+			#HITSTOP
+			OS.delay_msec(25)
 
-		#HITSTOP
-		OS.delay_msec(25)
+			# #HACK hitspark
+			# var hit_pos = get_collision_position(body)
+			# emit_hitspark(hit_pos)
 
-		# #HACK hitspark
-		# var hit_pos = get_collision_position(body)
-		# emit_hitspark(hit_pos)
+			attack_data = char_data.cur_attack
 
-		attack_data = char_data.cur_attack
+			screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
 
-		screenshake(attack_data.screenshake_duration, attack_data.screenshake_amp)
+			#HACK TEMPORARY KNOCKBACK CALC
+			attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
+			body.take_damage(attack_data.get_hit_var())
+			
 
-		#HACK TEMPORARY KNOCKBACK CALC
-		attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
-		body.take_damage(attack_data.get_hit_var())
-		
+			print("ENEMY HIT")
+			#TODO How to prevent double-hitting of moves
+			#Is this even necessary? It won't maintain hitting
+			#Should probably handle this differently, given the possibility of hitting through two enemies
+			#attack_hitbox.get_node("CollisionShape2D").disabled = true
 
-		print("ENEMY HIT")
-		#TODO How to prevent double-hitting of moves
-		#Is this even necessary? It won't maintain hitting
-		#Should probably handle this differently, given the possibility of hitting through two enemies
-		#attack_hitbox.get_node("CollisionShape2D").disabled = true
-
-		landed_hit = true
+			landed_hit = true
 

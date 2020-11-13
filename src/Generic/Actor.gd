@@ -69,6 +69,7 @@ func _ready():
 
 	char_data.set_name(actor_type)
 	hurtbox.set_actor_type(actor_type)
+	hitbox.set_actor_type(actor_type)
 	hitbox.set_actor(self)
 
 
@@ -131,8 +132,8 @@ func get_class():
 #Will reset attack hitbox to off 
 #Will reset hurtbox to on
 func reset_all_hitboxes():
-	hitbox.shape.disabled = true
-	hurtbox.shape.disabled = false
+	hitbox.disable()
+	hurtbox.enable()
 
 
 #Method to flip the actor and state machine immediately, without processing the turn animation
