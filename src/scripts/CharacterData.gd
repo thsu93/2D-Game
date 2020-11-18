@@ -21,11 +21,11 @@ enum ANIMATION_STATE{
 	RUN_START,
 	RUN_STOP,
 	TURNING,
-	GUARDING,
 	DODGING,
 	PARRYING,
 	ATTACKING,
 	DAMAGED,
+	GUARDING,
 	DISABLED, #TODO NECESSARY?
 	};
 
@@ -55,8 +55,72 @@ enum MOVE_STATE{
 	RUNNING,
 	DASHING,
 	BACKDASHING,
+	GUARDING,
 	TRANSITIONING,
 }
+
+
+enum CHAR_STATE{
+	WAITING_FOR_UPDATE, #Waiting for state input
+	STANDING,
+	WALKING,
+	RUNNING,
+	RUN_START,
+	RUN_STOP,
+	GUARDING,
+	FALLING,
+	TURNING,
+	DASHING,
+	BACKDASHING,
+	PARRYING,
+	ATTACKING,
+	JUMPING,
+	NORMAL_HIT,
+	STAGGERED_HIT,
+	COUNTERHIT,
+	DEAD,
+}
+
+enum AIR_STATE{
+	GROUNDED,
+	IN_AIR,
+}
+
+var state_animation_dictionary = {
+	CHAR_STATE.STANDING   	: "Idle",
+	CHAR_STATE.WALKING   	: "Walk",
+	CHAR_STATE.RUNNING  	: "Run",
+	CHAR_STATE.RUN_START  	: "RunStart",
+	CHAR_STATE.RUN_STOP  	: "RunStop",
+	CHAR_STATE.FALLING  	: "Fall",
+	CHAR_STATE.GUARDING  	: "Guard",
+	CHAR_STATE.TURNING  	: "Turn",
+	CHAR_STATE.DASHING  	: "Dash",
+	CHAR_STATE.BACKDASHING  : "Backdash",
+	CHAR_STATE.ATTACKING  	: "",
+	CHAR_STATE.PARRYING  	: "Parry",
+	CHAR_STATE.JUMPING  	: "Jump",
+	CHAR_STATE.NORMAL_HIT  	: "Damage",
+	CHAR_STATE.STAGGERED_HIT: "Stagger",
+	CHAR_STATE.COUNTERHIT  	: "Stagger",
+	CHAR_STATE.DEAD  		: "Death",
+}
+
+
+var anim_name_dictionary = {
+	ANIMATION_STATE.DASHING : "Dash",
+	ANIMATION_STATE.BACKDASHING : "Backdash",
+	ANIMATION_STATE.PARRYING : "Parry",
+	ANIMATION_STATE.TURNING : "Turn", 
+	ANIMATION_STATE.RUN_START : "RunStart",
+	ANIMATION_STATE.RUN_STOP : "RunStop",
+}
+
+var waiting_for_animation_completion = false
+
+var cur_state = CHAR_STATE.STANDING
+
+var air_state = AIR_STATE.GROUNDED
 
 var char_name = ""
 
@@ -75,7 +139,7 @@ var cur_attack = null
 
 #ANIMATIONS CONTAINED WITHIN CHAR
 var sprite_library
-var animation_player_library
+var animation_player_library 
 var current_animation = "StandIdle"
 
 #CHARACTER HP DATA
@@ -86,7 +150,6 @@ export(int) var max_HP = 5
 #TODO revisit how the cancelable attacks work
 export(bool) var uncancellable = false
 
-
 func _ready():
 	HP = max_HP
 	uncancellable = false
@@ -96,20 +159,6 @@ func set_name(name):
 
 func take_damage(hit_var):
 	if not damage_state_ == DAMAGE_STATE.INVULN:
-		# match (anim_state_):
-		# 	ANIMATION_STATE.DASHING:
-		# 		pass
-		# 	ANIMATION_STATE.ATTACKING:
-		# 		HP -= dmg	#Should some sort of multiplier?
-		# 		damage_state_ = DAMAGE_STATE.COUNTERHIT
-		# 		emit_signal("damage_state_change", damage_state_)
-		# 		#multiplied damage
-		# 	#STATE.GUARDING:
-		# 		#reduced damage
-		# 	_:
-		# 		HP -= dmg
-		# 		damage_state_ = DAMAGE_STATE.HIT
-		# 		emit_signal("damage_state_change", damage_state_)
 		
 		HP -= hit_var["dmg"]
 		
@@ -152,6 +201,7 @@ func toggle_invuln():
 #region Attack Processing
 
 #Handles Character Attacking effects. 
+#Currently does not do anything
 func process_attack():
 	return true
 	pass
@@ -161,12 +211,310 @@ func process_attack():
 
 #region Change States
 
+func change_state(_new_state):
+	var can_change = false
+	if _new_state == cur_state and not cur_state == CHAR_STATE.ATTACKING:
+		pass
+	elif cur_state == CHAR_STATE.WAITING_FOR_UPDATE:
+		can_change = true
+	else:
+		match _new_state:
+			CHAR_STATE.STANDING   	: can_change = change_to_standing()
+			CHAR_STATE.WALKING   	: can_change = change_to_walking()
+			CHAR_STATE.RUNNING  	: can_change = change_to_running()
+			CHAR_STATE.RUN_START  	: can_change = change_to_run_start()
+			CHAR_STATE.RUN_STOP  	: can_change = change_to_run_stop()
+			CHAR_STATE.FALLING  	: can_change = change_to_falling()
+			CHAR_STATE.GUARDING  	: can_change = change_to_guarding()
+			CHAR_STATE.TURNING  	: can_change = change_to_turning()
+			CHAR_STATE.DASHING  	: can_change = change_to_dashing()
+			CHAR_STATE.BACKDASHING  : can_change = change_to_backdashing()
+			CHAR_STATE.ATTACKING  	: can_change = change_to_attacking()
+			CHAR_STATE.PARRYING  	: can_change = change_to_parrying()
+			CHAR_STATE.JUMPING  	: can_change = change_to_jumping()
+			CHAR_STATE.NORMAL_HIT  	: can_change = change_to_normal_hit()
+			CHAR_STATE.STAGGERED_HIT: can_change = change_to_staggered_hit()
+			CHAR_STATE.COUNTERHIT  	: can_change = change_to_counterhit()
+			CHAR_STATE.DEAD  		: can_change = change_to_dead()
+	if can_change:
+		cur_state = _new_state
+		change_animation()
+
+#region specific change to state checks
+
+#Can state change to CHAR_STATE.STANDING
+#Currently: Always can when on ground, except if dead or run_start
+func change_to_standing():
+	if air_state == AIR_STATE.IN_AIR:
+		return false
+	elif cur_state == CHAR_STATE.DEAD:
+		return false
+	elif cur_state == CHAR_STATE.RUN_START:
+		return false
+	elif cur_state == CHAR_STATE.RUNNING:
+		return false
+	else:
+		if not waiting_for_animation_completion:
+			return true
+		else:
+			return false
+
+#Can state change to CHAR_STATE.WALKING   
+#Currently: Can only transition from standing or RunStop while grounded
+func change_to_walking():
+	if waiting_for_animation_completion:
+		return false
+	elif air_state == AIR_STATE.IN_AIR:
+		return false
+	elif cur_state == CHAR_STATE.STANDING:
+		return true
+	elif cur_state == CHAR_STATE.RUN_STOP:
+		return true
+	elif cur_state == CHAR_STATE.FALLING:
+		return true
+	elif cur_state == CHAR_STATE.JUMPING:
+		if not waiting_for_animation_completion: #If not in initial frames of the jump
+			return true
+		return false
+	else:
+		return false
+
+	
+#Can state change to CHAR_STATE.RUNNING  	
+#Currently: Can only do so from RunStart or Dashing
+func change_to_running():
+	if air_state == AIR_STATE.IN_AIR:
+		return false	
+	elif cur_state == CHAR_STATE.RUN_START:
+		if not waiting_for_animation_completion:
+			return true
+	elif cur_state == CHAR_STATE.DASHING:
+		return true
+	elif cur_state == CHAR_STATE.FALLING:
+		return true
+	elif cur_state == CHAR_STATE.JUMPING:
+		if not waiting_for_animation_completion: #If not in initial frames of the jump
+			return true
+		return false
+	else:
+		change_state(CHAR_STATE.RUN_START)
+		return false
+
+#Can state change to CHAR_STATE.JUMPING  	
+#Currently: can do so from any lower priority state
+func change_to_jumping():
+
+	if cur_state < CHAR_STATE.JUMPING and not uncancellable:
+		waiting_for_animation_completion = true
+		return true
+		
+	else:
+		return false
+
+#Can state change to CHAR_STATE.FALLING  	
+#Currently: can do so from any lower priority state
+func change_to_falling():
+	if air_state == AIR_STATE.GROUNDED:
+		return false
+	elif cur_state == CHAR_STATE.JUMPING:
+		waiting_for_animation_completion = false
+		return true
+	elif waiting_for_animation_completion:
+		return false
+	elif cur_state < CHAR_STATE.FALLING:
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.GUARDING  	
+#Currently: can do so from any lower priority state
+#TODO can you guard in the air?
+func change_to_guarding():
+	if cur_state < CHAR_STATE.GUARDING:
+		return true
+	else:
+		return false
+
+
+#Can state change to CHAR_STATE.RUN_START  	
+#Currently: can do so from walking or running
+func change_to_run_start():
+	if air_state == AIR_STATE.IN_AIR:
+		return false 
+
+	elif cur_state == CHAR_STATE.WALKING:
+		waiting_for_animation_completion = true
+		return true
+
+	elif cur_state == CHAR_STATE.STANDING:
+		waiting_for_animation_completion = true
+		return true
+
+	else:
+		return false
+
+#Can state change to CHAR_STATE.RUN_STOP  	
+#Currently: can only do so from running
+func change_to_run_stop():
+	if air_state == AIR_STATE.IN_AIR:
+		return false 
+	elif cur_state == CHAR_STATE.RUNNING:
+		waiting_for_animation_completion = true
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.TURNING  	
+#Currently: can do so from walking or standing
+#BUG: GIVES STANDING TURN WHEN JUMPING BUT NOT FALLING. DOES KNOW IT IS IN AIR. 
+func change_to_turning():
+	if cur_state == CHAR_STATE.JUMPING:
+		waiting_for_animation_completion = true
+		return true
+	elif cur_state == CHAR_STATE.FALLING:
+		waiting_for_animation_completion = true
+		return true
+		
+	elif cur_state < CHAR_STATE.TURNING:
+		waiting_for_animation_completion = true
+		return true
+	
+	else:
+		return false
+
+#Can state change to CHAR_STATE.DASHING  	
+#Currently: can do so from any lower-priority state, or attacking
+func change_to_dashing():
+	if cur_state < CHAR_STATE.DASHING:
+		return true
+	elif cur_state == CHAR_STATE.ATTACKING:
+		return true
+	elif cur_state == CHAR_STATE.FALLING:
+		return true
+	elif cur_state == CHAR_STATE.JUMPING:
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.BACKDASHING  
+#Currently: can do so from guarding
+#TODO Make this actually work
+func change_to_backdashing():
+	# if cur_state == CHAR_STATE.GUARDING:
+	# 	return true
+	# else:
+	# 	return false
+	return true
+
+#Can state change to CHAR_STATE.ATTACKING  	
+#Currently: can do so from any lower-priority state
+func change_to_attacking():
+	if cur_state < CHAR_STATE.ATTACKING:
+		waiting_for_animation_completion = true
+		return true
+	elif cur_state == CHAR_STATE.ATTACKING:
+		waiting_for_animation_completion = true
+		return true
+	elif cur_state == CHAR_STATE.JUMPING:
+		waiting_for_animation_completion = true
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.PARRYING  	
+#Currently: can do so from any lower-priority state
+func change_to_parrying():
+	if cur_state < CHAR_STATE.PARRYING:
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.NORMAL_HIT  	
+#Currently: can do so from any lower-priority state
+func change_to_normal_hit():
+	if cur_state < CHAR_STATE.NORMAL_HIT:
+		return true
+	else:
+		return false
+
+
+#Can state change to CHAR_STATE.STAGGERED_HIT	
+#Currently: can do so from any lower-priority state
+func change_to_staggered_hit():
+	if cur_state < CHAR_STATE.STAGGERED_HIT:
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.COUNTERHIT  	
+#Currently: can do so from any lower-priority state
+func change_to_counterhit():
+	if cur_state < CHAR_STATE.COUNTERHIT:
+		return true
+	else:
+		return false
+
+#Can state change to CHAR_STATE.DEAD  		
+#Currently: can do so from any lower-priority state
+func change_to_dead():
+	if cur_state < CHAR_STATE.DEAD:
+		return true
+	else:
+		return false
+
+#end region 
+
 #given a new horizontal state, attempt to change to that new state
 #if is not current direction, flip the character
+#No longer called from char directly, just called after 
 func change_horiz_state(dir):
 	#if trying to turn to the direction already facing
 	if not dir == horizontal_state_:
 		evaluate_state_change(dir, "HORIZONTAL")
+
+#Is the character in the air or not
+#is changed directly from Actor based on is_on_floor()
+func change_air_state(new_state):
+	if air_state != new_state:
+		air_state = new_state
+		if new_state == AIR_STATE.GROUNDED:
+			waiting_for_animation_completion = false
+			uncancellable = false
+
+			#TODO decide if thiis is how it should work
+
+			change_state(CHAR_STATE.STANDING)
+
+#endregion
+
+#
+func change_animation():
+	var new_animation = current_animation
+
+	if cur_state == CHAR_STATE.WAITING_FOR_UPDATE:
+		return
+	elif cur_state == CHAR_STATE.ATTACKING:
+		new_animation = cur_attack.movename
+	else:
+		new_animation = state_animation_dictionary[cur_state]
+	
+	var air_prefix = "Stand" if air_state == AIR_STATE.GROUNDED else "Jump"
+		#BUG ALL ATTACKS OUT OF DASH ARE REGISTERED AS 
+
+	if air_prefix + new_animation in animation_player_library:
+		new_animation = air_prefix + new_animation
+
+	if new_animation in animation_player_library:
+		current_animation = new_animation
+
+	else:
+		if char_name == "player":
+			print(char_name  + " could not find "+ new_animation)
+
+	emit_signal("play_animation", current_animation)
+
+
+#endregion
 
 #given a new movement state, attempt to change to that new state
 #if new state is the same as current state, simply refreshes the animation
@@ -179,26 +527,19 @@ func change_move_state(new_state):
 #given a new damage state, attempt to change to that new state 
 #currently does nothing at all, never called.
 func change_damage_state(new_state):
-	damage_state_ = new_state
+	if damage_state_ == DAMAGE_STATE.IDLE:
+		damage_state_ = new_state
 	pass
 
 
 #given a new animation state, attempt to change to that new state
 #Currently only checks against Dash/Backdash/Attack/Idle
 func change_anim_state(new_state):
-	if new_state == ANIMATION_STATE.DASHING:
-		evaluate_state_change(ANIMATION_STATE.DASHING, "ANIMATION")
-	if new_state == ANIMATION_STATE.BACKDASHING:
-		evaluate_state_change(ANIMATION_STATE.BACKDASHING, "ANIMATION")
-	if new_state == ANIMATION_STATE.ATTACKING:
-		evaluate_state_change(ANIMATION_STATE.ATTACKING, "ANIMATION")
-	if new_state == ANIMATION_STATE.PARRYING:
-		evaluate_state_change(ANIMATION_STATE.PARRYING, "ANIMATION")
-	if new_state == ANIMATION_STATE.GUARDING:
-		evaluate_state_change(ANIMATION_STATE.GUARDING, "ANIMATION")
+		
 	if new_state == ANIMATION_STATE.IDLE:
 		anim_state_ = ANIMATION_STATE.IDLE
-	
+	else:
+		evaluate_state_change(new_state, "ANIMATION")
 	pass
 
 #endregion
@@ -214,9 +555,11 @@ func evaluate_state_change(new_state, state_changed):
 	if state_changed == "DAMAGE":
 		pass
 		#Should probably change animation state to idle to indicate deferring
+
+
 	#If not currently animating
 	#TODO THIS IS WHERE THE PRIORITY SYSTEM WOULD GO
-	
+	#This is a mess
 	if state_changed == "ANIMATION":
 		if not anim_state_ == ANIMATION_STATE.TURNING:
 			if new_state == ANIMATION_STATE.DASHING:
@@ -301,39 +644,39 @@ func update_current_animation(new_anim = null):
 		new_anim = current_animation
 
 	if not damage_state_ == DAMAGE_STATE.IDLE:
-		
+		if damage_state_ == DAMAGE_STATE.GUARDING:
+			new_anim = "Guard"
 		#DAMAGE ANIMATIONS HANDLED WITHIN TAKE_DAMAGE
 
 		pass #deal with 
 
+	if anim_name_dictionary.has(anim_state_ ):
+		new_anim = anim_name_dictionary[anim_state_]
 	
-	elif anim_state_ == ANIMATION_STATE.DASHING:
-		# if move_state_ == MOVE_STATE.JUMPING or move_state_ == MOVE_STATE.FALLING:
-		# 	new_anim ="JumpDash"
-		# else:
-		# 	new_anim = "Dash"
-		new_anim = "Dash"
-	elif anim_state_ == ANIMATION_STATE.BACKDASHING:
-		new_anim = "Backdash"
+	# elif anim_state_ == ANIMATION_STATE.DASHING:
+	# 	# if move_state_ == MOVE_STATE.JUMPING or move_state_ == MOVE_STATE.FALLING:
+	# 	# 	new_anim ="JumpDash"
+	# 	# else:
+	# 	# 	new_anim = "Dash"
+	# 	new_anim = "Dash"
+	# elif anim_state_ == ANIMATION_STATE.BACKDASHING:
+	# 	new_anim = "Backdash"
 	
-	elif anim_state_ == ANIMATION_STATE.ATTACKING:
-		new_anim = cur_attack.movename
+	# elif anim_state_ == ANIMATION_STATE.PARRYING:
+	# 	new_anim = "Parry"
 
-	elif anim_state_ == ANIMATION_STATE.PARRYING:
-		new_anim = "Parry"
+	# elif anim_state_ == ANIMATION_STATE.TURNING:
+	# 	new_anim = "Turn"
 
-	elif anim_state_ == ANIMATION_STATE.TURNING:
-		new_anim = "Turn"
-
-	#Transitional Animations
-	elif anim_state_ == ANIMATION_STATE.CROUCH_DOWN:
-		new_anim = "CrouchDown"
-	elif anim_state_ == ANIMATION_STATE.STAND_UP:
-		new_anim = "StandUp"
-	elif anim_state_ == ANIMATION_STATE.RUN_START:
-		new_anim = "RunStart"
-	elif anim_state_ == ANIMATION_STATE.RUN_STOP:
-		new_anim = "RunStop"
+	# #Transitional Animations
+	# elif anim_state_ == ANIMATION_STATE.CROUCH_DOWN:
+	# 	new_anim = "CrouchDown"
+	# elif anim_state_ == ANIMATION_STATE.STAND_UP:
+	# 	new_anim = "StandUp"
+	# elif anim_state_ == ANIMATION_STATE.RUN_START:
+	# 	new_anim = "RunStart"
+	# elif anim_state_ == ANIMATION_STATE.RUN_STOP:
+	# 	new_anim = "RunStop"
 
 	
 	elif anim_state_ == ANIMATION_STATE.ATTACKING:
@@ -341,9 +684,6 @@ func update_current_animation(new_anim = null):
 		pass
 		#no attacking animations current
 		#should probably defer this call to a more complex function given possible variants
-	elif anim_state_ == ANIMATION_STATE.GUARDING:
-		new_anim = "Guard"
-		pass
 		#no attacking animations current
 		#have jumping/crouching/standing variants to consider as well 
 	elif anim_state_ == ANIMATION_STATE.DODGING:
@@ -355,9 +695,10 @@ func update_current_animation(new_anim = null):
 		match move_state_:
 			MOVE_STATE.CROUCHING: new_anim = "CrouchIdle"
 			MOVE_STATE.JUMPING: new_anim = "Jump" 
-			MOVE_STATE.FALLING: new_anim = "Falling"
+			MOVE_STATE.FALLING: new_anim = "Fall"
 			MOVE_STATE.RUNNING: new_anim = "Run"
 			MOVE_STATE.WALKING: new_anim = "Walk"
+			MOVE_STATE.GUARDING: new_anim = "Guard"
 			_: new_anim = "StandIdle"
 		pass
 
@@ -415,6 +756,8 @@ func match_vert_state(new_anim):
 #Then call to update state depending on which state was changed 
 func animation_completed():
 	
+	waiting_for_animation_completion = false
+
 	#Variable to track if the move state should change given the animation
 	var move_state_change = false
 
@@ -424,8 +767,9 @@ func animation_completed():
 
 	#if in the turning state, change horizontal state
 	if anim_state_ == ANIMATION_STATE.TURNING:
-		horizontal_state_ *= -1 #FLIP SIDE
-		emit_signal("turn_sprite")
+		if char_name != "player":
+			horizontal_state_ *= -1 #FLIP SIDE
+			emit_signal("turn_sprite")
 
 	#Check if the animation_state was a transitional animation
 	else:
@@ -442,9 +786,46 @@ func animation_completed():
 
 	anim_state_ = ANIMATION_STATE.IDLE
 
-	
 	if move_state_change:
 		change_move_state(move_state_)
 	else: 
 		evaluate_state_change(anim_state_, "ANIMATION")
+
+
+	if cur_state == CHAR_STATE.RUN_START:
+		change_state(CHAR_STATE.RUNNING)
+
+	elif cur_state == CHAR_STATE.RUN_STOP:
+		change_state(CHAR_STATE.STANDING)
+
+	elif cur_state == CHAR_STATE.GUARDING:
+		pass
+	
+	elif cur_state == CHAR_STATE.RUNNING:
+		pass	
+
+	elif cur_state == CHAR_STATE.WALKING:
+		pass
+	
+	elif cur_state == CHAR_STATE.JUMPING:
+		pass
+
+	elif cur_state == CHAR_STATE.FALLING:
+		pass
+
+	#One-shot animations
+	else:
+		if cur_state == CHAR_STATE.TURNING:
+			horizontal_state_*=-1
+			emit_signal("turn_sprite")
+
+		cur_state = CHAR_STATE.WAITING_FOR_UPDATE
+		# if air_state == AIR_STATE.IN_AIR:
+		# 	change_state(CHAR_STATE.FALLING)
+		# else:
+		# 	#TODO double setting state, find why
+		# 	change_state(CHAR_STATE.STANDING)
+
+	change_animation()
+
 #endregion

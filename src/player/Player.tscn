@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=2]
+[gd_scene load_steps=54 format=2]
 
 [ext_resource path="res://src/player/Player.tres" type="SpriteFrames" id=1]
 [ext_resource path="res://src/player/CharAnim/Combo (Heavy).tres" type="Animation" id=2]
@@ -136,6 +136,129 @@ tracks/7/keys = {
 "values": [ Color( 1, 1, 1, 1 ), Color( 0.901961, 0.0784314, 0.0784314, 1 ), Color( 0.901961, 0.0784314, 0.0784314, 1 ) ]
 }
 
+[sub_resource type="Animation" id=16]
+resource_name = "Fall"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "Fall" ]
+}
+
+[sub_resource type="Animation" id=15]
+resource_name = "Guard"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandGuard" ]
+}
+
+[sub_resource type="Animation" id=17]
+resource_name = "Jump"
+length = 0.7
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "Jump" ]
+}
+
+[sub_resource type="Animation" id=19]
+resource_name = "JumpTurn"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "JumpTurn" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("CharacterData:uncancellable")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=11]
+resource_name = "Run"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "Run" ]
+}
+
+[sub_resource type="Animation" id=12]
+resource_name = "RunStart"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "RunStart" ]
+}
+
+[sub_resource type="Animation" id=13]
+resource_name = "RunStop"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "RunStop" ]
+}
+
 [sub_resource type="Animation" id=2]
 length = 0.5
 tracks/0/type = "value"
@@ -209,6 +332,21 @@ tracks/5/keys = {
 "transitions": PoolRealArray( 1, 1 ),
 "update": 1,
 "values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=18]
+resource_name = "StandIdle"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandIdle" ]
 }
 
 [sub_resource type="Animation" id=3]
@@ -385,8 +523,63 @@ tracks/5/keys = {
 "values": [ true, false ]
 }
 
+[sub_resource type="Animation" id=14]
+resource_name = "StandTurn"
+length = 0.15
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandTurn" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("CharacterData:uncancellable")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Sprite:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[sub_resource type="Animation" id=10]
+resource_name = "Walk"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "Walk" ]
+}
+
 [sub_resource type="RectangleShape2D" id=5]
-extents = Vector2( 42.004, 73.6012 )
+extents = Vector2( 124.667, 88.6472 )
 
 [sub_resource type="SpriteFrames" id=6]
 animations = [ {
@@ -413,6 +606,7 @@ extents = Vector2( 5.05406, 11.9686 )
 
 [node name="Player" type="KinematicBody2D"]
 pause_mode = 2
+position = Vector2( 0, -0.25 )
 collision_mask = 1025
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
@@ -430,17 +624,27 @@ anims/CrouchJab = ExtResource( 16 )
 anims/Dash = ExtResource( 17 )
 anims/DashHook = ExtResource( 9 )
 anims/Death = SubResource( 1 )
+anims/Fall = SubResource( 16 )
+anims/Guard = SubResource( 15 )
+anims/Jump = SubResource( 17 )
 anims/JumpDash = ExtResource( 11 )
 anims/JumpHook = ExtResource( 12 )
 anims/JumpJab = ExtResource( 10 )
+anims/JumpTurn = SubResource( 19 )
 anims/Overhead = ExtResource( 8 )
+anims/Run = SubResource( 11 )
+anims/RunStart = SubResource( 12 )
+anims/RunStop = SubResource( 13 )
 anims/Shoryuken = ExtResource( 7 )
 anims/StandDamage = SubResource( 2 )
 anims/StandHook = ExtResource( 6 )
+anims/StandIdle = SubResource( 18 )
 anims/StandJab = ExtResource( 5 )
 anims/StandParry = SubResource( 3 )
 anims/StandStagger = SubResource( 4 )
+anims/StandTurn = SubResource( 14 )
 anims/StandUp = ExtResource( 4 )
+anims/Walk = SubResource( 10 )
 
 [node name="Camera" type="Camera2D" parent="."]
 offset = Vector2( 0, -20 )
@@ -454,7 +658,7 @@ script = ExtResource( 19 )
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "Combo (Light)"
+animation = "StandTurn"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -467,7 +671,7 @@ script = ExtResource( 22 )
 speed_scale = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -140.332, -44.6038 )
+position = Vector2( -138.388, -95.4487 )
 scale = Vector2( 1.13819, 1.02605 )
 shape = SubResource( 5 )
 disabled = true
@@ -494,7 +698,7 @@ max_HP = 100
 uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
-position = Vector2( -0.361423, -8.08499 )
+position = Vector2( 0.132431, -8.13243 )
 enabled = true
 cast_to = Vector2( 0, 8 )
 
@@ -503,10 +707,10 @@ position = Vector2( 0, -16 )
 shape = SubResource( 8 )
 
 [node name="Hurtbox" type="Area2D" parent="."]
+position = Vector2( -0.471924, -0.471939 )
 collision_layer = 2
 collision_mask = 16
 script = ExtResource( 21 )
-actor_type = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 position = Vector2( -7.60139, -27.9307 )

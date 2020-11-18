@@ -10,7 +10,6 @@ signal shake
 
 
 onready var HP_Bar = $HP_Bar
-onready var platform_detector = $PlatformDetector
 onready var floor_detector_left = $FloorDetectorLeft
 onready var floor_detector_right = $FloorDetectorRight
 onready var player_detector = $PlayerDetector

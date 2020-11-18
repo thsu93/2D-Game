@@ -14,6 +14,8 @@ extends KinematicBody2D
 #sent to the gamemanager, which is then sent to the camera
 signal screenshake(amplitude, duration)
 
+const DEFAULT_ANIM_PLAYER_SPEED = 1.5
+
 #REQUIRED NODES:
 
 onready var char_data = $CharacterData
@@ -21,6 +23,7 @@ onready var sprite = $Sprite
 onready var animation_player = $AnimationPlayer
 onready var hurtbox = $Hurtbox
 onready var hitbox = $Sprite/Hitbox
+onready var platform_detector = $PlatformDetector
 
 #Base actor type
 #Currently include "actor", "player", "enemy"
@@ -85,6 +88,7 @@ func _ready():
 	invuln_timer.connect("timeout", self, "on_invuln_end")
 	add_child(invuln_timer)
 
+	animation_player.playback_speed = DEFAULT_ANIM_PLAYER_SPEED
 
 # _physics_process is called after the inherited _physics_process function.
 # This allows the Player and Enemy scenes to be affected by gravity.
@@ -110,8 +114,12 @@ func _physics_process(delta):
 
 	#Make sure any jumping move animations are cancelled upon landing
 	if is_on_floor():
-		if current_animation.begins_with("Jump"):
-			char_data.change_anim_state(char_data.ANIMATION_STATE.IDLE)
+		char_data.change_air_state(char_data.AIR_STATE.GROUNDED)
+	else:
+		if not (char_data.cur_state == char_data.CHAR_STATE.DASHING or 
+			char_data.cur_state == char_data.CHAR_STATE.BACKDASHING or
+			char_data.cur_state == char_data.CHAR_STATE.ATTACKING): #TODO revisit this last one, if neeed be for getting hit out of air
+			char_data.change_air_state(char_data.AIR_STATE.IN_AIR)
 
 #Getters for GameManager
 
@@ -201,29 +209,38 @@ func _on_CharacterData_new_sprite_animation(new_anim):
 	play_new_sprite()
 
 func _on_CharacterData_play_animation(new_anim):
-	current_animation = new_anim		
+	reset_all_hitboxes()
+	current_animation = new_anim
 	animation_player.stop(true)
 	animation_player.play(current_animation)
 
 
-#TODO THIS MAY CAUSE A POTENTIAL PROBLEM IF ANIMATIONS AND SPRITES DON'T LINE UP
+#THIS MAY CAUSE A POTENTIAL PROBLEM IF ANIMATIONS AND SPRITES DON'T LINE UP
+#TODO REMOVE ALL SPRITE-SIDE ANIMATIONS
 func _on_Sprite_animation_finished():
 	if not current_animation in animation_player.get_animation_list():
 		char_data.animation_completed()
 		
-#Does this double up with the sprite animation finish?
+#Overloaded to clear any external_movement_data
 func _on_AnimationPlayer_animation_finished(_anim_name):
+	external_movement_data = Vector2()
+	remaining_animation_time = 0
+	no_grav = false
 	char_data.uncancellable = false
+	
+	animation_player.playback_speed = DEFAULT_ANIM_PLAYER_SPEED
+
 	char_data.animation_completed()
+
 #endregion
 
-
+#Force turning of sprite without going through turn animation
 func _on_CharacterData_turn_sprite():
 	self.scale.x *= -1
 
 #On character death
 func _on_CharacterData_dead():
-	print("dead")
+	print(actor_type, " is dead")
 	destroy()
 
 #destroy body
@@ -240,6 +257,3 @@ func destroy():
 #TODO Should this contain modifiers for frequency as well?
 func screenshake(duration, amplitude):
 	emit_signal("screenshake", duration, amplitude)
-
-
-	

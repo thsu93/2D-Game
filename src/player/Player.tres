@@ -1,11 +1,10 @@
-[gd_resource type="SpriteFrames" load_steps=371 format=2]
+[gd_resource type="SpriteFrames" load_steps=369 format=2]
 
 [ext_resource path="res://assets/Akihiko/ak032_01.png" type="Texture" id=1]
 [ext_resource path="res://assets/Akihiko/ak030_04.png" type="Texture" id=2]
 [ext_resource path="res://assets/Akihiko/ak033_04.png" type="Texture" id=3]
 [ext_resource path="res://assets/Akihiko/ak030_06.png" type="Texture" id=4]
 [ext_resource path="res://assets/Akihiko/ak032_10.png" type="Texture" id=5]
-[ext_resource path="res://assets/Akihiko/ak040_01.png" type="Texture" id=6]
 [ext_resource path="res://assets/Akihiko/ak020_08.png" type="Texture" id=7]
 [ext_resource path="res://assets/Akihiko/ak035_01.png" type="Texture" id=8]
 [ext_resource path="res://assets/Akihiko/ak031_03.png" type="Texture" id=9]
@@ -41,7 +40,6 @@
 [ext_resource path="res://assets/Akihiko/ak032_03.png" type="Texture" id=39]
 [ext_resource path="res://assets/Akihiko/ak045_01.png" type="Texture" id=40]
 [ext_resource path="res://assets/Akihiko/ak031_08.png" type="Texture" id=41]
-[ext_resource path="res://assets/Akihiko/ak040_00.png" type="Texture" id=42]
 [ext_resource path="res://assets/Akihiko/ak043_05.png" type="Texture" id=43]
 [ext_resource path="res://assets/Akihiko/ak040_02.png" type="Texture" id=44]
 [ext_resource path="res://assets/Akihiko/ak025_02.png" type="Texture" id=45]
@@ -563,7 +561,7 @@ animations = [ {
 "name": "DashUppercut",
 "speed": 5.0
 }, {
-"frames": [ ExtResource( 42 ), ExtResource( 6 ), ExtResource( 44 ), ExtResource( 32 ), ExtResource( 33 ), ExtResource( 18 ) ],
+"frames": [ ExtResource( 44 ), ExtResource( 32 ), ExtResource( 33 ), ExtResource( 18 ) ],
 "loop": true,
 "name": "StandGuard",
 "speed": 5.0
@@ -571,11 +569,6 @@ animations = [ {
 "frames": [ ExtResource( 83 ), ExtResource( 69 ), ExtResource( 111 ), ExtResource( 186 ), ExtResource( 135 ), ExtResource( 183 ), ExtResource( 104 ), ExtResource( 78 ), ExtResource( 188 ), ExtResource( 162 ), ExtResource( 161 ), ExtResource( 114 ) ],
 "loop": true,
 "name": "DashHook",
-"speed": 5.0
-}, {
-"frames": [ ExtResource( 29 ), ExtResource( 7 ) ],
-"loop": true,
-"name": "Falling",
 "speed": 5.0
 }, {
 "frames": [ ExtResource( 97 ), ExtResource( 137 ), ExtResource( 95 ), ExtResource( 71 ), ExtResource( 139 ), ExtResource( 166 ), ExtResource( 141 ), ExtResource( 117 ), ExtResource( 163 ), ExtResource( 182 ), ExtResource( 67 ) ],
@@ -612,4 +605,9 @@ animations = [ {
 "loop": true,
 "name": "Dash",
 "speed": 10.0
+}, {
+"frames": [ ExtResource( 29 ), ExtResource( 7 ) ],
+"loop": true,
+"name": "Fall",
+"speed": 5.0
 } ]

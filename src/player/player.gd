@@ -13,12 +13,13 @@ signal time_slowed
 signal time_unslowed
 
 
+const RUN_ACCEL = 750.0
 const WALK_ACCEL = 450.0
-const WALK_DECEL = 700.0
+const WALK_DECEL = 450.0
 const WALK_VELOCITY = 125.0
 const MAX_VELOCITY = 200.0
 
-const JUMP_VELOCITY = 450
+const JUMP_VELOCITY = 500
 const STOP_JUMP_FORCE = 450.0
 
 
@@ -26,8 +27,7 @@ const DASH_SPEED = 300
 const DASH_MAX = 2
 
 
-const GUARD_SPEED_MODIFIER = .25 
-
+const GUARD_SPEED_DECEL_MOD = .25
 
 const FLOOR_DETECT_DISTANCE = 20.0
 
@@ -45,7 +45,6 @@ var airborne_time = 0
 
 #links to nodes
 onready var camera = $Camera
-onready var platform_detector = $PlatformDetector
 onready var parry_box = $Sprite/ParryBox
 
 
@@ -56,7 +55,7 @@ onready var parry_box = $Sprite/ParryBox
 var mvmt_buffer = []
 
 #command buffer of size MAX_BUFFER_SIZE
-#Commands are represented as 1:Dash, 2:R Click, 3:L Click, 4:Parry
+#Commands are represented as 0:No Input, 1:Dash, 2:R Click, 3:L Click
 var cmd_buffer = []
 
 #Length of the current mvmt_buffer
@@ -76,6 +75,11 @@ var dash_count = 0
 #Timer of how much timeslow remains
 var slow_time = 0
 
+var guarding : bool = false
+
+var debug_state = 0
+
+
 #Set player actor type before Actor class calculates it
 func _init():
 	actor_type = "player"
@@ -85,12 +89,13 @@ func _ready():
 
 	self.scale.x = -1
 	sprite.speed_scale = 3
-	animation_player.playback_speed = 1.5
 
 
 	#HACK
 	char_data.select_attack(false)
 	attack_data = char_data.get_move_data()
+
+	print(animation_player.get_animation_list())
 
 
 #TODO: Idea of Time Freeze as Roman Cancel
@@ -107,10 +112,15 @@ func _ready():
 #TODO Refactor code to use input mvmt_buffer rather than repeat move checks
 func _physics_process(delta):
 
-	if not char_data.damage_state_ == char_data.DAMAGE_STATE.DEAD:
+	if not char_data.cur_state == char_data.CHAR_STATE.DEAD:
 		#TODO Remove this when finished with 
 		if Input.is_action_pressed("slow_time_debug"):
 			slow_time += delta
+			
+		# if char_data.cur_state != debug_state and char_data.cur_state != 0:
+		# 	print(char_data.cur_state)
+		# 	debug_state = char_data.cur_state
+		
 
 		#ROMAN CANCEL, ESSENTIALLY
 		#HACK PLACEHOLDER 
@@ -144,16 +154,13 @@ func _physics_process(delta):
 		if not char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
 			char_data.uncancellable = true
 
-		
-
 		#Obtain directional input buffers
-		check_buffer()
-
-
+		update_buffer()
 		#check dashing, attacking, and parrying
 		check_start_dash()
-		check_new_attack()
+		check_guarding()
 		check_parry()
+		check_new_attack()
 
 		# Update sidedness, give a bit of error room 
 		check_side()
@@ -165,7 +172,8 @@ func _physics_process(delta):
 		#TODO: Calculate move velocity allowing for:
 			#DASHING
 			#ATTACKING
-		if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+		# if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+		if char_data.cur_state == char_data.CHAR_STATE.ATTACKING:
 			#if want to have moves that are non-effected by gravity may need to reconsider
 			#However, those can likely handle themselves in the animation player or add to attack data
 			if no_grav == true:
@@ -186,38 +194,22 @@ func _physics_process(delta):
 			_velocity = move_and_slide_with_snap(
 				_velocity, snap_vector, FLOOR_NORMAL, false, 2, 0.9, false
 				)
+			
 
 					
 		
 	#endregion
 
-#If dash command is within the input buffer, initiate character dashing
-func check_start_dash():
-	if not char_data.uncancellable:
-		if 1 in cmd_buffer:
-			#TODO: Decide what optimal controls are here re: backdashing
-			dash_count += 1
-
-			if dash_count <= DASH_MAX:
-				if (mvmt_buffer[-1]==4 and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1]==6 and char_data.horizontal_state_ == 1):
-					char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
-					_velocity.x = char_data.horizontal_state_ * MAX_VELOCITY
-				else:
-					char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
-					_velocity.x = -1 * char_data.horizontal_state_ * MAX_VELOCITY
-
-			flush_buffer(false, true)
-
-
-#region MOVEMENT mvmt_buffer PROCESSSING
+#BUFFER PROCESSING
+#region 
 
 #update movements, etc.
-func check_buffer():
+func update_buffer():
 	var new_mvmt = get_dir_buttons_pressed()
 	var new_cmd = get_command_inputs()
 	mvmt_buffer.append(new_mvmt)
 	cmd_buffer.append(new_cmd)
-	check_run_buffered()
+	update_holding_run()
 	if mvmt_buffer.size() > MAX_BUFFER_SIZE:
 		mvmt_buffer.remove(0)
 	if cmd_buffer.size() > MAX_BUFFER_SIZE:
@@ -251,48 +243,43 @@ func get_dir_buttons_pressed():
 		new_input = 8
 	return new_input
 
+
+func get_command_inputs():
+	var dash = Input.is_action_just_pressed("dash")
+	var lclick = Input.is_action_just_pressed("lclick")
+	var rclick = Input.is_action_just_pressed("rclick")
+
+	var input = 0
+	if dash:
+		input = 1
+	elif rclick:
+		input = 2
+	elif lclick:
+		input = 3
 	
+	return input
+
+	pass
+	# cmd_buffer
+
 #Check if character is still running, preserving if character is jumping in the forward direction while running
-func check_run_buffered():
+#If not running any longer, try to stop
+func update_holding_run():
 	#If more than two movements stored in mvmt_buffer that do not match
-	if mvmt_buffer.size() > 2 and not mvmt_buffer[-1] == mvmt_buffer[-2]:
+	if mvmt_buffer.size() > 2 and not mvmt_buffer[-1] in mvmt_buffer.slice(0,-2):
 		#If the mismatch is not resulting from a directional jump
-		if not ((mvmt_buffer[-1] in [4,7] and mvmt_buffer[-2] in [4,7]) 
+		if not ((mvmt_buffer[-1] in [4,7] and mvmt_buffer[-2] in [4,7])
 			or (mvmt_buffer[-1] in [6,9] and mvmt_buffer[-2] in [6,9])):
-			held_run = false
+			char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
 
-func update_movements(delta):
-	if not char_data.uncancellable and char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-		if mvmt_buffer.size() > 1:
-			if mvmt_buffer[-1] == 4 or mvmt_buffer[-1] == 7:
-				if check_run([4,5,4]) or held_run:
-					_velocity.x = -MAX_VELOCITY
-				else:
-					_velocity.x = -WALK_VELOCITY
-			elif mvmt_buffer[-1] == 6 or mvmt_buffer[-1] == 9:
-				if check_run([6,5,6]) or held_run:
-					_velocity.x = MAX_VELOCITY
-				else:
-					_velocity.x = WALK_VELOCITY
-			elif mvmt_buffer[-1] == 5:
-				decelerate(delta)
-
-func decelerate(delta, mod = 1):
-	# if is_on_floor():
-	# 	var xv = abs(_velocity.x)
-	# 	xv -= WALK_DECEL * delta
-	# 	if xv < 0:
-	# 		xv = 0
-	# 	_velocity.x = sign(_velocity.x) * xv
-
-	if abs(_velocity.x) > 0 and is_on_floor():
-		var decel = WALK_DECEL * delta * mod
-		var new_velocity = abs(_velocity.x) - decel
-		var decel_velocity = char_data.horizontal_state_ * new_velocity if new_velocity > 0 else 0
-		_velocity.x = decel_velocity
+			if held_run:
+				flush_buffer(true, false)
+				
 
 
-func check_run(sequence):
+#Is the sequence found within the movement buffer 
+#Only finds run right now
+func find_sequence_in_move_buffer(sequence):
 	var found = false
 	var temp_buffer = mvmt_buffer.duplicate(true)
 	var count = sequence.size()
@@ -304,39 +291,70 @@ func check_run(sequence):
 				temp_buffer = temp_buffer.slice(pos+1, temp_buffer.size()-1)
 			else:
 				return false
+
+	#If sequence found			
 	if count == 0:
 		found = true
 		held_run = true
-		#Clear the mvmt_buffer. May have to revist this later for more complex inputs. 
-		# flush_buffer()
+		
 	return found
 	pass
 
-#Evaluates which side the player is currently on, and turns the player when 
-func check_side():
-	var side_left = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [1,4,7]
-	var side_right = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [3,6,9]
-
-	if char_data.anim_state_== char_data.ANIMATION_STATE.IDLE:
-		if _velocity.x < 0.5 and side_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
-			char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
-		
-		if _velocity.x > -0.5 and side_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
-			char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
-
 
 #clear buffers
-#will clear both by default
-#can override to clear only one
-func flush_buffer(clear_mvmt = true, clear_cmd = true):
+#will clear commands but not movement by default
+#can override to choose which to clear
+func flush_buffer(clear_mvmt = false, clear_cmd = true):
 	if clear_mvmt:
 		mvmt_buffer = []
+		held_run = false
 	if clear_cmd:
 		cmd_buffer = []
 #endregion
 
 
-#region cmd_buffer checks
+#endregion
+
+#STATE MACHINE UPDATES
+#region 
+
+#If dash command is within the input buffer, initiate character dashing
+func check_start_dash():
+	if not char_data.uncancellable:
+		if 1 in cmd_buffer:
+			#TODO: Decide what optimal controls are here re: backdashing
+			dash_count += 1
+			if dash_count <= DASH_MAX:
+				if (mvmt_buffer[-1] in [4,5,7] and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1] in [5,6,9] and char_data.horizontal_state_ == 1):
+					# char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
+					char_data.change_state(char_data.CHAR_STATE.DASHING)
+					_velocity.x = char_data.horizontal_state_ * MAX_VELOCITY
+				else:
+					# char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
+					char_data.change_state(char_data.CHAR_STATE.BACKDASHING)
+					_velocity.x = -1 * char_data.horizontal_state_ * MAX_VELOCITY
+				char_data.uncancellable = true
+			
+			flush_buffer(false, true)
+
+
+
+
+#Evaluates which side the player is currently on, and turns the player
+#TODO Will ignore turning if guarding
+func check_side():
+	var side_left = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [4,7]
+	var side_right = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [6,9]
+
+	if _velocity.x < 0 and side_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
+		char_data.change_state(char_data.CHAR_STATE.TURNING)
+		
+		# char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
+	
+	if _velocity.x > 0 and side_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
+		char_data.change_state(char_data.CHAR_STATE.TURNING)
+			
+			# char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
 
 #Check if player is swapping moves via the scroll wheel
 #Is not a part of the buffer system
@@ -359,30 +377,13 @@ func check_swap_move():
 		slow_time = SWAP_SLOW_TIME
 
 
-func get_command_inputs():
-	var dash = Input.is_action_just_pressed("dash")
-	var lclick = Input.is_action_just_pressed("lclick")
-	var rclick = Input.is_action_just_pressed("rclick")
-
-	var input = 0
-	if dash:
-		input = 1
-	elif rclick:
-		input = 2
-	elif lclick:
-		input = 3
-	
-	return input
-
-	pass
-	# cmd_buffer
-
 	#check parry, check attack, check dash
 
 
 #unclear how this happens, need to reproduce
 #Should find a way to incorporate this + dash into the move mvmt_buffer
 #TODO Better way to handle crouching vs standing vs dashing vs jumping etc.
+#BUG not detecting third row of attacks right now for some reason
 func check_new_attack():
 	
 	var matching_move_state = false
@@ -403,39 +404,53 @@ func check_new_attack():
 			#THIS SHOULD MOVE TO STATE MACHINE
 
 			#match player move state to check if can perform the move
-			match char_data.move_state_:
-				char_data.MOVE_STATE.CROUCHING: matching_move_state = attack_data.crouch_type
-				char_data.MOVE_STATE.JUMPING: matching_move_state = attack_data.air_type
-				char_data.MOVE_STATE.FALLING: matching_move_state = attack_data.air_type
-				#char_data.MOVE_STATE.DASHING: matching_move_state = attack_data.dashing_type
-				_: matching_move_state = true
+			# match char_data.move_state_:
+			# 	char_data.MOVE_STATE.CROUCHING: matching_move_state = attack_data.crouch_type
+			# 	char_data.MOVE_STATE.JUMPING: matching_move_state = attack_data.air_type
+			# 	char_data.MOVE_STATE.FALLING: matching_move_state = attack_data.air_type
+			# 	#char_data.MOVE_STATE.DASHING: matching_move_state = attack_data.dashing_type
+			# 	_: 
 
+			matching_move_state = true
+				
 			if matching_move_state:
 
-				if airborne_time > .1:
+				char_data.change_state(char_data.CHAR_STATE.ATTACKING)
 
-					#HACK force into idle
-					char_data.anim_state_ = char_data.ANIMATION_STATE.IDLE
-					char_data.change_move_state(char_data.MOVE_STATE.FALLING)
-
-				char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+				char_data.uncancellable = true
 
 				# slow_time = 0
 
-				if not attack_data.running_type and not (attack_data.dashing_type and char_data.move_state_ == char_data.MOVE_STATE.DASHING):
-					speed_reset()
+				if (attack_data.running_type or 
+					(attack_data.dashing_type and char_data.cur_state == char_data.CHAR_STATE.DASHING) 
+					or (attack_data.air_type and char_data.air_state == char_data.AIR_STATE.IN_AIR)):
+					flush_buffer(false, true)
 
-			flush_buffer(false, true)
+				else:
+					speed_reset()
+					flush_buffer(true, true)
+
+func check_guarding():
+	# if 1 in mvmt_buffer or 2 in mvmt_buffer or 3 in mvmt_buffer:
+	# 	guarding = true
+	# 	if char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
+	# 		char_data.change_move_state(char_data.MOVE_STATE.GUARDING)
+	# 	else:
+	# 		guarding = false
+	# 		# if char_data.damage_state_ ==  char_data.DAMAGE_STATE.GUARDING:
+	# 		# 	char_data.damage_state_ = char_data.DAMAGE_STATE.IDLE
+	# 		char_data.change_move_state(char_data.MOVE_STATE.WALKING)
+	pass
+
 
 
 #Checks to see if player has hit the parry button
 #Also then checks to see if 
 func check_parry():
 	#TODO which states can you cancel into parry from
-	if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-		if 1 in mvmt_buffer or 2 in mvmt_buffer or 3 in mvmt_buffer:
-			char_data.change_anim_state(char_data.ANIMATION_STATE.PARRYING)
-			flush_buffer()
+	if guarding and cmd_buffer[-1]== 3:
+		char_data.change_state(char_data.CHAR_STATE.PARRYING)
+		flush_buffer()
 		#TODO THIS DECELERATE FUNCTION IS BAD, IT DOES NOT ALWAYS RUN WHEN IT SHOULD BE DUE TO UNCANCELLABLE NOT CALLING TO THIS FUNCTION ANYMORE
 
 #Check to see if char is jumping/falling
@@ -447,66 +462,156 @@ func check_falling(delta, jump):
 	#Tolerance for 
 	if airborne_time > .1:
 		if _velocity.y > 0:
-			# Set off the jumping flag if going down.			
-			char_data.change_move_state(char_data.MOVE_STATE.FALLING)
+			# Set off the jumping flag if going down.
+			
+			char_data.change_state(char_data.CHAR_STATE.FALLING)
+
+
 		elif not jump:
 			stopping_jump = true
 		
 		if stopping_jump:
 			_velocity.y += STOP_JUMP_FORCE * delta
-
-	if _velocity.y < 0 and mvmt_buffer[-1] in [7,8,9]:
-		if char_data.move_state_ == char_data.MOVE_STATE.WALKING:
-			char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
 	
+#TODO Add description
+#TODO Ignore running if guarding, should probably be doing this already.			
+func update_movements(delta):
+	if not char_data.uncancellable:
+		if mvmt_buffer.size() > 1:
+				
+			var jump = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [7,8,9]
+
+			if not is_on_floor() and char_data.air_state == char_data.AIR_STATE.IN_AIR:
+				check_falling(delta, jump)
+
+			if char_data.cur_state < char_data.CHAR_STATE.TURNING or char_data.cur_state == char_data.CHAR_STATE.JUMPING:
+			#Look at movement towards Left
+				if mvmt_buffer[-1] == 4 or mvmt_buffer[-1] == 7:
+					#Run to l sequence of 4-5-4
+					if find_sequence_in_move_buffer([4,5,4]) or held_run:
+						
+					# _velocity.x = -MAX_VELOCITY
+					# held_run = true
+						
+
+					# else:
+					# 	_velocity.x = -WALK_VELOCITY
+
+						_velocity.x -= RUN_ACCEL * delta
+
+						held_run = true
+							
+					else:
+						if _velocity.x < -WALK_VELOCITY:
+							_velocity.x += WALK_DECEL * delta
+						
+						else:
+							_velocity.x -= WALK_ACCEL *delta
+
+						if _velocity.x > -WALK_VELOCITY + 20 or _velocity.x < -WALK_VELOCITY - 20:
+							_velocity.x = -WALK_VELOCITY
+
+				#Look at movement towards right
+				elif mvmt_buffer[-1] == 6 or mvmt_buffer[-1] == 9:
+					#Run to right sequence of 6-5-6
+					if find_sequence_in_move_buffer([6,5,6]) or held_run:
+					# 	_velocity.x = MAX_VELOCITY
+					# 	held_run = true
+						
+
+					# else:
+					# 	_velocity.x = WALK_VELOCITY
+
+						_velocity.x += RUN_ACCEL * delta
+
+						held_run = true
+							
+					else:
+						if _velocity.x > WALK_VELOCITY:
+							_velocity.x -= WALK_DECEL * delta
+						
+						else:
+							_velocity.x += WALK_ACCEL *delta
+
+						if _velocity.x > WALK_VELOCITY - 20 or _velocity.x < WALK_VELOCITY + 20:
+							_velocity.x = WALK_VELOCITY
+						
+
+				elif mvmt_buffer[-1] in [1,2,3,5]:
+					decelerate(delta)
+
+			if is_on_floor():
+
+				airborne_time = 0
+				dash_count = 0
+				
+
+				if char_data.cur_state == char_data.CHAR_STATE.JUMPING:
+					char_data.change_state(char_data.CHAR_STATE.STANDING)
+
+				if abs(_velocity.x) > WALK_VELOCITY + 50:
+					if not char_data.cur_state == char_data.CHAR_STATE.RUNNING:
+
+						if char_data.cur_state == char_data.CHAR_STATE.FALLING or char_data.cur_state == char_data.CHAR_STATE.DASHING:
+							char_data.change_state(char_data.CHAR_STATE.RUNNING)
+
+						else:
+							char_data.change_state(char_data.CHAR_STATE.RUN_START)
+				
+				elif abs(_velocity.x) <= WALK_VELOCITY and abs(_velocity.x) >= 0:
+					
+					if char_data.cur_state == char_data.CHAR_STATE.RUNNING:
+						char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
+					else:
+						char_data.change_state(char_data.CHAR_STATE.WALKING)
+
+				if abs(_velocity.x) == 0 :
+					if not char_data.cur_state == char_data.CHAR_STATE.STANDING and is_on_floor():
+						if char_data.cur_state == char_data.CHAR_STATE.RUNNING:
+							char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
+						else:
+							char_data.change_state(char_data.CHAR_STATE.STANDING)
+
+				if jump:
+					_velocity.y -= JUMP_VELOCITY
+					stopping_jump = false
+		
+					if _velocity.y < 0:
+						char_data.change_state(char_data.CHAR_STATE.JUMPING)
+
+			#CORRECT FOR OVERSPEED
+			if abs(_velocity.x) > MAX_VELOCITY:
+				_velocity.x = sign(_velocity.x) * MAX_VELOCITY
 
 #Check whether run or walk animation
 #based on character movement speed
 func update_move_anim(delta):
+	pass 
 
-	if not char_data.uncancellable and char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-		#Did the player push up at all
-		var jump = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [7,8,9]
+	# if not char_data.uncancellable:
+	# 	#Did the player push up at all
 
-		if not is_on_floor():
-			check_falling(delta, jump)
-
-		if is_on_floor():
-
-			airborne_time = 0
-			dash_count = 0
-
-			if char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
-
-			if jump:
-				_velocity.y = -JUMP_VELOCITY if not _velocity.y < 0 else _velocity.y - JUMP_VELOCITY 
-				char_data.change_move_state(char_data.MOVE_STATE.JUMPING)
-				stopping_jump = false
-
-			# old movement update location
-			# update_movements(delta)
-			
-			#CORRECT FOR THE LAG TIME OF IS_ON_FLOOR() IF CHAR HAS JUST ENTERED THE AIR
-				# if not jump:
-			#CORRECT FOR OVERSPEED
-			if abs(_velocity.x) > MAX_VELOCITY:
-				_velocity.x = sign(_velocity.x) * MAX_VELOCITY
-			#CHANGE ANIMATIONS TO MATCH SPEED
-			if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
-				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
-			elif abs(_velocity.x) > WALK_VELOCITY and sign(_velocity.x) == char_data.horizontal_state_:
-				#CANNOT RUN WHILE MOVING BACKWARDS
-				char_data.change_move_state(char_data.MOVE_STATE.RUNNING)
-			elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
+	# 		if not guarding:
+	# 			#CHANGE ANIMATIONS TO MATCH SPEED
+	# 			if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
+	# 				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
+	# 			elif abs(_velocity.x) > WALK_VELOCITY and sign(_velocity.x) == char_data.horizontal_state_:
+	# 				#CANNOT RUN WHILE MOVING BACKWARDS
+	# 				char_data.change_move_state(char_data.MOVE_STATE.RUNNING)
+	# 			elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
+	# 				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
 
 #endregion
 
+			
+#Slow player down to 0 velocity
+func decelerate(delta, decel_mod = 1):
+	if abs(_velocity.x) > 0 and is_on_floor():
+		var decel = WALK_DECEL * delta * decel_mod
+		var new_velocity = abs(_velocity.x) - decel
+		var decel_velocity = char_data.horizontal_state_ * new_velocity if new_velocity > 0 else 0
+		_velocity.x = decel_velocity
 
-
-#SIGNALS FROM GAMESTATE CHANGES
-#region 
 
 #animations
 #region 
@@ -519,20 +624,6 @@ func _on_Sprite_animation_finished():
 
 	# current_animation = char_data.get_new_animation()
 	#play_new_sprite()
-
-#Overloaded to clear any external_movement_data
-func _on_AnimationPlayer_animation_finished(_anim_name):
-	external_movement_data = Vector2()
-	remaining_animation_time = 0
-	no_grav = false
-	char_data.uncancellable = false
-	char_data.animation_completed()
-
-
-	#TODO Fix this and remove it
-func force_velocity(new_velocity):
-	_velocity = new_velocity
-
 
 
 #HACK, NEED TO HAVE A DIFFERENT WAY TO DEAL WITH CANCELLING MOVES
@@ -615,7 +706,7 @@ func _on_ParryBox_area_entered(area):
 
 #endregion
 
-#BUG this is trhowing errors "Can't Change While Flushign Queries"
+#BUG this is throwing errors "Can't Change While Flushign Queries"
 func reset_all_hitboxes():
 	hitbox.shape.disabled = true
 	hurtbox.enable()
@@ -625,11 +716,11 @@ func reset_all_hitboxes():
 #TODO improve overall time-slow situation
 
 #Slow down time if there is any time_slow, then subtract delta from time_slow amount
-#Allows for modified slowdown rates
+#Allows for decel_modified slowdown rates
 #Default slowdown is BASE_TIME_SLOW (.4)
-func time_slow(delta, slow_mod = BASE_TIME_SLOW):
+func time_slow(delta, slow_decel_mod = BASE_TIME_SLOW):
 	if slow_time > 0:
-		Engine.time_scale = slow_mod
+		Engine.time_scale = slow_decel_mod
 
 		#If want things to move in normal time during full slowdown, can multiply their delta by 1/Engine.time_scale
 		slow_time -= delta
