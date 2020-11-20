@@ -170,7 +170,7 @@ func take_damage(hit_var):
 
 #At the end of invuln, turn it off in character data
 func on_invuln_end():
-	if char_data.damage_state_ == char_data.DAMAGE_STATE.INVULN:
+	if char_data.invuln:
 		char_data.toggle_invuln()
 
 
@@ -210,6 +210,11 @@ func _on_CharacterData_new_sprite_animation(new_anim):
 
 func _on_CharacterData_play_animation(new_anim):
 	reset_all_hitboxes()
+
+	#HACK
+	if char_data.cur_state == char_data.CHAR_STATE.ATTACKING:
+		hitbox.enable()
+
 	current_animation = new_anim
 	animation_player.stop(true)
 	animation_player.play(current_animation)

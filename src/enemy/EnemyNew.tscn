@@ -1,4 +1,4 @@
-[gd_scene load_steps=157 format=2]
+[gd_scene load_steps=164 format=2]
 
 [ext_resource path="res://src/enemy/NanayaCharacterData.gd" type="Script" id=1]
 [ext_resource path="res://src/enemy/EnemyNew.gd" type="Script" id=2]
@@ -138,6 +138,13 @@
 [ext_resource path="res://src/attacks/Hitspark.tscn" type="PackedScene" id=136]
 [ext_resource path="res://src/Generic/Hurtbox.gd" type="Script" id=137]
 [ext_resource path="res://src/Generic/Hitbox.gd" type="Script" id=138]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_006.png" type="Texture" id=139]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_001.png" type="Texture" id=140]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_000.png" type="Texture" id=141]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_003.png" type="Texture" id=142]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_002.png" type="Texture" id=143]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_005.png" type="Texture" id=144]
+[ext_resource path="res://assets/PlayStation 2 - Melty Blood Actress Again - Shiki Nanaya/nanaya/shi81_004.png" type="Texture" id=145]
 
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 6.0
@@ -384,7 +391,19 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id=8]
-length = 0.15
+length = 0.2
+tracks/0/type = "value"
+tracks/0/path = NodePath("Sprite:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ "StandTurn" ]
+}
 
 [sub_resource type="Animation" id=9]
 loop = true
@@ -458,6 +477,11 @@ animations = [ {
 "name": "CrouchDown",
 "speed": 5.0
 }, {
+"frames": [ ExtResource( 141 ), ExtResource( 140 ), ExtResource( 143 ), ExtResource( 142 ), ExtResource( 145 ), ExtResource( 144 ), ExtResource( 139 ) ],
+"loop": true,
+"name": "StandTurn",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 34 ), ExtResource( 50 ), ExtResource( 54 ), ExtResource( 38 ), ExtResource( 43 ), ExtResource( 41 ), ExtResource( 40 ), ExtResource( 51 ) ],
 "loop": true,
 "name": "StandDamage",
@@ -522,6 +546,7 @@ bg_color = Color( 0.909804, 0.0745098, 0.0745098, 1 )
 extents = Vector2( 5.4763, 16.0131 )
 
 [node name="Enemy" type="KinematicBody2D"]
+position = Vector2( -0.176773, 0.176777 )
 scale = Vector2( 1.5, 1.5 )
 collision_mask = 1025
 script = ExtResource( 2 )
@@ -586,10 +611,11 @@ max_HP = 150
 position = Vector2( 0.351875, -16.8728 )
 scale = Vector2( 0.3, 0.3 )
 frames = SubResource( 14 )
-animation = "StandIdle"
+animation = "StandTurn"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
+position = Vector2( 0, 0.392845 )
 collision_layer = 16
 collision_mask = 2
 script = ExtResource( 138 )

@@ -227,11 +227,6 @@ __meta__ = {
 ] instance=ExtResource( 12 )]
 position = Vector2( -43.835, 644.641 )
 
-[node name="Enemy2" parent="Props/Enemies" groups=[
-"Actors",
-] instance=ExtResource( 12 )]
-position = Vector2( -419.835, 643.641 )
-
 [node name="Player" parent="." groups=[
 "Actors",
 ] instance=ExtResource( 6 )]
@@ -271,9 +266,6 @@ __meta__ = {
 [connection signal="combo" from="Props/Enemies/Enemy" to="." method="_on_Enemy_combo"]
 [connection signal="screenshake" from="Props/Enemies/Enemy" to="." method="_on_Actor_screenshake"]
 [connection signal="shake" from="Props/Enemies/Enemy" to="." method="_on_Enemy_shake"]
-[connection signal="combo" from="Props/Enemies/Enemy2" to="." method="_on_Enemy_combo"]
-[connection signal="screenshake" from="Props/Enemies/Enemy2" to="." method="_on_Actor_screenshake"]
-[connection signal="shake" from="Props/Enemies/Enemy2" to="." method="_on_Enemy_shake"]
 [connection signal="player_died" from="Player" to="." method="_on_Player_player_died"]
 [connection signal="screenshake" from="Player" to="." method="_on_Actor_screenshake"]
 [connection signal="selected_move_changed" from="Player" to="." method="_on_Player_selected_move_changed"]

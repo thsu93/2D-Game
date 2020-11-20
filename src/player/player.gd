@@ -151,7 +151,7 @@ func _physics_process(delta):
 
 		#HACK This deals with trying to attack during damage state idle, but probably not the best.
 		#Should add something within Char_data to force unbreakable damage state
-		if not char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
+		if char_data.cur_state in char_data.DAMAGE_STATES:
 			char_data.uncancellable = true
 
 		#Obtain directional input buffers
@@ -167,12 +167,10 @@ func _physics_process(delta):
 
 		update_movements(delta)
 
-		update_move_anim(delta)
 
-		#TODO: Calculate move velocity allowing for:
 			#DASHING
 			#ATTACKING
-		# if char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
+			#TODO Evaluate these checks
 		if char_data.cur_state == char_data.CHAR_STATE.ATTACKING:
 			#if want to have moves that are non-effected by gravity may need to reconsider
 			#However, those can likely handle themselves in the animation player or add to attack data
@@ -180,7 +178,7 @@ func _physics_process(delta):
 				no_grav = false
 			if not attack_data.running_type:
 				decelerate(delta)
-		elif char_data.anim_state_ == char_data.ANIMATION_STATE.PARRYING or char_data.anim_state_  == char_data.ANIMATION_STATE.GUARDING:
+		elif char_data.cur_state == char_data.CHAR_STATE.GUARDING or char_data.cur_state == char_data.CHAR_STATE.PARRYING:
 			decelerate(delta)
 
 		#If the player is being moved by external forces, use that function.
@@ -326,11 +324,9 @@ func check_start_dash():
 			dash_count += 1
 			if dash_count <= DASH_MAX:
 				if (mvmt_buffer[-1] in [4,5,7] and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1] in [5,6,9] and char_data.horizontal_state_ == 1):
-					# char_data.change_anim_state(char_data.ANIMATION_STATE.DASHING)
 					char_data.change_state(char_data.CHAR_STATE.DASHING)
 					_velocity.x = char_data.horizontal_state_ * MAX_VELOCITY
 				else:
-					# char_data.change_anim_state(char_data.ANIMATION_STATE.BACKDASHING)
 					char_data.change_state(char_data.CHAR_STATE.BACKDASHING)
 					_velocity.x = -1 * char_data.horizontal_state_ * MAX_VELOCITY
 				char_data.uncancellable = true
@@ -404,6 +400,7 @@ func check_new_attack():
 			#THIS SHOULD MOVE TO STATE MACHINE
 
 			#match player move state to check if can perform the move
+			#TODO redo this to match new state machine
 			# match char_data.move_state_:
 			# 	char_data.MOVE_STATE.CROUCHING: matching_move_state = attack_data.crouch_type
 			# 	char_data.MOVE_STATE.JUMPING: matching_move_state = attack_data.air_type
@@ -419,6 +416,8 @@ func check_new_attack():
 
 				char_data.uncancellable = true
 
+				hitbox.enable()
+				
 				# slow_time = 0
 
 				if (attack_data.running_type or 
@@ -427,19 +426,9 @@ func check_new_attack():
 					flush_buffer(false, true)
 
 				else:
-					speed_reset()
 					flush_buffer(true, true)
 
 func check_guarding():
-	# if 1 in mvmt_buffer or 2 in mvmt_buffer or 3 in mvmt_buffer:
-	# 	guarding = true
-	# 	if char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
-	# 		char_data.change_move_state(char_data.MOVE_STATE.GUARDING)
-	# 	else:
-	# 		guarding = false
-	# 		# if char_data.damage_state_ ==  char_data.DAMAGE_STATE.GUARDING:
-	# 		# 	char_data.damage_state_ = char_data.DAMAGE_STATE.IDLE
-	# 		char_data.change_move_state(char_data.MOVE_STATE.WALKING)
 	pass
 
 
@@ -545,6 +534,12 @@ func update_movements(delta):
 				airborne_time = 0
 				dash_count = 0
 				
+				if jump:
+					_velocity.y -= JUMP_VELOCITY
+					stopping_jump = false
+		
+					if _velocity.y < 0:
+						char_data.change_state(char_data.CHAR_STATE.JUMPING)
 
 				if char_data.cur_state == char_data.CHAR_STATE.JUMPING:
 					char_data.change_state(char_data.CHAR_STATE.STANDING)
@@ -572,34 +567,10 @@ func update_movements(delta):
 						else:
 							char_data.change_state(char_data.CHAR_STATE.STANDING)
 
-				if jump:
-					_velocity.y -= JUMP_VELOCITY
-					stopping_jump = false
-		
-					if _velocity.y < 0:
-						char_data.change_state(char_data.CHAR_STATE.JUMPING)
 
 			#CORRECT FOR OVERSPEED
 			if abs(_velocity.x) > MAX_VELOCITY:
 				_velocity.x = sign(_velocity.x) * MAX_VELOCITY
-
-#Check whether run or walk animation
-#based on character movement speed
-func update_move_anim(delta):
-	pass 
-
-	# if not char_data.uncancellable:
-	# 	#Did the player push up at all
-
-	# 		if not guarding:
-	# 			#CHANGE ANIMATIONS TO MATCH SPEED
-	# 			if abs(_velocity.x) > 5 and abs(_velocity.x) <= WALK_VELOCITY:
-	# 				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
-	# 			elif abs(_velocity.x) > WALK_VELOCITY and sign(_velocity.x) == char_data.horizontal_state_:
-	# 				#CANNOT RUN WHILE MOVING BACKWARDS
-	# 				char_data.change_move_state(char_data.MOVE_STATE.RUNNING)
-	# 			elif abs(_velocity.x) <= 5 and not char_data.move_state_ == char_data.MOVE_STATE.JUMPING:
-	# 				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
 
 #endregion
 
@@ -618,8 +589,6 @@ func decelerate(delta, decel_mod = 1):
 func _on_Sprite_animation_finished():
 	#HACK reset speeds shouldn't be like this
 	if not current_animation in animation_player.get_animation_list():
-		# if current_animation =="Backdash":
-		# 	speed_reset()
 		char_data.animation_completed()
 
 	# current_animation = char_data.get_new_animation()
@@ -644,7 +613,7 @@ func _on_Hitbox_area_entered(area):
 		
 		var body = area.get_parent()
 		# body.stunned = true
-		if not body.char_data.damage_state_ == char_data.DAMAGE_STATE.INVULN:
+		if not char_data.invuln:
 			#HITSTOP
 			OS.delay_msec(25)
 
@@ -729,13 +698,7 @@ func time_slow(delta, slow_decel_mod = BASE_TIME_SLOW):
 		Engine.time_scale = 1
 		slow_time = 0
 		emit_signal("time_unslowed")
-	
-#HACK this should be fixed to a reasonable system
-func speed_reset():
-	if not (char_data.move_state_ == char_data.MOVE_STATE.JUMPING or char_data.move_state_ == char_data.MOVE_STATE.FALLING):
-		_velocity.x = 0
-
-	
+		
 #Getters for the gamemanager
 
 func get_movelist():

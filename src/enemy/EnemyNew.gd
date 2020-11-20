@@ -28,6 +28,7 @@ var hit_timer = 0
 
 #JAB, LUNGE, UPPER, ELBOW
 
+var turn_timer = 0
 
 
 func _init():
@@ -83,18 +84,14 @@ func _physics_process(_delta):
 			invuln_timer.start()
 			char_data.toggle_invuln()
 
-	if char_data.damage_state_ == char_data.DAMAGE_STATE.IDLE:
-		if char_data.anim_state_ == char_data.ANIMATION_STATE.IDLE:
-			_velocity = calculate_move_velocity(_velocity)
+	if not char_data.cur_state in char_data.DAMAGE_STATES and not char_data.cur_state in  char_data.ACTION_STATES:
+		_velocity = calculate_move_velocity(_velocity)
 
-			if abs(_velocity.x) > 5 and not char_data.move_state_ == char_data.MOVE_STATE.WALKING:
-				char_data.change_move_state(char_data.MOVE_STATE.WALKING)
+		if abs(_velocity.x) > 5:
+			char_data.change_state(char_data.CHAR_STATE.WALKING)
 
-			elif abs(_velocity.x) < 5 and not char_data.move_state_ == char_data.MOVE_STATE.STANDING:
-				char_data.change_move_state(char_data.MOVE_STATE.STANDING)
-
-		elif char_data.anim_state_ == char_data.ANIMATION_STATE.ATTACKING:
-			_velocity.x = 0
+		elif abs(_velocity.x) < 5:
+			char_data.change_state(char_data.CHAR_STATE.STANDING)
 
 	else:
 		_velocity.x = 0
@@ -103,6 +100,8 @@ func _physics_process(_delta):
 	_velocity.y = move_and_slide(_velocity, FLOOR_NORMAL).y
 
 	
+	turn_timer += _delta
+
 	run_ai(_delta)
 
 	display_HP()
@@ -125,16 +124,17 @@ func run_ai(_delta):
 
 		landed_hit = false
 
-	elif timer > ATTACK_TIMER and not char_data.anim_state_ == char_data.ANIMATION_STATE.DAMAGED:
+	elif timer > ATTACK_TIMER and not char_data.cur_state in char_data.DAMAGE_STATES:
 		if player_detector.is_colliding():
 			timer = 0
 			attack()
-			
+
 
 func attack():
 	hitbox.enable()
+	print(hitbox.active)
 	hit_timer = 0
-	char_data.change_anim_state(char_data.ANIMATION_STATE.ATTACKING)
+	char_data.change_state(char_data.CHAR_STATE.ATTACKING)
 
 #TODO: Make the HP bars flip. Probably have them be in their own scene with own handler. 	
 
@@ -159,10 +159,13 @@ func calculate_move_velocity(linear_velocity):
 		if (not floor_detector_left.is_colliding()
 			or not floor_detector_right.is_colliding()
 			or is_on_wall()):
-			if velocity.x < 0: 
-				char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
-			else: 
-				char_data.change_horiz_state(char_data.HORIZONTAL_STATE.L)
+			if not char_data.cur_state == char_data.CHAR_STATE.TURNING and turn_timer > .2:
+				char_data.change_state(char_data.CHAR_STATE.TURNING)
+				
+				#HACK timer w/ on-wall taking time to reset
+
+				turn_timer = 0
+
 
 		velocity.x = speed.x * char_data.horizontal_state_
 
@@ -176,11 +179,7 @@ func calculate_move_velocity(linear_velocity):
 #combo counts
 #stun effects
 func take_damage(hit_var):
-
-
-	
 	hit_var["dmg"] /= damage_scaling_mult
-	
 	
 	char_data.take_damage(hit_var)
 
@@ -192,7 +191,6 @@ func take_damage(hit_var):
 		knockback = Vector2()
 
 	knockback_scaling_mult *= (1+ hit_var["knockback_scaling"])
-	
 
 	stunned = true
 	
@@ -214,9 +212,9 @@ func _on_Hitspark_animation_finished():
 
 #What to do when the enemy hits the player	
 func _on_Hitbox_area_entered(area):
+	print(hitbox.active)
 	if hitbox.active:
 		if area.get_class() == "Hurtbox" and area.actor_type == "player":
-
 			var body = area.get_parent()
 
 			# body.stunned = true
@@ -235,13 +233,6 @@ func _on_Hitbox_area_entered(area):
 			#HACK TEMPORARY KNOCKBACK CALC
 			attack_data.knockback_dir = Vector2(char_data.horizontal_state_ * abs(attack_data.knockback_dir.x), attack_data.knockback_dir.y)
 			body.take_damage(attack_data.get_hit_var())
-			
-
-			print("ENEMY HIT")
-			#TODO How to prevent double-hitting of moves
-			#Is this even necessary? It won't maintain hitting
-			#Should probably handle this differently, given the possibility of hitting through two enemies
-			#attack_hitbox.get_node("CollisionShape2D").disabled = true
 
 			landed_hit = true
 

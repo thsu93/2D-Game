@@ -579,7 +579,7 @@ tracks/0/keys = {
 }
 
 [sub_resource type="RectangleShape2D" id=5]
-extents = Vector2( 124.667, 88.6472 )
+extents = Vector2( 41.4391, 25.7395 )
 
 [sub_resource type="SpriteFrames" id=6]
 animations = [ {
@@ -658,7 +658,7 @@ script = ExtResource( 19 )
 position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "StandTurn"
+animation = "StandDamage"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -671,7 +671,7 @@ script = ExtResource( 22 )
 speed_scale = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -138.388, -95.4487 )
+position = Vector2( -180.467, -124.597 )
 scale = Vector2( 1.13819, 1.02605 )
 shape = SubResource( 5 )
 disabled = true
