@@ -84,7 +84,7 @@ func _physics_process(_delta):
 			invuln_timer.start()
 			char_data.toggle_invuln()
 
-	if not char_data.cur_state in char_data.DAMAGE_STATES and not char_data.cur_state in  char_data.ACTION_STATES:
+	if not char_data.cur_state in char_data.DAMAGE_STATES and not char_data.cur_state in char_data.ACTION_STATES:
 		_velocity = calculate_move_velocity(_velocity)
 
 		if abs(_velocity.x) > 5:
@@ -96,8 +96,9 @@ func _physics_process(_delta):
 	else:
 		_velocity.x = 0
 
+	if not char_data.cur_state in char_data.DAMAGE_STATES:
 	# We only update the y value of _velocity as we want to handle the horizontal movement ourselves.
-	_velocity.y = move_and_slide(_velocity, FLOOR_NORMAL).y
+		_velocity.y = move_and_slide(_velocity, FLOOR_NORMAL).y
 
 	
 	turn_timer += _delta
@@ -111,23 +112,24 @@ func _physics_process(_delta):
 #Current plan: Will attack if player enters collider in front of enemy, with a timer changing when the enemy attacks.
 func run_ai(_delta):
 	timer += _delta
-	if landed_hit:
-		if char_data.cur_attack.movename == "Jab": 
-			char_data.next_move()
-			attack()
-			timer = 0
+	if not not char_data.cur_state in char_data.DAMAGE_STATES:
+		if landed_hit:
+			if char_data.cur_attack.movename == "Jab": 
+				char_data.next_move()
+				attack()
+				timer = 0
+				
 			
-		
-		else: 
-			hit_timer = 0
-			char_data.base_move()
+			else: 
+				hit_timer = 0
+				char_data.base_move()
 
-		landed_hit = false
+			landed_hit = false
 
-	elif timer > ATTACK_TIMER and not char_data.cur_state in char_data.DAMAGE_STATES:
-		if player_detector.is_colliding():
-			timer = 0
-			attack()
+		elif timer > ATTACK_TIMER:
+			if player_detector.is_colliding():
+				timer = 0
+				attack()
 
 
 func attack():

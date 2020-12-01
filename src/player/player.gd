@@ -27,7 +27,7 @@ const DASH_SPEED = 300
 const DASH_MAX = 2
 
 
-const GUARD_SPEED_DECEL_MOD = .25
+const GUARD_SPEED_DECEL_MOD = .5
 
 const FLOOR_DETECT_DISTANCE = 20.0
 
@@ -319,19 +319,23 @@ func flush_buffer(clear_mvmt = false, clear_cmd = true):
 #If dash command is within the input buffer, initiate character dashing
 func check_start_dash():
 	if not char_data.uncancellable:
-		if 1 in cmd_buffer:
+		if cmd_buffer.size() > 0 and 1 in cmd_buffer:
+
 			#TODO: Decide what optimal controls are here re: backdashing
-			dash_count += 1
-			if dash_count <= DASH_MAX:
-				if (mvmt_buffer[-1] in [4,5,7] and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1] in [5,6,9] and char_data.horizontal_state_ == 1):
+			
+			if dash_count < DASH_MAX and not (char_data.cur_state == char_data.CHAR_STATE.DASHING or char_data.cur_state == char_data.CHAR_STATE.BACKDASHING):
+				dash_count += 1
+
+				if mvmt_buffer.size() == 0 or (mvmt_buffer[-1] in [4,5,7] and char_data.horizontal_state_ == -1) or (mvmt_buffer[-1] in [5,6,9] and char_data.horizontal_state_ == 1):
 					char_data.change_state(char_data.CHAR_STATE.DASHING)
 					_velocity.x = char_data.horizontal_state_ * MAX_VELOCITY
 				else:
 					char_data.change_state(char_data.CHAR_STATE.BACKDASHING)
-					_velocity.x = -1 * char_data.horizontal_state_ * MAX_VELOCITY
+					_velocity.x = -1 * char_data.horizontal_state_ * WALK_VELOCITY
+					
 				char_data.uncancellable = true
 			
-			flush_buffer(false, true)
+				flush_buffer(false, true)
 
 
 
@@ -379,7 +383,6 @@ func check_swap_move():
 #unclear how this happens, need to reproduce
 #Should find a way to incorporate this + dash into the move mvmt_buffer
 #TODO Better way to handle crouching vs standing vs dashing vs jumping etc.
-#BUG not detecting third row of attacks right now for some reason
 func check_new_attack():
 	
 	var matching_move_state = false
@@ -417,7 +420,7 @@ func check_new_attack():
 				char_data.uncancellable = true
 
 				hitbox.enable()
-				
+
 				# slow_time = 0
 
 				if (attack_data.running_type or 
@@ -428,7 +431,15 @@ func check_new_attack():
 				else:
 					flush_buffer(true, true)
 
+			#TODO way to store "next" move:
+			#Should this always be the last move input during buffer time? the first?
+
+
+					
 func check_guarding():
+	if mvmt_buffer.size() > 0:
+		if mvmt_buffer[-1] in [1,2,3]:
+			char_data.change_state(char_data.CHAR_STATE.GUARDING)
 	pass
 
 
@@ -436,11 +447,9 @@ func check_guarding():
 #Checks to see if player has hit the parry button
 #Also then checks to see if 
 func check_parry():
-	#TODO which states can you cancel into parry from
 	if guarding and cmd_buffer[-1]== 3:
 		char_data.change_state(char_data.CHAR_STATE.PARRYING)
 		flush_buffer()
-		#TODO THIS DECELERATE FUNCTION IS BAD, IT DOES NOT ALWAYS RUN WHEN IT SHOULD BE DUE TO UNCANCELLABLE NOT CALLING TO THIS FUNCTION ANYMORE
 
 #Check to see if char is jumping/falling
 #Will change state if 
@@ -450,11 +459,13 @@ func check_falling(delta, jump):
 
 	#Tolerance for 
 	if airborne_time > .1:
+		if _velocity.y < 0 and not char_data.cur_state == char_data.CHAR_STATE.JUMPING and not char_data.cur_state == char_data.CHAR_STATE.TURNING:
+			char_data.change_state(char_data.CHAR_STATE.JUMPING)
+
 		if _velocity.y > 0:
 			# Set off the jumping flag if going down.
 			
 			char_data.change_state(char_data.CHAR_STATE.FALLING)
-
 
 		elif not jump:
 			stopping_jump = true
@@ -462,6 +473,11 @@ func check_falling(delta, jump):
 		if stopping_jump:
 			_velocity.y += STOP_JUMP_FORCE * delta
 	
+
+#endregion
+
+
+#region Player Movement Handling
 #TODO Add description
 #TODO Ignore running if guarding, should probably be doing this already.			
 func update_movements(delta):
@@ -473,9 +489,11 @@ func update_movements(delta):
 			if not is_on_floor() and char_data.air_state == char_data.AIR_STATE.IN_AIR:
 				check_falling(delta, jump)
 
-			if char_data.cur_state < char_data.CHAR_STATE.TURNING or char_data.cur_state == char_data.CHAR_STATE.JUMPING:
-			#Look at movement towards Left
-				if mvmt_buffer[-1] == 4 or mvmt_buffer[-1] == 7:
+			
+			if (char_data.cur_state < char_data.CHAR_STATE.TURNING #STANDING, WALKING, RUNNING, RUN_STOP, RUN_START, FALLING, GUARDING
+				or char_data.cur_state == char_data.CHAR_STATE.JUMPING):
+				#Look at movement towards Left
+				if (mvmt_buffer[-1] in [1,4,7]):
 					#Run to l sequence of 4-5-4
 					if find_sequence_in_move_buffer([4,5,4]) or held_run:
 						
@@ -501,7 +519,7 @@ func update_movements(delta):
 							_velocity.x = -WALK_VELOCITY
 
 				#Look at movement towards right
-				elif mvmt_buffer[-1] == 6 or mvmt_buffer[-1] == 9:
+				elif mvmt_buffer[-1] in [3,6,9]:
 					#Run to right sequence of 6-5-6
 					if find_sequence_in_move_buffer([6,5,6]) or held_run:
 					# 	_velocity.x = MAX_VELOCITY
@@ -525,9 +543,13 @@ func update_movements(delta):
 						if _velocity.x > WALK_VELOCITY - 20 or _velocity.x < WALK_VELOCITY + 20:
 							_velocity.x = WALK_VELOCITY
 						
+				
 
-				elif mvmt_buffer[-1] in [1,2,3,5]:
+				else:
 					decelerate(delta)
+
+				if char_data.cur_state == char_data.CHAR_STATE.GUARDING:
+					_velocity.x *= GUARD_SPEED_DECEL_MOD
 
 			if is_on_floor():
 
@@ -544,33 +566,42 @@ func update_movements(delta):
 				if char_data.cur_state == char_data.CHAR_STATE.JUMPING:
 					char_data.change_state(char_data.CHAR_STATE.STANDING)
 
-				if abs(_velocity.x) > WALK_VELOCITY + 50:
-					if not char_data.cur_state == char_data.CHAR_STATE.RUNNING:
 
-						if char_data.cur_state == char_data.CHAR_STATE.FALLING or char_data.cur_state == char_data.CHAR_STATE.DASHING:
-							char_data.change_state(char_data.CHAR_STATE.RUNNING)
-
-						else:
-							char_data.change_state(char_data.CHAR_STATE.RUN_START)
-				
-				elif abs(_velocity.x) <= WALK_VELOCITY and abs(_velocity.x) >= 0:
-					
-					if char_data.cur_state == char_data.CHAR_STATE.RUNNING:
-						char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
-					else:
-						char_data.change_state(char_data.CHAR_STATE.WALKING)
-
-				if abs(_velocity.x) == 0 :
-					if not char_data.cur_state == char_data.CHAR_STATE.STANDING and is_on_floor():
-						if char_data.cur_state == char_data.CHAR_STATE.RUNNING:
-							char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
-						else:
-							char_data.change_state(char_data.CHAR_STATE.STANDING)
-
+				update_grounded_move_state()
 
 			#CORRECT FOR OVERSPEED
+			#TODO is this necessary?
 			if abs(_velocity.x) > MAX_VELOCITY:
 				_velocity.x = sign(_velocity.x) * MAX_VELOCITY
+
+
+func update_grounded_move_state():
+	if abs(_velocity.x) > WALK_VELOCITY + 50:
+		if not char_data.cur_state == char_data.CHAR_STATE.RUNNING:
+
+			if char_data.cur_state == char_data.CHAR_STATE.FALLING or char_data.cur_state == char_data.CHAR_STATE.DASHING:
+				char_data.change_state(char_data.CHAR_STATE.RUNNING)
+
+			else:
+				if sign(_velocity.x) == char_data.horizontal_state_:
+					char_data.change_state(char_data.CHAR_STATE.RUN_START)
+	
+	elif abs(_velocity.x) <= WALK_VELOCITY and abs(_velocity.x) >= 0:
+		
+		if char_data.cur_state == char_data.CHAR_STATE.RUNNING:
+			char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
+		else:
+			if sign(_velocity.x) == char_data.horizontal_state_:
+				char_data.change_state(char_data.CHAR_STATE.WALKING)
+
+	if abs(_velocity.x) == 0 or not sign(_velocity.x) == char_data.horizontal_state_:
+		if not char_data.cur_state == char_data.CHAR_STATE.STANDING and is_on_floor():
+			if char_data.cur_state == char_data.CHAR_STATE.RUNNING:
+				char_data.change_state(char_data.CHAR_STATE.RUN_STOP)
+			else:
+				if mvmt_buffer.size()> 0 and not mvmt_buffer[-1] in [1,2,3]:
+					char_data.change_state(char_data.CHAR_STATE.STANDING)
+
 
 #endregion
 
@@ -580,19 +611,12 @@ func decelerate(delta, decel_mod = 1):
 	if abs(_velocity.x) > 0 and is_on_floor():
 		var decel = WALK_DECEL * delta * decel_mod
 		var new_velocity = abs(_velocity.x) - decel
-		var decel_velocity = char_data.horizontal_state_ * new_velocity if new_velocity > 0 else 0
+		var decel_velocity = sign(_velocity.x) * new_velocity if new_velocity > 0 else 0
 		_velocity.x = decel_velocity
 
 
 #animations
 #region 
-func _on_Sprite_animation_finished():
-	#HACK reset speeds shouldn't be like this
-	if not current_animation in animation_player.get_animation_list():
-		char_data.animation_completed()
-
-	# current_animation = char_data.get_new_animation()
-	#play_new_sprite()
 
 
 #HACK, NEED TO HAVE A DIFFERENT WAY TO DEAL WITH CANCELLING MOVES

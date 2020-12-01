@@ -118,7 +118,8 @@ func _physics_process(delta):
 	else:
 		if not (char_data.cur_state == char_data.CHAR_STATE.DASHING or 
 			char_data.cur_state == char_data.CHAR_STATE.BACKDASHING or
-			char_data.cur_state == char_data.CHAR_STATE.ATTACKING): #TODO revisit this last one, if neeed be for getting hit out of air
+			char_data.cur_state == char_data.CHAR_STATE.ATTACKING): 
+				#TODO revisit this last one, if neeed be for getting hit out of air
 			char_data.change_air_state(char_data.AIR_STATE.IN_AIR)
 
 #Getters for GameManager
@@ -221,10 +222,6 @@ func _on_CharacterData_play_animation(new_anim):
 
 
 #THIS MAY CAUSE A POTENTIAL PROBLEM IF ANIMATIONS AND SPRITES DON'T LINE UP
-#TODO REMOVE ALL SPRITE-SIDE ANIMATIONS
-func _on_Sprite_animation_finished():
-	if not current_animation in animation_player.get_animation_list():
-		char_data.animation_completed()
 		
 #Overloaded to clear any external_movement_data
 func _on_AnimationPlayer_animation_finished(_anim_name):

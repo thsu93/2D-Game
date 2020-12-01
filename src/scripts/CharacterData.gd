@@ -180,6 +180,7 @@ func change_state(_new_state):
 			CHAR_STATE.STAGGERED_HIT: can_change = change_to_staggered_hit()
 			CHAR_STATE.COUNTERHIT  	: can_change = change_to_counterhit()
 			CHAR_STATE.DEAD  		: can_change = change_to_dead()
+
 	if can_change:
 		cur_state = _new_state
 		change_animation()
@@ -242,6 +243,7 @@ func change_to_running():
 		return false
 	else:
 		change_state(CHAR_STATE.RUN_START)
+		print("starting run")
 		return false
 
 #Can state change to CHAR_STATE.JUMPING  	
@@ -310,7 +312,6 @@ func change_to_run_stop():
 
 #Can state change to CHAR_STATE.TURNING  	
 #Currently: can do so from walking or standing
-#BUG: GIVES STANDING TURN WHEN JUMPING BUT NOT FALLING. DOES KNOW IT IS IN AIR. 
 func change_to_turning():
 	if cur_state == CHAR_STATE.JUMPING:
 		waiting_for_animation_completion = true
@@ -436,7 +437,6 @@ func change_animation():
 		new_animation = state_animation_dictionary[cur_state]
 	
 	var air_prefix = "Stand" if air_state == AIR_STATE.GROUNDED else "Jump"
-		#BUG ALL ATTACKS OUT OF DASH ARE REGISTERED AS 
 
 	if air_prefix + new_animation in animation_player_library:
 		new_animation = air_prefix + new_animation
