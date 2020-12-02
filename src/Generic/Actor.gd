@@ -90,6 +90,8 @@ func _ready():
 
 	animation_player.playback_speed = DEFAULT_ANIM_PLAYER_SPEED
 
+	no_grav = false
+
 # _physics_process is called after the inherited _physics_process function.
 # This allows the Player and Enemy scenes to be affected by gravity.
 func _physics_process(delta):

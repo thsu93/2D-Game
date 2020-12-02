@@ -13,6 +13,23 @@ var MOVE_DICTIONARY = {
 	"Corkscrew" : preload("res://src/attacks/player/corkscrew.gd").new(),
 	"Combo (Light)" : preload("res://src/attacks/player/combolight.gd").new(),
 	"Combo (Heavy)": preload("res://src/attacks/player/comboheavy.gd").new(),
+	"Parry" : preload("res://src/attacks/player/parry.gd").new(),
+}
+
+var TEMP_MOVESET_1 = {
+	"Name": "Temp 1",
+	5: preload("res://src/attacks/player/jab.gd").new(),
+	2: preload("res://src/attacks/player/parry.gd").new(),
+	6: preload("res://src/attacks/player/hook.gd").new(),
+	8: preload("res://src/attacks/player/shoryuken.gd").new(),
+}
+
+var TEMP_MOVESET_2 = {
+	"Name": "Temp 2",
+	5: preload("res://src/attacks/player/jab.gd").new(),
+	2: preload("res://src/attacks/player/corkscrew.gd").new(),
+	6: preload("res://src/attacks/player/hook.gd").new(),
+	8: preload("res://src/attacks/player/shoryuken.gd").new(),
 }
 
 #TODO evaluate this
@@ -27,6 +44,18 @@ var special_movelist = [MOVE_DICTIONARY["Corkscrew"],
 						MOVE_DICTIONARY["Overhead"],
 						MOVE_DICTIONARY["Combo (Heavy)"],
 					]
+
+var normal_moveset = [
+					TEMP_MOVESET_1,
+					TEMP_MOVESET_1,
+					TEMP_MOVESET_1,
+]
+
+var special_moveset = [
+					TEMP_MOVESET_2,
+					TEMP_MOVESET_2,
+					TEMP_MOVESET_2,
+]
 
 #The current position within the movelist.
 var cur_move_num = 0
@@ -110,10 +139,27 @@ func select_prev_move():
 	cur_move_num = cur_move_num -1 if cur_move_num > 0 else 0
 	# cur_attack = movelist[cur_move_num]
 
-#Determines if the player's current attack is a special (right click) or normal (left click) attack.
 #Called when player clicks either mouse button
-func select_attack(special = false):
-	cur_attack = normal_movelist[cur_move_num] if not special else special_movelist[cur_move_num]
+#Receives whether R click or L click, and which directional button the player was pushing at time of attack
+#Checks against movelist
+#TODO only has down, side, up, neutral actions right now. More complex directional inputs?
+func select_attack(rclick = false, dir_input = 5):
+	var dir = dir_input
+	if dir in [1,2,3]:
+		dir = 2
+	if dir in [7,8,9]:
+		dir = 8
+	if dir in [4,6]:
+		dir = 6
+
+	cur_attack = normal_moveset[cur_move_num][dir] if not rclick else special_moveset[cur_move_num][dir]
+
+
+
+#Determines if the player's current attack is a special (right click) or normal (left click) attack.
+#DEPRECATED
+# func select_attack(special = false):
+# 	cur_attack = normal_movelist[cur_move_num] if not special else special_movelist[cur_move_num]
 
 
 

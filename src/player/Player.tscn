@@ -1128,8 +1128,8 @@ tracks/0/keys = {
 "values": [ "Walk" ]
 }
 
-[sub_resource type="RectangleShape2D" id=15]
-extents = Vector2( 65.5655, 55.3936 )
+[sub_resource type="RectangleShape2D" id=24]
+extents = Vector2( 124.667, 204.825 )
 
 [sub_resource type="SpriteFrames" id=16]
 animations = [ {
@@ -1160,6 +1160,7 @@ position = Vector2( 0, -0.25 )
 collision_mask = 1025
 script = ExtResource( 71 )
 speed = Vector2( 150, 350 )
+movement_locked = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Backdash = ExtResource( 3 )
@@ -1209,10 +1210,10 @@ smoothing_speed = 8.0
 script = ExtResource( 19 )
 
 [node name="Sprite" type="AnimatedSprite" parent="."]
-position = Vector2( -0.917702, -20.2503 )
+position = Vector2( 0, -20 )
 scale = Vector2( 0.131, 0.131 )
 frames = ExtResource( 1 )
-animation = "StandIdle"
+animation = "Shoryuken"
 speed_scale = 2.0
 
 [node name="Hitbox" type="Area2D" parent="Sprite"]
@@ -1225,9 +1226,9 @@ script = ExtResource( 22 )
 speed_scale = 3.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite/Hitbox"]
-position = Vector2( -181.032, -92.8011 )
+position = Vector2( -140.332, -44.6038 )
 scale = Vector2( 1.13819, 1.02605 )
-shape = SubResource( 15 )
+shape = SubResource( 24 )
 disabled = true
 
 [node name="Effects" type="AnimatedSprite" parent="Sprite"]
@@ -1249,6 +1250,7 @@ disabled = true
 [node name="CharacterData" type="Node" parent="."]
 script = ExtResource( 377 )
 max_HP = 100
+uncancellable = true
 
 [node name="PlatformDetector" type="RayCast2D" parent="."]
 position = Vector2( 0.132431, -8.13243 )

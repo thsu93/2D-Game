@@ -151,6 +151,7 @@ func _physics_process(delta):
 
 		#HACK This deals with trying to attack during damage state idle, but probably not the best.
 		#Should add something within Char_data to force unbreakable damage state
+		#TODO add some way to do a burst or something in here
 		if char_data.cur_state in char_data.DAMAGE_STATES:
 			char_data.uncancellable = true
 
@@ -343,7 +344,7 @@ func check_start_dash():
 #Evaluates which side the player is currently on, and turns the player
 #TODO Will ignore turning if guarding
 func check_side():
-	var side_left = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [4,7]
+	var side_left = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [4,7] #Do not turn while guarding
 	var side_right = mvmt_buffer.size() > 0 and mvmt_buffer[-1] in [6,9]
 
 	if _velocity.x < 0 and side_left and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.R):
@@ -353,8 +354,6 @@ func check_side():
 	
 	if _velocity.x > 0 and side_right and (char_data.horizontal_state_ == char_data.HORIZONTAL_STATE.L):
 		char_data.change_state(char_data.CHAR_STATE.TURNING)
-			
-			# char_data.change_horiz_state(char_data.HORIZONTAL_STATE.R)
 
 #Check if player is swapping moves via the scroll wheel
 #Is not a part of the buffer system
@@ -390,13 +389,17 @@ func check_new_attack():
 	var rclick = 2 in cmd_buffer
 	var lclick = 3 in cmd_buffer
 
+	
+		
 
 	if not char_data.uncancellable:
 		if lclick or rclick:
 
-			#Did the player click R or L
-			#R click is of a higher priority
-			char_data.select_attack(rclick)
+			var dir = 5
+			if mvmt_buffer.size() > 0:
+				dir = mvmt_buffer[-1]
+
+			char_data.select_attack(rclick, dir)
 
 			attack_data = char_data.get_move_data()
 
@@ -415,7 +418,10 @@ func check_new_attack():
 				
 			if matching_move_state:
 
-				char_data.change_state(char_data.CHAR_STATE.ATTACKING)
+				var attacked = char_data.change_state(char_data.CHAR_STATE.ATTACKING)
+
+				if attacked:
+					char_data.process_attack()
 
 				char_data.uncancellable = true
 
@@ -430,6 +436,7 @@ func check_new_attack():
 
 				else:
 					flush_buffer(true, true)
+					_velocity.x = 0
 
 			#TODO way to store "next" move:
 			#Should this always be the last move input during buffer time? the first?

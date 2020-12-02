@@ -185,6 +185,8 @@ func change_state(_new_state):
 		cur_state = _new_state
 		change_animation()
 
+	return can_change
+
 #region specific change to state checks
 
 #Can state change to CHAR_STATE.STANDING

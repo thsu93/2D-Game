@@ -459,7 +459,7 @@ animations = [ {
 "frames": [ ExtResource( 198 ), ExtResource( 200 ), ExtResource( 365 ), ExtResource( 350 ), ExtResource( 168 ), ExtResource( 351 ), ExtResource( 131 ), ExtResource( 165 ), ExtResource( 361 ), ExtResource( 178 ), ExtResource( 159 ), ExtResource( 191 ), ExtResource( 190 ), ExtResource( 181 ) ],
 "loop": true,
 "name": "Shoryuken",
-"speed": 5.0
+"speed": 10.0
 }, {
 "frames": [ ExtResource( 21 ), ExtResource( 277 ), ExtResource( 274 ), ExtResource( 36 ), ExtResource( 3 ) ],
 "loop": true,
