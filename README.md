@@ -1,4 +1,4 @@
-# Physics 2D Character Action Game
+# 2D Character Action Game Prototype
 
 New game concept. Readme to be updated.
 
