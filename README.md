@@ -1,4 +1,4 @@
-# Physics Platformer
+# Physics 2D Character Action Game
 
 New game concept. Readme to be updated.
 
