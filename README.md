@@ -18,5 +18,5 @@ While also taking advantage of the asymmetric, single-player aspect to:
 
 
 
-Please note that this game will not compile, as sprites have not been included in the Github repo due to size/copyright constraints. 
+Please note that this game will not compile; sprites have not been included in the Github repo due to size constraints and copyright concerns. 
 -------------
