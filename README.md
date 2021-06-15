@@ -1,9 +1,5 @@
 # 2D Character Action Game Prototype
 
-
-Please note game will not compile as sprites have not been included in this github repo due to size/copyright constraints. 
--------------
-
 Prototype based around combining concepts from highly mechanically complex but somewhat obtuse 2-D fighting games (i.e. Street Fighter, Guilty Gear, MUGEN engine) and accessible but at times overly simplistic platformers (i.e. Hollow Knight, Cuphead) to create a single-player experience that emphasizes and rewards dynamism and situational analysis.
 
 Game objectives are:
@@ -19,3 +15,8 @@ While also taking advantage of the asymmetric, single-player aspect to:
 * Give options for customization of character moveset
 * Reward progression in game with new or improved attacks
 
+
+
+
+Please note that this game will not compile, as sprites have not been included in the Github repo due to size/copyright constraints. 
+-------------
