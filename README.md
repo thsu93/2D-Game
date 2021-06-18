@@ -15,7 +15,11 @@ While also taking advantage of the asymmetric, single-player aspect to:
 * Give options for customization of character moveset
 * Reward progression in game with new or improved attacks
 
-
+Completion
+* Entity State Machine: 90% - Counterhit states may need some tweaking, otherwise all likely states should be present
+* Combat System: 70% - Re-evaluate the knockback system, damage scaling. 
+* Time-slow Mechanic: 80% - Visual effect on activation. Clearer indication of duration remaining? 
+* Artwork: 10% - Find artist
 
 
 Please note that this game will not compile; sprites have not been included in the Github repo due to size constraints and copyright concerns. 
